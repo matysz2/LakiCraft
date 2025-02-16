@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-LakicraftApplication<lakicraft>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.lakicraft.LakicraftApplication",
+            "projectName": "lakicraft",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

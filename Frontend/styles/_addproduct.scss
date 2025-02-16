@@ -1,0 +1,80 @@
+.add-product-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 10%;
+    margin-bottom: 50%;
+  
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  
+    form {
+      display: flex;
+      flex-direction: column;
+  
+      // Każdy element formularza – etykieta i input – w osobnym kontenerze
+      .form-group {
+        margin-bottom: 20px;
+  
+        // Upewnij się, że etykieta zajmuje cały wiersz
+        label {
+          display: block;
+          font-weight: bold;
+          margin-bottom: 5px;
+        }
+  
+        // Kontener na input wyrównany do prawej
+        .input-row {
+          display: flex;
+          justify-content: flex-end; // wyrównanie inputu do prawej strony
+          gap: 10px;
+          flex-wrap: wrap;
+  
+          input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 500px;
+  
+            @media (max-width: 600px) {
+              width: 100%; // na małych ekranach input zajmuje całą szerokość
+            }
+          }
+        }
+      }
+  
+      .error {
+        color: red;
+        font-size: 0.9em;
+        margin-top: 5px;
+      }
+  
+      .submit-btn {
+        margin-top: 50px;
+        padding: 10px;
+        font-size: 18px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+  
+        &:hover {
+          background-color: #0056b3;
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .add-product-container {
+      padding: 15px;
+    }
+  }
+  

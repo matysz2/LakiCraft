@@ -1,0 +1,166 @@
+@charset "UTF-8";
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px; // Mniejszy padding
+  background-image: url(../image/headers.webp);
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+  position: fixed; // HEADER TERAZ JEST STAŁY!
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; // Jest zawsze na wierzchu
+}
+
+.dashboard {
+  padding-top: 80px; // Dopasuj do wysokości headera!
+}
+
+.header .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header .logo img {
+  width: 40px;
+  height: 40px;
+}
+
+.header .logo span {
+  font-size: 1.8rem;
+  color: white;
+  font-weight: bold;
+}
+
+.header .user-menu {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.header .user-menu .menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.header .user-menu .dropdown-menu {
+  display: flex;
+  gap: 25px;
+  list-style: none;
+}
+
+.header .user-menu .dropdown-menu li {
+  padding: 8px 15px;
+  cursor: pointer;
+}
+
+.header .user-menu .dropdown-menu li a,
+.header .user-menu .dropdown-menu li button {
+  text-decoration: none;
+  color: white;
+  display: block;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.header .user-menu .dropdown-menu li a:hover,
+.header .user-menu .dropdown-menu li button:hover {
+  background: #555;
+  color: #f4f4f4;
+}
+
+.header .user-menu.open .dropdown-menu {
+  display: block;
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #333;
+  border-radius: 8px;
+  padding: 10px 0;
+  width: 200px;
+}
+
+.header .user-menu .logout-btn {
+  color: red;
+}
+
+/* 🔻 MEDIA QUERIES DLA MOBILNYCH 🔻 */
+@media (max-width: 768px) {
+  .header {
+    padding: 10px 20px; // Mniejszy padding na telefonach
+  }
+
+  .header .user-menu {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    position: relative;
+  }
+
+  .header .user-menu .menu-toggle {
+    display: block;
+  }
+
+  .header .user-menu .dropdown-menu {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #333;
+    border-radius: 0;
+    padding: 10px 0;
+    z-index: 999;
+  }
+
+  .header .user-menu.open .dropdown-menu {
+    display: flex;
+  }
+
+  .header .user-menu .dropdown-menu li {
+    text-align: center;
+    width: 100%;
+    padding: 12px 0;
+  }
+
+  .header .user-menu .dropdown-menu li a {
+    width: 100%;
+    display: block;
+    text-align: center;
+  }
+
+  /* Stylizacja dla przycisku .logout-btn */
+  .header .user-menu .logout-btn {
+    width: 100%;
+    padding: 10px 0;
+    background-color: #e74c3c; // Kolor tła przycisku
+    color: #fff; // Kolor tekstu przycisku
+    border: none; // Bez obramowania
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .header .user-menu .logout-btn:hover {
+    background-color: #c0392b; // Kolor tła po najechaniu
+  }
+}
+
+
+.dashboard {
+  padding-top: 80px; // Upewniamy się, że treść zaczyna się pod nagłówkiem
+}

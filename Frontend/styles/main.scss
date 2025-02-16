@@ -1,0 +1,288 @@
+@import "./variables";
+@import "./header";
+@import "./footer";
+@import "./reset";
+@import "./accountSeller";
+@import "./SellerDashboard";
+@import "./products";
+@import "./addproduct";
+
+
+main {
+  padding: 40px;
+  background-color: #f9f9f9; /* Jasne tło dla całego main */
+
+  /* Hero Section */
+  .hero {
+    background-image: url('../image/header.webp');
+    background-size: contain;
+    color: black;
+    opacity: 0.9; // Poprawiona przejrzystość
+    text-align: center;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-top: 100px;
+
+    h1 {
+      font-size: 3rem;
+    }
+
+    p {
+      font-size: 2rem;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: $button-background;
+      color: $button-text;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 1rem;
+      transition: background-color 0.3s, color 0.3s;
+
+      &:hover {
+        background-color: $secondary-color;
+        color: white;
+      }
+    }
+  }
+
+  /* About Us, Services & Contact Sections */
+  .about-us,
+  .services,
+  .contact {
+    margin: 40px 0;
+    text-align: center;
+  }
+
+  .about-us p,
+  .services p {
+    font-size: 1.1rem;
+  }
+
+  /* Services Section */
+  .services {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .service-list {
+      display: flex;
+      justify-content: space-around;
+      gap: 30px;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .service-item {
+      background-color: #f4f4f4;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      width: 30%;
+      min-height: 180px; // Gwarantuje równe wysokości
+      text-align: left;
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      }
+
+      h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 1.1rem;
+      }
+    }
+  }
+
+  /* Contact Section */
+  .contact {
+    text-align: center;
+    margin-top: 40px;
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 500px;
+      margin: 0 auto; // Wyśrodkowanie formularza
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      align-items: center; // Opcjonalnie - jeśli chcesz, by elementy formularza były wyśrodkowane
+      justify-content: center;
+    }
+
+    input,
+    textarea {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+      width: 100%;
+    }
+
+    button {
+      padding: 15px;
+      background-color: $primary-color;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      width: 100%;
+      transition: background-color 0.3s, transform 0.2s;
+
+      &:hover {
+        background-color: $secondary-color;
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  /* Login Modal */
+  .login-modal {
+    position: fixed; // Ustawia modal względem viewportu
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); // Przyciemnione tło
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; // Wysoki z-index, aby modal był na wierzchu
+
+    .login-content {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      text-align: center;
+      width: 300px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+      h2 {
+        margin-bottom: 20px;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1rem;
+        width: 100%;
+      }
+
+      button {
+        padding: 10px 20px;
+        background-color: $primary-color;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        width: 100%;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: $secondary-color;
+        }
+      }
+
+      .close {
+        margin-top: 10px;
+        padding: 5px 10px;
+        background-color: #ccc;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        width: 100%;
+
+        &:hover {
+          background-color: #bbb;
+        }
+      }
+    }
+  }
+
+  /* Media Queries */
+  @media (max-width: $breakpoint-mobile) {
+    padding: 20px;
+
+    .hero {
+      padding: 40px 20px;
+      
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+    }
+
+    .services {
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+
+      .service-list {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .service-item {
+        width: 100%;
+      }
+    }
+
+    .contact form {
+      padding: 10px;
+    }
+
+    .contact input,
+    .contact textarea {
+      font-size: 0.9rem;
+    }
+
+    .contact button {
+      padding: 12px;
+    }
+
+    .login-modal .login-content {
+      width: 90%;
+    }
+  }
+  .error-message {
+    color: red;
+    font-size: 1.2rem;
+    margin-top: 10px;
+  }
+}
