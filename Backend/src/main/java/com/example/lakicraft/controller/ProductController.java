@@ -3,11 +3,10 @@ package com.example.lakicraft.controller;
 import com.example.lakicraft.model.Product;
 import com.example.lakicraft.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.data.jpa.repository.JpaRepository; // Aby korzystać z JpaRepository
+ // Aby korzystać z JpaRepository
 
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +17,7 @@ import java.util.Optional;
 public class ProductController {
 
    @Autowired
-    private ProductRepository productRepository;
+public ProductRepository productRepository;
 
     // Pobranie wszystkich produktów dla użytkownika na podstawie user_id z nagłówka
     @GetMapping
@@ -44,15 +43,6 @@ public class ProductController {
             return ResponseEntity.ok(product.get()); // Zwróć znaleziony produkt
         }
         return ResponseEntity.notFound().build(); // Jeśli produkt nie istnieje, zwróć 404 Not Found
-    }
-
-    // Dodanie nowego produktu
-    @PostMapping
-    public ResponseEntity<Product> addProduct(@RequestBody Product product, @RequestHeader("user_id")Long userId) {
-        // Ustawiamy userId przed zapisaniem
-        product.setUserId(userId);
-        Product savedProduct = productRepository.save(product); // Zapisz produkt w bazie danych
-        return ResponseEntity.status(201).body(savedProduct); // Zwróć zapisany produkt z kodem 201 (Created)
     }
 
     // Edytowanie produktu
@@ -120,6 +110,16 @@ public class ProductController {
         existingProduct.setBrand(product.getBrand());
 
         return productRepository.save(existingProduct); // Zapisujemy zaktualizowany produkt
+    }
+    @PostMapping
+    public ResponseEntity<String> addProduct(@RequestBody Product product, @RequestHeader("user_id") Long userId) {
+        try {
+            product.setUserId(userId); // Przypisujemy userId z nagłówka
+            productRepository.save(product); // Zapisujemy produkt do bazy danych
+            return ResponseEntity.ok("Produkt dodany pomyślnie!");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Błąd przy dodawaniu produktu");
+        }
     }
 }
 

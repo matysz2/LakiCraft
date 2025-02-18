@@ -3,6 +3,12 @@ package com.example.lakicraft.model;
 import jakarta.persistence.*;
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+
+import com.example.lakicraft.controller.ProductController;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -101,5 +107,13 @@ public class Product {
 
     public void setPackaging(Double packaging) {
         this.packaging = packaging;
+    }
+
+    @PostMapping
+    public ResponseEntity<Product> addProduct(ProductController productController, Long userId) {
+        // Ustawiamy userId przed zapisaniem
+        setUserId(userId);
+        Product savedProduct = productController.productRepository.save(this); // Zapisz produkt w bazie danych
+        return ResponseEntity.status(201).body(savedProduct); // Zwróć zapisany produkt z kodem 201 (Created)
     }
 }
