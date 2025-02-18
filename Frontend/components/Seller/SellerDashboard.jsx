@@ -127,9 +127,10 @@ const SellerDashboard = () => {
           <div className="products">
             {products.map((product) => (
               <div className="product-item" key={product.id}>
-                <h4>Kod: {product.kod}</h4>
+                <h3>Kod: {product.kod}</h3>
                 <h3>Nazwa: {product.name}</h3>
                 <p>Stan: {product.stock} sztuk</p>
+                <p>Opakowanie: {product.packaging} kg/l</p>
                 <p>Cena: {product.price} zł</p>
               </div>
             ))}

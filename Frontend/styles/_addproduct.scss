@@ -36,7 +36,7 @@
           flex-wrap: wrap;
   
           input {
-            padding: 10px;
+            padding: 50px;
             border: 1px solid #ccc;
             border-radius: 5px;
             width: 500px;
@@ -46,6 +46,9 @@
             }
           }
         }
+      }
+      .input-group {
+        margin-top: 20px;
       }
   
       .error {

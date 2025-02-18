@@ -16,8 +16,26 @@ const MainContent = () => {
     if (user) {
       setUserData(user);
       setIsLoggedIn(true);
+      // Przekierowanie w zależności od roli
+      switch (user.role) {
+        case "admin":
+          navigate("/admin-dashboard");
+          break;
+        case "stolarz":
+          navigate("/carpenter-dashboard");
+          break;
+        case "lakiernik":
+          navigate("/lacquerer-dashboard");
+          break;
+        case "sprzedawca":
+          navigate("/seller-dashboard");
+          break;
+        default:
+          navigate("/");
+          break;
+      }
     }
-  }, []);
+  }, [navigate]);  // Dodajemy 'navigate' do zależności, aby uniknąć błędów
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -29,16 +47,16 @@ const MainContent = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         setUserData(data.user);
         localStorage.setItem("userData", JSON.stringify(data.user)); // Zapisujemy dane w localStorage
         setIsLoggedIn(true);
         setShowLoginModal(false);
         setErrorMessage("");
-  
+
         // Przekierowanie w zależności od roli
         switch (data.user.role) {
           case "admin":
@@ -65,18 +83,12 @@ const MainContent = () => {
       console.error("Błąd połączenia z serwerem:", error);
     }
   };
-  
 
   const handleLogout = () => {
     localStorage.removeItem("userData");
     setUserData(null);
     setIsLoggedIn(false);
     navigate("/");
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   };
 
   return (
@@ -86,6 +98,9 @@ const MainContent = () => {
         <p>Twoje miejsce na znalezienie najlepszego lakieru, lakiernika i stolarza</p>
         {!isLoggedIn && (
           <button onClick={() => setShowLoginModal(true)}>Zaloguj się</button>
+        )}
+        {isLoggedIn && (
+          <button onClick={handleLogout}>Wyloguj się</button>
         )}
       </section>
 
@@ -156,17 +171,6 @@ const MainContent = () => {
               Zamknij
             </button>
           </div>
-        </section>
-      )}
-
-      {/* User Info Section */}
-      {userData && (
-        <section className="user-info">
-          <h2>Witaj, {userData.name}!</h2>
-          <p>Email: {userData.email}</p>
-          <p>Rola: {userData.role}</p>
-          <p>Data utworzenia: {formatDate(userData.createdAt)}</p>
-          <button onClick={handleLogout}>Wyloguj się</button>
         </section>
       )}
     </main>

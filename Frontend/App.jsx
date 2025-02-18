@@ -10,6 +10,7 @@ import SellerDashboard from "./components/Seller/SellerDashboard";
 import Account from "./components/Seller/Account"; 
 import Products from "./components/Seller/Products"; 
 import AddProduct from "./components/Seller/AddProduct"; 
+import OrderList from "./components/Seller/OrderList"; 
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
@@ -47,6 +48,8 @@ const App = () => {
         <Route path="/account" element={<Account />} /> 
         <Route path="/products" element={<Products />} /> 
         <Route path="/add-product" element={<AddProduct />} /> 
+        <Route path="/add-product" element={<AddProduct />} /> 
+        <Route path="/orders" element={<OrderList />} /> 
       </Routes>
 
       <Footer />

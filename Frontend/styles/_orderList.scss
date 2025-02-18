@@ -1,0 +1,119 @@
+@import "./variables";
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  margin-top: 140px;
+  margin-bottom: 50%;
+}
+
+.order-card {
+  width: 100%;
+  background-color: $background-light;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    color: $primary-color;
+    margin-bottom: 10px;
+  }
+
+  .more-btn {
+    background-color: $secondary-color;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+
+    &:hover {
+      background-color: darken($secondary-color, 10%);
+    }
+  }
+
+  .order-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+
+    button {
+      padding: 8px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+
+      &.processing {
+        background-color: $primary-color;
+        color: white;
+      }
+
+      &.completed {
+        background-color: $success-color;
+        color: white;
+      }
+
+      &.cancel {
+        background-color: $error-color;
+        color: white;
+      }
+
+      &.message {
+        background-color: $info-color;
+        color: white;
+      }
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+}
+.toggle-details {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.toggle-details:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .order-card {
+    padding: 10px;
+
+    .order-header {
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .order-actions {
+      flex-direction: column;
+      gap: 10px;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

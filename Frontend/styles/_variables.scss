@@ -1,11 +1,19 @@
-// styles/_variables.scss
+$primary-color: #4CAF50;  // Zielony - główny kolor
+$secondary-color: #45a049; // Ciemniejszy zielony - przyciski akcji
+$background-color: #f4f4f4; // Tło strony
+$text-color: #333; // Kolor tekstu
+$button-background: white; // Tło przycisków
+$button-text: $primary-color; // Tekst na przyciskach
 
-$primary-color: #4CAF50;
-$secondary-color: #45a049;
-$background-color: #f4f4f4;
-$text-color: #333;
-$button-background: white;
-$button-text: $primary-color;
+// Dodatkowe kolory dla statusów zamówień
+$success-color: #28a745; // Zielony - zrealizowano
+$error-color: #dc3545; // Czerwony - anulowano
+$info-color: #007bff; // Niebieski - napisanie wiadomości
+$border-color: #ddd; // Kolor obramowania
+$background-light: #ffffff; // Jasne tło dla kart
 
+// Media queries
 $breakpoint-mobile: 768px;
+
+// Fonty
 $font-family: Arial, sans-serif;

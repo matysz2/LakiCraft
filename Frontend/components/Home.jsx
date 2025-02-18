@@ -11,22 +11,32 @@ const MainContent = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // Sprawdzamy, czy użytkownik jest zalogowany
+  // Sprawdzamy, czy użytkownik jest zalogowany lub ma aktywną sesję
   useEffect(() => {
-    // Sprawdzamy sesję użytkownika (wysyłamy zapytanie do backendu)
     const checkSession = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/user/check-session", {
-          method: "GET",
-          credentials: "include", // Wysyłanie cookies
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          setUserData(data.user);
+        const storedUserData = JSON.parse(localStorage.getItem("userData"));
+        if (storedUserData) {
+          setUserData(storedUserData);
           setIsLoggedIn(true);
+          // Przekierowanie w zależności od roli
+          redirectUser(storedUserData.role);
         } else {
-          setIsLoggedIn(false);
+          // Sprawdzenie sesji z backendu, jeżeli brak w localStorage
+          const response = await fetch("http://localhost:8080/api/user/check-session", {
+            method: "GET",
+            credentials: "include", // Wysyłanie cookies
+          });
+
+          const data = await response.json();
+          if (response.ok && data.user) {
+            setUserData(data.user);
+            setIsLoggedIn(true);
+            localStorage.setItem("userData", JSON.stringify(data.user)); // Zapisujemy dane w localStorage
+            redirectUser(data.user.role);
+          } else {
+            setIsLoggedIn(false);
+          }
         }
       } catch (error) {
         console.error("Błąd połączenia z serwerem:", error);
@@ -36,6 +46,26 @@ const MainContent = () => {
 
     checkSession();
   }, []);
+
+  const redirectUser = (role) => {
+    switch (role) {
+      case "admin":
+        navigate("/admin-dashboard");
+        break;
+      case "stolarz":
+        navigate("/carpenter-dashboard");
+        break;
+      case "lakiernik":
+        navigate("/lacquerer-dashboard");
+        break;
+      case "sprzedawca":
+        navigate("/seller-dashboard");
+        break;
+      default:
+        navigate("/");
+        break;
+    }
+  };
 
   const handleLoginClick = () => {
     setShowLoginModal(true);
@@ -66,23 +96,7 @@ const MainContent = () => {
         localStorage.setItem("userData", JSON.stringify(data.user));
 
         // Przekierowanie na podstawie roli
-        switch (data.user.role) {
-          case "admin":
-            navigate("/admin-dashboard");
-            break;
-          case "stolarz":
-            navigate("/carpenter-dashboard");
-            break;
-          case "lakiernik":
-            navigate("/lacquerer-dashboard");
-            break;
-          case "sprzedawca":
-            navigate("/seller-dashboard");
-            break;
-          default:
-            navigate("/");
-            break;
-        }
+        redirectUser(data.user.role);
       } else {
         setErrorMessage(data.message);
       }
@@ -113,7 +127,76 @@ const MainContent = () => {
     }
   };
 
+  return (
+    <main>
+      <section className="hero">
+        <h1>Witamy w LakiCraft!</h1>
+        <p>Twoje miejsce na znalezienie najlepszego lakieru, lakiernika i stolarza</p>
+        {!isLoggedIn && (
+          <button onClick={handleLoginClick}>Zaloguj się</button>
+        )}
+      </section>
 
+      {/* About Us Section */}
+      <section className="about-us">
+        <h2>O nas</h2>
+        <p>
+          LakiCraft to platforma, która łączy stolarzy, lakierników i sprzedawców
+          lakierów. Ułatwiamy proces zakupu lakierów i wynajmowania lakierników,
+          aby stworzyć piękne i trwałe wykończenia dla każdego projektu stolarskiego.
+        </p>
+      </section>
+
+      {/* Services Section */}
+      <section className="services">
+        <h2>Nasze Usługi</h2>
+        <div className="service-list">
+          <div className="service-item">
+            <h3>Sprzedawcy Lakierów</h3>
+            <p>Sprzedawcy mogą wystawiać swoje produkty.</p>
+          </div>
+          <div className="service-item">
+            <h3>Lakiernicy</h3>
+            <p>Lakiernicy mogą dodać wolne terminy i cennik.</p>
+          </div>
+          <div className="service-item">
+            <h3>Stolarze</h3>
+            <p>Stolarze mogą znaleźć odpowiednie lakiery i lakierników.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <section className="login-modal">
+          <div className="login-content">
+            <h2>Logowanie</h2>
+            <form onSubmit={handleSubmitLogin}>
+              <input
+                type="email"
+                placeholder="E-mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Hasło"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button type="submit">Zaloguj się</button>
+            </form>
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
+            <button className="close" onClick={() => setShowLoginModal(false)}>
+              Zamknij
+            </button>
+          </div>
+        </section>
+      )}
+    </main>
+  );
 };
 
 export default MainContent;
