@@ -88,4 +88,9 @@ public class Sale {
     public void setSaleDate(LocalDateTime saleDate) {
         this.saleDate = saleDate;
     }
+
+    public void setUserId(Integer id2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setUserId'");
+    }
 }

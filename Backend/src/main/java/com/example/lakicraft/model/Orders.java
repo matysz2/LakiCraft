@@ -37,9 +37,8 @@ public class Orders {
     @Column(nullable = false)
     private BigDecimal totalPrice;
 
-    @ManyToOne
-    @JoinColumn(name = "status_id", nullable = false)
-    private OrderStatus status;
+    @Column(nullable = false)
+    private String status;
 
     @Column(nullable = false)
     private String shippingAddress;
@@ -54,4 +53,8 @@ public class Orders {
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller; // Powiązanie z tabelą User, który pełni rolę sprzedawcy
+
+
+
+
 }
