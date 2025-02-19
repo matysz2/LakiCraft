@@ -6,10 +6,13 @@ const OrderList = () => {
   const [orders, setOrders] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
+  const [hiddenButtons, setHiddenButtons] = useState(() => {
+    return JSON.parse(localStorage.getItem("hiddenButtons")) || {};
+  });
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Sprawdzenie, czy użytkownik jest zalogowany
     const storedUserData = localStorage.getItem("userData");
     if (!storedUserData) {
       navigate("/");
@@ -22,7 +25,6 @@ const OrderList = () => {
       return;
     }
 
-    // Pobranie zamówień
     fetch("http://localhost:8080/api/orders", {
       method: "GET",
       headers: {
@@ -49,28 +51,38 @@ const OrderList = () => {
       });
   }, [navigate]);
 
-  // Funkcja do rozwinięcia/zwinięcia szczegółów zamówienia
   const toggleOrderDetails = (orderId) => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
 
-  // Funkcja do zmiany statusu zamówienia
   const updateOrderStatus = (orderId, status) => {
     fetch(`http://localhost:8080/api/orders/${orderId}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "Order-Id": orderId,
+        "Order-Status": status,
       },
-      body: JSON.stringify({ status }), // Wysłanie nowego statusu
+      body: JSON.stringify({ status }), // Wysyłamy status w formacie JSON
     })
       .then((res) => res.json())
-      .then((data) => {
-        // Po pomyślnej zmianie statusu aktualizujemy listę zamówień
+      .then(() => {
         setOrders((prevOrders) =>
           prevOrders.map((order) =>
-            order.id === orderId ? { ...order, status: { ...order.status, status } } : order
+            order.id === orderId ? { ...order, status } : order
           )
         );
+
+        setHiddenButtons((prev) => {
+          const newHidden = {
+            ...prev,
+            [orderId]: status === "Anulowane"
+              ? ["W realizacji", "Zrealizowane", "Anulowane"]
+              : [...(prev[orderId] || []), status],
+          };
+          localStorage.setItem("hiddenButtons", JSON.stringify(newHidden)); // Zapisujemy do localStorage
+          return newHidden;
+        });
       })
       .catch((error) => {
         console.error("Błąd zmiany statusu zamówienia:", error);
@@ -78,17 +90,15 @@ const OrderList = () => {
       });
   };
 
-  // Funkcja do wysłania wiadomości
   const sendMessage = (orderId) => {
     const message = prompt("Wpisz wiadomość do klienta:");
     if (message) {
-      // Wysyłamy wiadomość do klienta
       fetch(`http://localhost:8080/api/orders/${orderId}/message`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message }), // Wysłanie wiadomości
+        body: JSON.stringify({ message }),
       })
         .then((res) => res.json())
         .then(() => {
@@ -105,7 +115,6 @@ const OrderList = () => {
     <div className="order-list">
       <SellerHeader />
       <div className="order-list-content">
-        {/* Komunikat o błędzie */}
         {errorMessage ? (
           <div className="error-message">❌ {errorMessage}</div>
         ) : orders.length === 0 ? (
@@ -119,19 +128,16 @@ const OrderList = () => {
                 <span>Data zamówienia: {order.orderDate ? new Date(order.orderDate).toLocaleDateString() : "Brak daty"}</span>
               </div>
 
-              {/* Przyciski rozwijania/zwijania */}
               <button className="toggle-details" onClick={() => toggleOrderDetails(order.id)}>
                 {expandedOrderId === order.id ? "Zwiń" : "Rozwiń"}
               </button>
 
-              {/* Szczegóły zamówienia */}
               {expandedOrderId === order.id && (
                 <div className="order-details">
                   <div><strong>Adres wysyłki:</strong> {order.shippingAddress}</div>
-                  <div><strong>Status:</strong> {order.status ? order.status.status : "Brak statusu"}</div>
+                  <div><strong>Status:</strong> {order.status || "Brak statusu"}</div>
                   <div><strong>Łączna cena:</strong> {order.totalPrice ? order.totalPrice.toFixed(2) : "Brak ceny"}</div>
 
-                  {/* Lista produktów w zamówieniu */}
                   <div>
                     <strong>Produkty:</strong>
                     {order.orderItems?.length > 0 ? (
@@ -150,9 +156,21 @@ const OrderList = () => {
               )}
 
               <div className="order-actions">
-                <button className="processing" onClick={() => updateOrderStatus(order.id, "W realizacji")}>W realizacji</button>
-                <button className="completed" onClick={() => updateOrderStatus(order.id, "Zrealizowane")}>Zrealizowano</button>
-                <button className="cancel" onClick={() => updateOrderStatus(order.id, "Anulowane")}>Anuluj</button>
+                {!hiddenButtons[order.id]?.includes("W realizacji") && (
+                  <button className="processing" onClick={() => updateOrderStatus(order.id, "W realizacji")}>
+                    W realizacji
+                  </button>
+                )}
+                {!hiddenButtons[order.id]?.includes("Zrealizowane") && (
+                  <button className="completed" onClick={() => updateOrderStatus(order.id, "Zrealizowane")}>
+                    Zrealizowano
+                  </button>
+                )}
+                {!hiddenButtons[order.id]?.includes("Anulowane") && (
+                  <button className="cancel" onClick={() => updateOrderStatus(order.id, "Anulowane")}>
+                    Anuluj
+                  </button>
+                )}
                 <button className="message" onClick={() => sendMessage(order.id)}>Napisz wiadomość</button>
               </div>
             </div>
