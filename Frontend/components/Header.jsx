@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/main.scss";
-import logo from "../image/logo2.jpg"; // Importowanie obrazka
+import logo from "../image/logo.png"; // Importowanie obrazka
 
 const Header = () => {
   return (

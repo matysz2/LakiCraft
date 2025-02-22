@@ -11,6 +11,8 @@ import Account from "./components/Seller/Account";
 import Products from "./components/Seller/Products"; 
 import AddProduct from "./components/Seller/AddProduct"; 
 import OrderList from "./components/Seller/OrderList"; 
+import OrderMessages from "./components/Seller/OrderMessages";
+import LoadingScreen from "./components/LoadingScreen";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
@@ -50,7 +52,10 @@ const App = () => {
         <Route path="/add-product" element={<AddProduct />} /> 
         <Route path="/add-product" element={<AddProduct />} /> 
         <Route path="/orders" element={<OrderList />} /> 
-      </Routes>
+        <Route path="/messages" element={<OrderMessages />} />      
+        <Route path="/orders/:orderId/messages" element={<OrderMessages />} />
+
+        </Routes>
 
       <Footer />
     </div>
