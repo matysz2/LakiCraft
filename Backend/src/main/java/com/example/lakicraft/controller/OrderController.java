@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import com.example.lakicraft.model.OrderItem;
 import com.example.lakicraft.model.OrderStatus;
 import com.example.lakicraft.model.Orders;
 import com.example.lakicraft.model.Sale;
@@ -46,46 +47,47 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
-   
+   @Transactional
     @PutMapping("/{orderId}/status")
-    @Transactional
-    public ResponseEntity<String> updateOrderStatus(@PathVariable Long orderId, @RequestBody Map<String, String> request) {
-        // Pobieramy status z requesta
-        String status = request.get("status");
+    public ResponseEntity<String> updateOrderStatus(@PathVariable Long orderId, @RequestBody Map<String, String> requestBody) {
+        // Pobieramy status z ciała żądania
+        String status = requestBody.get("status");
+        
         if (status == null || !isValidStatus(status)) {
-            return ResponseEntity.badRequest().body("{\"error\": \"Nieznany status\"}");
+            return ResponseEntity.status(400).body("{\"error\": \"Nieznany lub brakujący status\"}");
         }
-
-        // Pobieramy zamówienie
+    
+        // Pobierz zamówienie
         Orders order = orderRepository.findById(orderId).orElse(null);
         if (order == null) {
             return ResponseEntity.status(404).body("{\"error\": \"Zamówienie nie znalezione\"}");
         }
-
-        // Zmieniamy status zamówienia
+    
+        // Aktualizacja statusu zamówienia
         order.setStatus(status);
         orderRepository.save(order);
-
-        // Jeśli status to "Zrealizowane", zapisujemy sprzedaż
+    
+        // Jeśli status to "Zrealizowane", zapisz dane do tabeli Sale
         if ("Zrealizowane".equals(status)) {
-            order.getOrderItems().forEach(orderItem -> {
+            for (OrderItem orderItem : order.getOrderItems()) {
                 Sale sale = new Sale();
-                sale.setUserId(order.getUser().getId());  
+                sale.setUserId(order.getUser().getId().longValue());
                 sale.setProduct(orderItem.getProduct());
                 sale.setAmount(BigDecimal.valueOf(orderItem.getQuantity()));
                 sale.setTotalPrice(orderItem.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())));
                 sale.setSaleDate(LocalDateTime.now());
-
+    
                 saleRepository.save(sale);
-            });
+            }
         }
-
+    
         return ResponseEntity.ok("{\"message\": \"Status zamówienia zaktualizowany na " + status + "\"}");
     }
-
-    // Walidacja statusu
+    
+    // Metoda walidacji statusu
     private boolean isValidStatus(String status) {
-        return "W realizacji".equals(status) || "Zrealizowane".equals(status) || "Anulowane".equals(status);
+        return status.equals("W realizacji") || status.equals("Zrealizowane") || status.equals("Anulowane");
     }
     
+
 }

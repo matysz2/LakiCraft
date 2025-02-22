@@ -89,8 +89,5 @@ public class Sale {
         this.saleDate = saleDate;
     }
 
-    public void setUserId(Integer id2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUserId'");
-    }
+
 }

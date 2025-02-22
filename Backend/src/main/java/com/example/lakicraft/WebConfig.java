@@ -14,5 +14,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // Dozwolone metody
                 .allowedHeaders("*")
                 .allowCredentials(true);  // Zezwolenie na poświadczenia
+
+                registry.addMapping("/orders/1/messages")
+                .allowedOrigins("http://localhost:3000")  // Zezwala na dostęp tylko z tej domeny
+                .allowedMethods("GET", "POST")           // Zezwala na GET i POST
+                .allowedHeaders("Authorization", "Content-Type")  // Zezwala na określone nagłówki
+                .allowCredentials(true);  // Umożliwia przesyłanie ciasteczek
     }
 }
