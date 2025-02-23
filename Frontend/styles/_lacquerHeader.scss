@@ -1,0 +1,146 @@
+@import "./variables";
+
+.lacquer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-image: url(../image/headers.webp);
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .logo span {
+    font-size: 1.8rem;
+    color: white;
+    font-weight: bold;
+  }
+
+  .user-menu {
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      display: flex;
+      gap: 15px;
+      cursor: pointer;
+      list-style: none;
+      position: relative; // Pozycjonowanie dla li
+
+      li {
+        position: relative; // Konieczne do użycia ::after na li
+
+        // Efekt hover dla li
+        &:hover::after {
+          content: "";
+          display: block;
+          width: 100%;
+          height: 2px;
+          background-color: yellow;
+          position: absolute;
+          bottom: 0;
+          left: 0;
+        }
+      }
+    }
+
+    &.open .dropdown-menu {
+      display: block;
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: #333;
+      border-radius: 8px;
+      padding: 10px 0;
+      width: 200px;
+    }
+  }
+
+  // Responsywność
+  @media (max-width: 768px) {
+    .lacquer-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .user-menu {
+      flex-direction: column;
+      width: 100%;
+      position: relative;
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .dropdown-menu {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #333;
+        border-radius: 0;
+        padding: 10px 0;
+        z-index: 999;
+      }
+
+      &.open .dropdown-menu {
+        display: flex;
+      }
+
+      .dropdown-menu li {
+        text-align: center;
+        width: 100%;
+        padding: 12px 0;
+        position: relative; // Konieczne do użycia ::after
+      }
+
+      .dropdown-menu li:hover::after {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 2px;
+        background-color: yellow;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+      }
+
+      .dropdown-menu li a {
+        width: 100%;
+        display: block;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.lacquer-header .logout-btn {
+  color: red;
+}

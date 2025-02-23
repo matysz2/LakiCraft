@@ -1,0 +1,86 @@
+@import "./variables";
+
+.lacquerer-dashboard {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  margin-bottom: 50%;
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  section {
+    background: #f9f9f9; // Jasne tło
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid $primary-color; // Obramowanie dla każdej sekcji
+    margin-bottom: 30px; // Odsunięcie sekcji od siebie
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    h2 {
+      margin-bottom: 15px;
+      color: $primary-color;
+    }
+
+    .error {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+  }
+
+  .orders, 
+  .appointments, 
+  .lacquers {
+    .order, 
+    .appointment, 
+    .lacquer {
+      background: white;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .lacquers {
+    .lacquer-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+
+      .lacquer {
+        text-align: center;
+
+        button {
+          margin-top: 10px;
+          background: $primary-color;
+          color: white;
+          border: none;
+          padding: 8px 12px;
+          cursor: pointer;
+          border-radius: 5px;
+          transition: background 0.3s;
+
+          &:hover {
+            background: darken($primary-color, 10%);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsywność
+@media (max-width: 768px) {
+  .lacquerer-dashboard {
+    padding: 10px;
+  }
+
+  .lacquers .lacquer-list {
+    grid-template-columns: 1fr;
+  }
+}

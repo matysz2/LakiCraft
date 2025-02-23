@@ -9,6 +9,8 @@
 @import "./orderList";
 @import "./orderMessages";
 @import "./loadingScreen";
+@import "./lacquererDashboard";
+@import "./lacquerHeader";
 
 
 main {
@@ -32,6 +34,7 @@ main {
 
     p {
       font-size: 2rem;
+      color: white;
     }
 
     button {
