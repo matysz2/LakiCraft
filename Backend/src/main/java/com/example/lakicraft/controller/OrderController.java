@@ -37,6 +37,8 @@ public class OrderController {
     @Autowired
     private OrderStatusRepository orderStatusRepository;
     // Pobranie zamówień dla zalogowanego użytkownika
+   
+   
     @GetMapping
     public ResponseEntity<List<Orders>> getOrders(@RequestHeader("userId") Long userId) {
         List<Orders> orders = orderRepository.findBySellerId(userId);
@@ -46,6 +48,8 @@ public class OrderController {
         }
         return ResponseEntity.ok(orders);
     }
+
+
 
    @Transactional
     @PutMapping("/{orderId}/status")
@@ -88,6 +92,16 @@ public class OrderController {
     private boolean isValidStatus(String status) {
         return status.equals("W realizacji") || status.equals("Zrealizowane") || status.equals("Anulowane");
     }
-    
+      // Pobranie zamówień dla klienta
+   
+   
+      @GetMapping("/customer")
+    public ResponseEntity<List<Orders>> getOrdersByCustomer(@RequestHeader("userId") Long userId) {
+        List<Orders> orders = orderRepository.findByUserId(userId);
+        if (orders.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(orders);
+    }
 
 }
