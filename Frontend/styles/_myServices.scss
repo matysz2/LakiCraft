@@ -1,0 +1,113 @@
+.my-services {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 800px;
+  margin: 2rem auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 50%;
+  margin-top: 10%;
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    img {
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      margin-right: 1rem;
+      object-fit: cover;
+    }
+
+    h2 {
+      margin-top: 100px;
+      font-size: 1.8rem;
+      max-width: 100%;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+
+      input {
+        font-size: inherit;
+        padding: 0.2rem;
+        width: 100%;
+        max-width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        display: block;
+      }
+    }
+  }
+
+  .card-body {
+    p {
+      font-size: 1rem;
+      margin: 0.5rem 0;
+      line-height: 1.4;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+
+      input,
+      textarea {
+        font-size: 1rem;
+        padding: 0.3rem;
+        margin-left: 0.5rem;
+        width: 100%;
+        max-width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        display: block;
+      }
+
+      textarea {
+        height: auto;
+        min-height: 60px;
+        resize: vertical;
+        overflow: hidden;
+      }
+    }
+  }
+
+  .actions {
+    margin-top: 1rem;
+    text-align: right;
+
+    button {
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #45a049;
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    padding: 1rem;
+
+    .card-header {
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20%;
+
+      img {
+        width: 60px;
+        height: 60px;
+        margin: 0 0 0.5rem 0;
+      }
+
+      h2 {
+        font-size: 1.4rem;
+        margin: 0;
+      }
+    }
+  }
+}

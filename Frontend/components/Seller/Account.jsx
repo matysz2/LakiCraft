@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SellerHeader from "./SellerHeaders";
+import LakiernikHeader from "../Lacquerer/LacquererHeader";
 
 const Account = () => {
   const [user, setUser] = useState(null);
@@ -170,7 +171,7 @@ const Account = () => {
 
   return (
     <div className="account-container">
-      <SellerHeader />
+      {user.role === "sprzedawca" ? <SellerHeader /> : user.role === "lakiernik" ? <LakiernikHeader /> : <BuyerHeader />}
       <h2>Moje Konto</h2>
       <div className="account-details">
         {renderField("Nazwa Firmy", user.name, "name")}
@@ -178,45 +179,22 @@ const Account = () => {
         {renderField("Nazwisko", user.lastName, "lastName")}
         {renderField("Email", user.email, "email")}
         {renderField("Status konta", user.accountStatus, "accountStatus")}
-        {renderField("Data rejestracji", user.createdAt ? new Date(user.createdAt).toLocaleDateString() : null, "createdAt")}
+        {renderField("Data rejestracji", user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "", "createdAt")}
         {renderField("Hasło", "", "password", "password")}
       </div>
       {saveStatus && <p style={{ color: "green" }}>{saveStatus}</p>}
       {saveError && <p style={{ color: "red" }}>{saveError}</p>}
       <div className="account-actions">
         {isEditing ? (
-          <button
-            className="save-btn"
-            onClick={handleSave}
-            style={{
-              backgroundColor: "#4CAF50",
-              color: "white",
-              padding: "10px 20px",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
+          <button className="save-btn" onClick={handleSave}>
             Zapisz
           </button>
         ) : (
-          <button
-            className="edit-btn"
-            onClick={handleEdit}
-          >
+          <button className="edit-btn" onClick={handleEdit}>
             Edytuj
           </button>
         )}
-        <button
-          className="delete-btn"
-          onClick={handleDelete}
-          style={{
-            backgroundColor: "#f44336",
-            color: "white",
-            padding: "10px 20px",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
+        <button className="delete-btn" onClick={handleDelete}>
           Usuń konto
         </button>
       </div>
@@ -225,3 +203,4 @@ const Account = () => {
 };
 
 export default Account;
+

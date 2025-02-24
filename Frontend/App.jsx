@@ -14,7 +14,9 @@ import OrderMessages from "./components/Seller/OrderMessages";
 
 import LacquererDashboard from "./components/Lacquerer/LacquererDashboard";
 import LacquererHeader from "./components/Lacquerer/LacquererHeader";
+
 import LoadingScreen from "./components/LoadingScreen";
+import MyServices from "./components/Lacquerer/MyServices";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
@@ -43,7 +45,7 @@ const App = () => {
   return (
     <div>
       {/* Jeśli użytkownik ma rolę 'lakiernik' i jest na stronie lacquerer-dashboard, wyświetlamy LacquererHeader */}
-      {userRole === "lakiernik" && isLacquererPage ? (
+      {userRole === "lakiernik" ? (
         <LacquererHeader />
       ) : (
         !isSellerPage && <Header />
@@ -60,7 +62,9 @@ const App = () => {
         <Route path="/orders" element={<OrderList />} /> 
         <Route path="/messages" element={<OrderMessages />} />      
         <Route path="/orders/:orderId/messages" element={<OrderMessages />} />
+
         <Route path="/lacquerer-dashboard" element={<LacquererDashboard />} />
+        <Route path="/my-services" element={<MyServices />} />
       </Routes>
 
       <Footer />
