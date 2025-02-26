@@ -6,8 +6,13 @@ import java.util.List;
 
 public interface LacquerOrderRepository extends JpaRepository<LacquerOrder, Long> {
     // Metoda do pobierania zamówień na lakierowanie na podstawie userId
-    List<LacquerOrder> findByClientId(Long clientId);
+
+    List<LacquerOrder> findByClientIdOrderByIdDesc(Long clientId);
+
 
      // Pobieranie niezrealizowanych zamówień dla użytkownika
      List<LacquerOrder> findByClientIdAndStatusNot(Long userId, String status);
+
+     List<LacquerOrder> findByClientIdAndStatus(Long userId, String status);
+
 }
