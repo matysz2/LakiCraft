@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import LoadingScreen from "../LoadingScreen";
 import SellerHeader from "./SellerHeaders";
+import LacquerHeader from "../Lacquerer/LacquererHeader"; // Dodanie importu dla nagłówka lakiernika
 import '../../styles/main.scss'; // Upewnij się, że masz odpowiednią ścieżkę do pliku
 
 const OrderMessages = () => {
@@ -12,6 +13,7 @@ const OrderMessages = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState(""); // Dodanie komunikatu o sukcesie
+  const [userRole, setUserRole] = useState(null); // Stan do przechowywania roli użytkownika
 
   useEffect(() => {
     console.log("Komponent OrderMessages zamontowany, ustawiam isLoading na true");
@@ -22,6 +24,9 @@ const OrderMessages = () => {
       navigate("/");
       return;
     }
+
+    const userData = JSON.parse(storedUserData);
+    setUserRole(userData.role); // Ustawienie roli użytkownika
 
     console.log("orderId z useParams: ", orderId);
 
@@ -103,7 +108,7 @@ const OrderMessages = () => {
 
   return (
     <div className="order-messages">
-      <SellerHeader />
+      {userRole === "sprzedawca" ? <SellerHeader /> : <LacquerHeader />} {/* Renderowanie odpowiedniego nagłówka w zależności od roli */}
       <h2>Historia wiadomości dla zamówienia #{orderId}</h2>
       {error && <div className="error">{error}</div>}
       {successMessage && <div className="success">{successMessage}</div>} {/* Komunikat o sukcesie */}

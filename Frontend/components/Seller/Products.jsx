@@ -50,7 +50,7 @@ const Products = () => {
       .then((data) => {
         setProducts(data);
       })
-      .catch((err) => {
+      .catch(() => {
         setError("Błąd przy pobieraniu produktów.");
       })
       .finally(() => {
@@ -60,7 +60,9 @@ const Products = () => {
 
   const editProduct = (productId) => {
     const productToEdit = products.find((product) => product.id === productId);
-    setEditableProduct({ ...productToEdit });
+    if (productToEdit) {
+      setEditableProduct({ ...productToEdit });
+    }
   };
 
   const saveProduct = () => {
@@ -101,41 +103,77 @@ const Products = () => {
     }));
   };
 
-  const deleteProduct = (productId) => {
-    const storedUserData = JSON.parse(localStorage.getItem("userData"));
-    const userId = storedUserData ? storedUserData.id : null;
 
-    if (!userId) {
-      console.error("Brak userId w localStorage.");
-      return;
-    }
-
-    const confirmDelete = window.confirm("Czy na pewno chcesz usunąć ten produkt?");
-    if (!confirmDelete) return;
-
+  const deleteProductFromServer = (productId) => {
     fetch(`http://localhost:8080/api/products/${productId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "user_id": userId,
+        "user_id": JSON.parse(localStorage.getItem("userData")).id,
       },
     })
       .then((res) => {
         if (!res.ok) {
           throw new Error(`Błąd przy usuwaniu produktu: ${res.status}`);
         }
-        return res.text();
+        // Jeśli usunięcie się powiedzie, usuwamy produkt lokalnie
+        setProducts((prevProducts) => prevProducts.filter((product) => product.id !== productId));
+        alert("Produkt został usunięty.");
       })
-      .then((message) => {
-        alert(message);
-        setProducts((prevProducts) =>
-          prevProducts.filter((product) => product.id !== productId)
-        );
-      })
-      .catch(() => {
-        setError("Błąd przy usuwaniu produktu.");
+      .catch((error) => {
+        console.error("Błąd przy usuwaniu produktu:", error);
+        alert("Błąd przy usuwaniu produktu.");
       });
   };
+  
+
+  // Funkcja sprawdzająca, czy produkt może zostać usunięty
+  const checkIfProductCanBeDeleted = (productId) => {
+    fetch(`http://localhost:8080/api/orders/order-items/check/${productId}`)
+      .then((res) => {
+        console.log("Status odpowiedzi:", res.status);
+        if (!res.ok) {
+          throw new Error(`Błąd przy sprawdzaniu zależności: ${res.status}`);
+        }
+        return res.text();  // Zmiana na text(), żeby sprawdzić dokładną odpowiedź serwera
+      })
+      .then((data) => {
+        console.log("Odpowiedź serwera:", data);  // Logowanie odpowiedzi jako tekst
+        try {
+          const parsedData = JSON.parse(data);  // Próba parsowania odpowiedzi jako JSON
+          if (parsedData.canDelete) {
+            deleteProductFromServer(productId);
+          } else {
+            alert("Nie można usunąć tego produktu, ponieważ jest powiązany z zamówieniami.");
+          }
+        } catch (error) {
+          console.error("Błąd przy parsowaniu odpowiedzi jako JSON:", error);
+          alert("Błąd przy sprawdzaniu zależności.");
+        }
+      })
+      .catch((error) => {
+        console.error("Błąd przy sprawdzaniu zależności:", error);
+        alert("Błąd przy sprawdzaniu zależności.");
+      });
+  };
+  
+
+  const deleteProduct = (productId) => {
+    const storedUserData = JSON.parse(localStorage.getItem("userData"));
+    const userId = storedUserData ? storedUserData.id : null;
+  
+    if (!userId) {
+      console.error("Brak userId w localStorage.");
+      return;
+    }
+  
+    const confirmDelete = window.confirm("Czy na pewno chcesz usunąć ten produkt?");
+    if (!confirmDelete) return;
+  
+    // Sprawdzamy, czy produkt jest powiązany z jakimikolwiek zamówieniami
+    checkIfProductCanBeDeleted(productId);
+  };
+  
 
   if (loading) return <p>Ładowanie produktów...</p>;
 
@@ -153,14 +191,22 @@ const Products = () => {
       <div className="products-list">
         {products.map((product) => (
           <div key={product.id} className="product-card">
+            {product.imagePath && (
+              <img
+                src={`http://localhost:8080/${product.imagePath}`}
+                alt={product.name}
+                className="product-image"
+              />
+            )}
+
             {editableProduct?.id === product.id ? (
               <>
-                <input type="text" name="kod" value={editableProduct.kod} onChange={handleChange} placeholder="Kod produktu" />
-                <input type="text" name="name" value={editableProduct.name} onChange={handleChange} placeholder="Nazwa produktu" />
-                <input type="text" name="packaging" value={editableProduct.packaging} onChange={handleChange} placeholder="Opakowanie" />
-                <input type="number" name="price" value={editableProduct.price} onChange={handleChange} placeholder="Cena" />
-                <input type="number" name="stock" value={editableProduct.stock} onChange={handleChange} placeholder="Stan magazynowy" />
-                <input type="text" name="brand" value={editableProduct.brand} onChange={handleChange} placeholder="Marka" />
+                <input type="text" name="kod" value={editableProduct?.kod || ""} onChange={handleChange} placeholder="Kod produktu" />
+                <input type="text" name="name" value={editableProduct?.name || ""} onChange={handleChange} placeholder="Nazwa produktu" />
+                <input type="text" name="packaging" value={editableProduct?.packaging || ""} onChange={handleChange} placeholder="Opakowanie" />
+                <input type="number" name="price" value={editableProduct?.price || ""} onChange={handleChange} placeholder="Cena" />
+                <input type="number" name="stock" value={editableProduct?.stock || ""} onChange={handleChange} placeholder="Stan magazynowy" />
+                <input type="text" name="brand" value={editableProduct?.brand || ""} onChange={handleChange} placeholder="Marka" />
                 <button onClick={saveProduct}>Zapisz</button>
                 <button onClick={() => setEditableProduct(null)}>Anuluj</button>
               </>

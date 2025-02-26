@@ -6,11 +6,17 @@ import "../../styles/_lacquererDashboard.scss";
 const LacquererDashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
-  const [pendingOrders, setPendingOrders] = useState([]); // zamówienia lakierowania oczekujące realizacji
-  const [customerOrders, setCustomerOrders] = useState([]); // zamówienia klienta pobrane z endpointu /customer
+  const [pendingOrders, setPendingOrders] = useState([]);
+  const [customerOrders, setCustomerOrders] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({ pendingOrders: "", customerOrders: "", appointments: "" });
+
+  // Nowe stany dla formularza dodawania terminu
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [description, setDescription] = useState('');
 
   useEffect(() => {
     const storedUserData = localStorage.getItem("userData");
@@ -67,66 +73,102 @@ const LacquererDashboard = () => {
     fetchData();
   }, [userData]);
 
-  // Funkcja pobierająca oczekujące zamówienia lakierowania dla lakiernika
   const fetchLacquerOrders = async (userId) => {
-    try {
-      const response = await fetch(`http://localhost:8080/${userId}/pending`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error("Nie udało się pobrać zamówień lakierowania.");
-      }
-  
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Błąd przy pobieraniu zamówień lakierowania:", error);
-      throw new Error("Błąd przy pobieraniu zamówień lakierowania.");
-    }
+    const response = await fetch(`http://localhost:8080/${userId}/pending`, {
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!response.ok) throw new Error("Nie udało się pobrać zamówień lakierowania.");
+    return await response.json();
   };
-  
-  
-  // Funkcja pobierająca zamówienia klienta (wg kontrolera GET /customer)
+
   const fetchCustomerOrders = async (userId) => {
     const response = await fetch(`http://localhost:8080/api/orders/customer`, {
-      headers: {
-        "userId": userId,
-      },
+      headers: { "userId": userId },
     });
     if (!response.ok) throw new Error("Błąd serwera przy pobieraniu zamówień klienta.");
     return await response.json();
   };
-// Funkcja do aktualizacji statusu zamówienia
-const updateOrderStatus = async (orderId, newStatus) => {
-  try {
-    const response = await fetch(`http://localhost:8080/api/lacquerOrders/${orderId}/status`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status: newStatus }),
-    });
-
-    if (!response.ok) throw new Error("Nie udało się zaktualizować statusu.");
-
-    // Aktualizacja stanu po zmianie statusu
-    setPendingOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
-    );
-  } catch (error) {
-    console.error("Błąd przy zmianie statusu:", error);
-  }
-};
 
   const fetchAppointments = async (userId) => {
-    const response = await fetch(`http://localhost:8080/api/appointments?userId=${userId}`);
+    const response = await fetch(`http://localhost:8080/api/appointments?userId=${userData.id}`);
     if (!response.ok) throw new Error("Błąd serwera");
     return await response.json();
+  };
+
+  const handleAddAppointment = () => {
+    setIsFormVisible(!isFormVisible);
+  };
+
+  const handleDateChange = (e) => {
+    setSelectedDate(e.target.value);
+  };
+
+  const handleTimeChange = (e) => {
+    setSelectedTime(e.target.value);
+  };
+
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value);
+  };
+
+  const handleSubmitAppointment = async (e) => {
+    e.preventDefault();
+    if (!selectedDate || !selectedTime || !description) {
+      setErrors({ appointments: "Wybierz datę, godzinę i dodaj opis." });
+      return;
+    }
+
+    const newAppointment = {
+      date: `${selectedDate} ${selectedTime}`,
+      status: 'Wolny',
+      description: description,
+      user: { id: userData.id }, // Dodaj ID użytkownika
+    };
+    
+
+    try {
+      const response = await fetch("http://localhost:8080/api/appointments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newAppointment),
+      });
+
+      if (response.ok) {
+        const savedAppointment = await response.json();
+        setAppointments([...appointments, savedAppointment]);
+        setIsFormVisible(false);
+        setSelectedDate('');
+        setSelectedTime('');
+        setDescription('');
+      } else {
+        throw new Error("Błąd podczas dodawania terminu.");
+      }
+    } catch (error) {
+      console.error("Błąd dodawania terminu:", error);
+      alert("Nie udało się dodać terminu.");
+    }
+  };
+
+  const handleDeleteAppointment = async (appointmentId) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/appointments/${appointmentId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+        setAppointments(appointments.filter(appt => appt.id !== appointmentId));
+        alert("Termin został pomyślnie usunięty.");
+      } else {
+        throw new Error("Błąd podczas usuwania terminu.");
+      }
+    } catch (error) {
+      console.error("Błąd usuwania terminu:", error);
+      alert("Nie udało się usunąć terminu.");
+    }
   };
 
   if (loading) {
@@ -152,40 +194,78 @@ const updateOrderStatus = async (orderId, newStatus) => {
               minute: '2-digit',
             });
             return (
-              <p key={appt.id}>
-                {formattedDate} - Status: {appt.status} - {appt.description}
-              </p>
+              <div key={appt.id} className="appointment-item">
+                <p>{formattedDate} - Status: {appt.status} - {appt.description}</p>
+                <button
+                  className="delete-button"
+                  onClick={() => handleDeleteAppointment(appt.id)}
+                >
+                  Usuń termin
+                </button>
+              </div>
             );
           })
         ) : (
           <p>Brak dostępnych terminów.</p>
         )}
+
+        <button onClick={handleAddAppointment}>Dodaj termin</button>
+
+        {isFormVisible && (
+          <div className="appointment-form">
+            <form onSubmit={handleSubmitAppointment}>
+              <label>
+                Wybierz datę:
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={handleDateChange}
+                />
+              </label>
+              <label>
+                Wybierz godzinę:
+                <input
+                  type="time"
+                  value={selectedTime}
+                  onChange={handleTimeChange}
+                />
+              </label>
+              <label>
+                Opis:
+                <textarea
+                  value={description}
+                  onChange={handleDescriptionChange}
+                  placeholder="Wpisz opis terminu"
+                />
+              </label>
+              <button type="submit">Zatwierdź</button>
+            </form>
+          </div>
+        )}
       </section>
 
       {/* Sekcja oczekujących zamówień lakierowania */}
-<section className="orders">
-  <h2>Oczekujące zamówienia lakierowania:</h2>
-  {errors.pendingOrders && <p className="error">{errors.pendingOrders}</p>}
-  {pendingOrders.length > 0 ? (
-    pendingOrders.map((order) => (
-      <div key={order.id} className="order">
-        <p><strong>Zamówienie #{order.id}</strong></p>
-        <p>Klient: {order.carpenter.name || "Nieznany"}</p>
-        <p>Lakier: {order.lacquer}</p>
-        <p>Status: {order.status}</p>
-        <p>Data zamówienia: {new Date(order.orderDate).toLocaleString("pl-PL")}</p>
-        <p>Cena: {order.totalPrice} zł</p>
-        <p>Ilość metrów do malowania: {order.paintingMeters} m</p>
+      <section className="orders">
+        <h2>Oczekujące zamówienia lakierowania:</h2>
+        {errors.pendingOrders && <p className="error">{errors.pendingOrders}</p>}
+        {pendingOrders.length > 0 ? (
+          pendingOrders.map((order) => (
+            <div key={order.id} className="order">
+              <p><strong>Zamówienie #{order.id}</strong></p>
+              <p>Klient: {order.carpenter.name || "Nieznany"}</p>
+              <p>Lakier: {order.lacquer}</p>
+              <p>Status: {order.status}</p>
+              <p>Data zamówienia: {new Date(order.orderDate).toLocaleString("pl-PL")}</p>
+              <p>Cena: {order.totalPrice} zł</p>
+              <p>Ilość metrów do malowania: {order.paintingMeters} m</p>
+            </div>
+          ))
+        ) : (
+          <p>Brak zamówień lakierowania.</p>
+        )}
+      </section>
 
-     
-      </div>
-    ))
-  ) : (
-    <p>Brak zamówień lakierowania.</p>
-  )}
-</section>
-
-      {/* Sekcja zamówień klienta oparta o controller GET /customer */}
+      {/* Sekcja zamówień klienta */}
       <section className="customer-orders">
         <h2>Twoje zamówienia lakierów:</h2>
         {errors.customerOrders && <p className="error">{errors.customerOrders}</p>}
@@ -197,7 +277,6 @@ const updateOrderStatus = async (orderId, newStatus) => {
               <p>Status: {order.status}</p>
               <p>Kwota: {order.totalPrice} zł</p>
               <p>Sprzedawca: {order.seller?.name || "Nieznany"}</p>
-              {/* Możesz dodać dodatkowe szczegóły z orderItems, jeśli są potrzebne */}
             </div>
           ))
         ) : (

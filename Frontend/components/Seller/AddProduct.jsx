@@ -11,17 +11,20 @@ const AddProduct = () => {
     stanMagazynowy: "",
     marka: "",
     opakowanie: "",
+    image: null,  // Dodano stan dla obrazu
   });
 
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState(null); // Dodano stan na błąd przy wysyłce
   const navigate = useNavigate();
 
+  // Sprawdzenie czy użytkownik jest zalogowany
   useEffect(() => {
     const storedUserData = localStorage.getItem("userData");
     if (!storedUserData) navigate("/");
   }, [navigate]);
 
+  // Walidacja formularza
   const validate = () => {
     let newErrors = {};
     if (!formData.kod.trim()) newErrors.kod = "Kod jest wymagany";
@@ -32,15 +35,23 @@ const AddProduct = () => {
     if (!formData.marka.trim()) newErrors.marka = "Marka jest wymagana";
     if (!formData.opakowanie || formData.opakowanie <= 0)
       newErrors.opakowanie = "Opakowanie musi być większe od 0";
+    if (!formData.image) newErrors.image = "Zdjęcie jest wymagane"; // Walidacja zdjęcia
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // Obsługa zmian w formularzu
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setFormData({ ...formData, image: files[0] }); // Przechowywanie wybranego obrazu
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
+  // Obsługa wysyłki formularza
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -48,24 +59,29 @@ const AddProduct = () => {
     const storedUserData = JSON.parse(localStorage.getItem("userData"));
     const userId = storedUserData?.id;
     if (!userId) return navigate("/");
-  
-    const productData = {
-      kod: formData.kod,
-      name: formData.nazwa,
-      price: formData.cena,
-      stock: formData.stanMagazynowy,
-      brand: formData.marka,
-      packaging: formData.opakowanie,
-      user_id: userId,
-    };
-  
+
+    // Tworzenie FormData do wysłania
+    const formDataToSend = new FormData();
+    formDataToSend.append("kod", formData.kod);
+    formDataToSend.append("name", formData.nazwa);
+    formDataToSend.append("price", formData.cena);
+    formDataToSend.append("stock", formData.stanMagazynowy);
+    formDataToSend.append("brand", formData.marka);
+    formDataToSend.append("packaging", formData.opakowanie);
+    formDataToSend.append("user_id", userId); // Dodajemy user_id jako parametr
+    if (formData.image) {
+      formDataToSend.append("image", formData.image); // Dodanie obrazu do danych formularza
+    }
+
+    // Wysłanie danych na backend
     fetch("http://localhost:8080/api/products", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "user_id": userId },
-      body: JSON.stringify(productData),
+      body: formDataToSend,
+      headers: {
+        "Accept": "application/json", // Nagłówek do akceptacji odpowiedzi JSON
+      },
     })
       .then((res) => {
-        // Jeśli odpowiedź jest tekstowa
         return res.text().then((text) => {
           console.log("Response text:", text); // Zaloguj zawartość odpowiedzi
           if (!res.ok) {
@@ -84,6 +100,7 @@ const AddProduct = () => {
           stanMagazynowy: "",
           marka: "",
           opakowanie: "",
+          image: null, // Resetowanie obrazu po dodaniu
         });
         setSubmitError(null);
       })
@@ -91,13 +108,13 @@ const AddProduct = () => {
         console.error("Błąd w obsłudze odpowiedzi:", error);
       });
   };
-  
 
   return (
     <div className="add-product-container">
       <SellerHeaders />
       <h1>Dodaj nowy produkt</h1>
       <form onSubmit={handleSubmit}>
+        {/* Formularz dla Kod produktu */}
         <div className="input-group">
           <label>Kod produktu: </label>
           <input
@@ -109,6 +126,7 @@ const AddProduct = () => {
           {errors.kod && <p className="error">{errors.kod}</p>}
         </div>
 
+        {/* Formularz dla Nazwa */}
         <div className="input-group">
           <label>Nazwa: </label>
           <input
@@ -120,6 +138,7 @@ const AddProduct = () => {
           {errors.nazwa && <p className="error">{errors.nazwa}</p>}
         </div>
 
+        {/* Formularz dla Cena */}
         <div className="input-group">
           <label>Cena PLN: </label>
           <input
@@ -131,6 +150,7 @@ const AddProduct = () => {
           {errors.cena && <p className="error">{errors.cena}</p>}
         </div>
 
+        {/* Formularz dla Stan magazynowy */}
         <div className="input-group">
           <label>Stan magazynowy: </label>
           <input
@@ -144,6 +164,7 @@ const AddProduct = () => {
           )}
         </div>
 
+        {/* Formularz dla Marka */}
         <div className="input-group">
           <label>Marka: </label>
           <input
@@ -155,6 +176,7 @@ const AddProduct = () => {
           {errors.marka && <p className="error">{errors.marka}</p>}
         </div>
 
+        {/* Formularz dla Opakowanie */}
         <div className="input-group">
           <label>Opakowanie: </label>
           <input
@@ -166,6 +188,19 @@ const AddProduct = () => {
           {errors.opakowanie && <p className="error">{errors.opakowanie}</p>}
         </div>
 
+        {/* Formularz dla Zdjęcia */}
+        <div className="input-group">
+          <label>Zdjęcie: </label>
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            onChange={handleChange}
+          />
+          {errors.image && <p className="error">{errors.image}</p>}
+        </div>
+
+        {/* Przycisk do wysyłania formularza */}
         <button type="submit" className="submit-btn">
           Dodaj produkt
         </button>
