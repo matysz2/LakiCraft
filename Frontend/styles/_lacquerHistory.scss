@@ -1,0 +1,21 @@
+.lacquer-history table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .lacquer-history th, .lacquer-history td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  @media (max-width: 768px) {
+    .lacquer-history table {
+      font-size: 14px;
+    }
+  
+    .lacquer-history th, .lacquer-history td {
+      padding: 8px;
+    }
+  }
+  

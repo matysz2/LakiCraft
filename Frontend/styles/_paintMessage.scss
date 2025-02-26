@@ -1,0 +1,111 @@
+@import "./variables";
+
+.paint-message {
+  max-width: 600px;
+  margin: 10% auto 50%;
+  padding: 20px;
+  background: $light-gray;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    text-align: center;
+    color: $primary-color;
+  }
+
+  .error, .no-messages {
+    text-align: center;
+    color: $error-color;
+    font-weight: bold;
+    padding: 10px;
+  }
+
+  .success {
+    text-align: center;
+    color: green;
+    font-weight: bold;
+    padding: 10px;
+  }
+
+  .messages-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 10px;
+
+    .message {
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 80%;
+      word-wrap: break-word;
+
+      &.SELLER {
+        align-self: flex-end;
+        background: $seller-color;
+        color: white;
+      }
+
+      &.CUSTOMER {
+        align-self: flex-start;
+        background: $customer-color;
+        color: black;
+      }
+
+      .message-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8em;
+        opacity: 0.7;
+      }
+
+      .message-text {
+        margin-top: 5px;
+      }
+    }
+  }
+
+  .send-message {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+
+    input {
+      flex-grow: 1;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+
+      &:hover {
+        background-color: #1976d2;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 15px;
+
+    .send-message {
+      flex-direction: column;
+
+      input {
+        width: 100%;
+      }
+
+      button {
+        width: 100%;
+        margin-top: 10px;
+      }
+    }
+  }
+}

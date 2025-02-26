@@ -1,0 +1,59 @@
+.lacquer-order-page {
+  display: flex;
+  justify-content: space-between; /* Rozmieszcza sekcje obok siebie */
+  margin: 20px;
+  flex-wrap: wrap; /* Umożliwia zawijanie sekcji */
+  margin-bottom: 50%;
+  margin-top: 100px;
+}
+
+.section {
+  width: 48%; /* Każda sekcja ma 48% szerokości, aby mieściły się obok siebie */
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px; /* Dodaje odstęp między sekcjami */
+  cursor: pointer;  /* Kursor zmienia się na rękę po najechaniu */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Dodanie animacji */
+}
+
+.section:hover {
+  transform: translateY(-5px); /* Przemieszczanie w górę sekcji po najechaniu */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Większy cień przy najechaniu */
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.section-content {
+  text-align: center;
+}
+
+.section img {
+  width: 80%;
+  max-height: 800px; /* Możesz dostosować rozmiar obrazu */
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Responsywność - dla urządzeń mobilnych */
+@media (max-width: 768px) {
+  .lacquer-order-page {
+    flex-direction: column; /* Zmienia kierunek flex na kolumnowy, aby sekcje były poniżej siebie */
+    align-items: center; /* Wyrównuje sekcje do środka */
+  }
+
+  .section {
+    width: 100%; /* Zmienia szerokość sekcji na 100% na mniejszych ekranach */
+    margin-bottom: 15px; /* Mniejsza przestrzeń między sekcjami na urządzeniach mobilnych */
+  }
+
+  .section-title {
+    font-size: 20px; /* Mniejsza czcionka na małych ekranach */
+  }
+}

@@ -17,6 +17,11 @@ import LacquererHeader from "./components/Lacquerer/LacquererHeader";
 
 import LoadingScreen from "./components/LoadingScreen";
 import MyServices from "./components/Lacquerer/MyServices";
+import LacquerHistory from "./components/Lacquerer/LacquerHistoryPage";
+import LacquerOrder from "./components/Lacquerer/OrderList";
+import MyOrder from "./components/Lacquerer/LacquerOrderPage";
+import PaintMessage from "./components/Lacquerer/PaintMessage";
+
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
@@ -65,7 +70,12 @@ const App = () => {
 
         <Route path="/lacquerer-dashboard" element={<LacquererDashboard />} />
         <Route path="/my-services" element={<MyServices />} />
-      </Routes>
+        <Route path="/my-order" element={<MyOrder />} />
+        <Route path="/my-history" element={<LacquerHistory />} />
+        <Route path="/my-services" element={<MyServices />} />
+        <Route path="/order-list" element={<LacquerOrder />} />
+        <Route path="/paint-message/:orderId" element={<PaintMessage />} />
+        </Routes>
 
       <Footer />
     </div>

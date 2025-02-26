@@ -69,11 +69,26 @@ const LacquererDashboard = () => {
 
   // Funkcja pobierająca oczekujące zamówienia lakierowania dla lakiernika
   const fetchLacquerOrders = async (userId) => {
-    const response = await fetch(`http://localhost:8080/api/lacquerOrders/user/${userId}/pending`);
-    if (!response.ok) throw new Error("Błąd serwera");
-    return await response.json();
+    try {
+      const response = await fetch(`http://localhost:8080/${userId}/pending`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Nie udało się pobrać zamówień lakierowania.");
+      }
+  
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Błąd przy pobieraniu zamówień lakierowania:", error);
+      throw new Error("Błąd przy pobieraniu zamówień lakierowania.");
+    }
   };
-
+  
+  
   // Funkcja pobierająca zamówienia klienta (wg kontrolera GET /customer)
   const fetchCustomerOrders = async (userId) => {
     const response = await fetch(`http://localhost:8080/api/orders/customer`, {
@@ -84,6 +99,29 @@ const LacquererDashboard = () => {
     if (!response.ok) throw new Error("Błąd serwera przy pobieraniu zamówień klienta.");
     return await response.json();
   };
+// Funkcja do aktualizacji statusu zamówienia
+const updateOrderStatus = async (orderId, newStatus) => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/lacquerOrders/${orderId}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: newStatus }),
+    });
+
+    if (!response.ok) throw new Error("Nie udało się zaktualizować statusu.");
+
+    // Aktualizacja stanu po zmianie statusu
+    setPendingOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
+  } catch (error) {
+    console.error("Błąd przy zmianie statusu:", error);
+  }
+};
 
   const fetchAppointments = async (userId) => {
     const response = await fetch(`http://localhost:8080/api/appointments?userId=${userId}`);
@@ -125,25 +163,27 @@ const LacquererDashboard = () => {
       </section>
 
       {/* Sekcja oczekujących zamówień lakierowania */}
-      <section className="orders">
-        <h2>Oczekujące zamówienia lakierowania:</h2>
-        {errors.pendingOrders && <p className="error">{errors.pendingOrders}</p>}
-        {pendingOrders.length > 0 ? (
-          pendingOrders.map((order) => (
-            <div key={order.id} className="order">
-              <p><strong>Zamówienie #{order.id}</strong></p>
-              <p>Klient: {order.carpenter.name || "Nieznany"}</p>
-              <p>Lakier: {order.lacquer}</p>
-              <p>Status: {order.status}</p>
-              <p>Data zamówienia: {new Date(order.orderDate).toLocaleString("pl-PL")}</p>
-              <p>Cena: {order.totalPrice} zł</p>
-              <p>Ilość metrów do malowania: {order.paintingMeters} m</p>
-            </div>
-          ))
-        ) : (
-          <p>Brak zamówień lakierowania.</p>
-        )}
-      </section>
+<section className="orders">
+  <h2>Oczekujące zamówienia lakierowania:</h2>
+  {errors.pendingOrders && <p className="error">{errors.pendingOrders}</p>}
+  {pendingOrders.length > 0 ? (
+    pendingOrders.map((order) => (
+      <div key={order.id} className="order">
+        <p><strong>Zamówienie #{order.id}</strong></p>
+        <p>Klient: {order.carpenter.name || "Nieznany"}</p>
+        <p>Lakier: {order.lacquer}</p>
+        <p>Status: {order.status}</p>
+        <p>Data zamówienia: {new Date(order.orderDate).toLocaleString("pl-PL")}</p>
+        <p>Cena: {order.totalPrice} zł</p>
+        <p>Ilość metrów do malowania: {order.paintingMeters} m</p>
+
+     
+      </div>
+    ))
+  ) : (
+    <p>Brak zamówień lakierowania.</p>
+  )}
+</section>
 
       {/* Sekcja zamówień klienta oparta o controller GET /customer */}
       <section className="customer-orders">
