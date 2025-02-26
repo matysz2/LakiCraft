@@ -28,6 +28,10 @@ public class Orders {
     private Long id;
     
     @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // Powiązanie z tabelą User, który złożył zamówienie
     

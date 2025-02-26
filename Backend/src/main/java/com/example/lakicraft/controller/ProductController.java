@@ -7,9 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
  // Aby korzystać z JpaRepository
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:3000") // Upewnij się, że CORS jest poprawnie ustawione dla aplikacji React
 @RestController
@@ -111,15 +116,46 @@ public ProductRepository productRepository;
 
         return productRepository.save(existingProduct); // Zapisujemy zaktualizowany produkt
     }
-    @PostMapping
-    public ResponseEntity<String> addProduct(@RequestBody Product product, @RequestHeader("user_id") Long userId) {
-        try {
-            product.setUserId(userId); // Przypisujemy userId z nagłówka
-            productRepository.save(product); // Zapisujemy produkt do bazy danych
-            return ResponseEntity.ok("Produkt dodany pomyślnie!");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Błąd przy dodawaniu produktu");
+
+
+
+// Dodawanie nowego produktu z możliwością przesyłania zdjęcia
+@PostMapping
+public ResponseEntity<String> addProduct(
+        @RequestParam("kod") String kod,
+        @RequestParam("name") String name,
+        @RequestParam("price") Double price,
+        @RequestParam("stock") Integer stock,
+        @RequestParam("brand") String brand,
+        @RequestParam("packaging") Double packaging,
+        @RequestParam("user_id") Long userId,
+        @RequestParam(value = "image", required = false) MultipartFile image
+) {
+    try {
+        Product product = new Product();
+        product.setKod(kod);
+        product.setName(name);
+        product.setPrice(price);
+        product.setStock(stock);
+        product.setBrand(brand);
+        product.setPackaging(packaging);
+        product.setUserId(userId);
+
+        // Obsługa przesyłania obrazu (jeśli został dołączony)
+        if (image != null && !image.isEmpty()) {
+            String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
+            Path filePath = Paths.get("uploads/" + fileName);
+            Files.createDirectories(filePath.getParent());
+            Files.write(filePath, image.getBytes());
+            product.setImagePath(filePath.toString());
         }
+
+        productRepository.save(product);
+        return ResponseEntity.ok("Produkt dodany pomyślnie!");
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body("Błąd przy dodawaniu produktu");
     }
+
+}
 }
 

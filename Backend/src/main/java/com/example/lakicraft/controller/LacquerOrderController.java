@@ -44,6 +44,7 @@ public class LacquerOrderController {
     
 
     // Dodawanie zamówienia lakierowania
+    
     @PostMapping
     public LacquerOrder createLacquerOrder(@RequestBody LacquerOrder lacquerOrder) {
         return lacquerOrderRepository.save(lacquerOrder);

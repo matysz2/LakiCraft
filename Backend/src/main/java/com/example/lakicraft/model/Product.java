@@ -35,6 +35,10 @@ public class Product {
     @JsonIgnore
     private List<Sale> sales;  // Relacja odwrotna - jeden produkt może mieć wiele sprzedaży
 
+    @Column(name = "image_path") // Nowe pole na ścieżkę zdjęcia
+    private String imagePath;
+
+    
     // Gettery i Settery
     public Long getId() {
         return id;
@@ -115,5 +119,13 @@ public class Product {
         setUserId(userId);
         Product savedProduct = productController.productRepository.save(this); // Zapisz produkt w bazie danych
         return ResponseEntity.status(201).body(savedProduct); // Zwróć zapisany produkt z kodem 201 (Created)
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

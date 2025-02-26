@@ -1,6 +1,7 @@
 package com.example.lakicraft.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.lakicraft.model.OrderItem;
-import com.example.lakicraft.model.OrderStatus;
 import com.example.lakicraft.model.Orders;
 import com.example.lakicraft.model.Sale;
 import com.example.lakicraft.repository.OrderRepository;
@@ -103,5 +103,31 @@ public class OrderController {
         }
         return ResponseEntity.ok(orders);
     }
+
+
+    @Transactional
+    @GetMapping("/user-orders")
+    public ResponseEntity<List<Orders>> getUserOrders(@RequestHeader("userId") Long userId) {
+        if (userId == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<Orders> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);
+        return ResponseEntity.ok(orders);
+    }
+  
+   // Endpoint do sprawdzania, czy produkt może być usunięty
+@GetMapping("/order-items/check/{productId}")
+public ResponseEntity<Map<String, Boolean>> checkProductDeletion(@PathVariable Long productId) {
+    try {
+        long count = orderRepository.countByOrderItems_Product_Id(productId);
+        boolean canDelete = count == 0; // Jeśli liczba zależności wynosi 0, produkt może zostać usunięty
+
+        Map<String, Boolean> response = Map.of("canDelete", canDelete);
+        return ResponseEntity.ok(response);  // Zwracamy odpowiedź z informacją, czy produkt może zostać usunięty
+    } catch (Exception e) {
+        // Obsługuje błąd w przypadku nieoczekiwanych problemów
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", true));
+    }
+}
 
 }

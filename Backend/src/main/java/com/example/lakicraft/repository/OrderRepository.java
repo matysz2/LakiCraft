@@ -20,4 +20,11 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
 
     List<Orders> findByUserId(Long userId);
 
+        List<Orders> findByUserIdOrderByOrderDateDesc(Long userId);
+        long countByProductId(Long productId);  // Liczymy, ile razy produkt jest powiązany z zamówieniami
+
+
+    
+            // Metoda licząca zamówienia dla danego produktu
+            long countByOrderItems_Product_Id(Long productId);
 }
