@@ -68,32 +68,49 @@ const Products = () => {
   const saveProduct = () => {
     if (!editableProduct) return;
 
-    fetch(`http://localhost:8080/api/products/${editableProduct.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "user_id": editableProduct.userId,
-      },
-      body: JSON.stringify(editableProduct),
+    const productUpdate = {
+      name: editableProduct.name,
+      kod: editableProduct.kod,
+      packaging: editableProduct.packaging,
+      price: editableProduct.price,
+      stock: editableProduct.stock,
+      brand: editableProduct.brand
+      // Usuwamy user_id, bo nie chcemy go przekazywać
+    };
+
+    // Pobieramy user_id z localStorage
+  const userId = JSON.parse(localStorage.getItem("userData"))?.id;
+  if (!userId) {
+    alert("Brak ID użytkownika w localStorage.");
+    return;
+  }
+
+  fetch(`http://localhost:8080/api/products/${editableProduct.id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "user_id": userId // Dodajemy user_id do nagłówka zapytania
+    },
+    body: JSON.stringify(productUpdate),  // Wysyłamy zaktualizowane dane
+  })
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(`Błąd przy zapisywaniu produktu: ${res.status}`);
+      }
+      return res.json();
     })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Błąd przy zapisywaniu produktu: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((updatedProduct) => {
-        setProducts((prevProducts) =>
-          prevProducts.map((product) =>
-            product.id === editableProduct.id ? updatedProduct : product
-          )
-        );
-        setEditableProduct(null);
-      })
-      .catch(() => {
-        setError("Błąd przy zapisywaniu produktu.");
-      });
-  };
+    .then((updatedProduct) => {
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === editableProduct.id ? updatedProduct : product
+        )
+      );
+      setEditableProduct(null);
+    })
+    .catch(() => {
+      setError("Błąd przy zapisywaniu produktu.");
+    });
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -103,13 +120,19 @@ const Products = () => {
     }));
   };
 
-
   const deleteProductFromServer = (productId) => {
+    const userId = JSON.parse(localStorage.getItem("userData"))?.id; // Pobranie userId z localStorage
+    
+    if (!userId) {
+      console.error("Brak userId w localStorage.");
+      return;
+    }
+  
     fetch(`http://localhost:8080/api/products/${productId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "user_id": JSON.parse(localStorage.getItem("userData")).id,
+        "user_id": userId, // Teraz userId jest przekazywane w nagłówku
       },
     })
       .then((res) => {
@@ -118,11 +141,11 @@ const Products = () => {
         }
         // Jeśli usunięcie się powiedzie, usuwamy produkt lokalnie
         setProducts((prevProducts) => prevProducts.filter((product) => product.id !== productId));
-        alert("Produkt został usunięty.");
+        alert("Produkt został pomyślnie usunięty.");
       })
       .catch((error) => {
         console.error("Błąd przy usuwaniu produktu:", error);
-        alert("Błąd przy usuwaniu produktu.");
+        alert("Błąd przy usuwaniu produktu: produkt powiązany z zamówieniem.");
       });
   };
   
@@ -131,24 +154,17 @@ const Products = () => {
   const checkIfProductCanBeDeleted = (productId) => {
     fetch(`http://localhost:8080/api/orders/order-items/check/${productId}`)
       .then((res) => {
-        console.log("Status odpowiedzi:", res.status);
         if (!res.ok) {
           throw new Error(`Błąd przy sprawdzaniu zależności: ${res.status}`);
         }
-        return res.text();  // Zmiana na text(), żeby sprawdzić dokładną odpowiedź serwera
+        return res.json();  // Zmieniamy na .json(), aby obsługiwać dane jako JSON
       })
       .then((data) => {
-        console.log("Odpowiedź serwera:", data);  // Logowanie odpowiedzi jako tekst
-        try {
-          const parsedData = JSON.parse(data);  // Próba parsowania odpowiedzi jako JSON
-          if (parsedData.canDelete) {
-            deleteProductFromServer(productId);
-          } else {
-            alert("Nie można usunąć tego produktu, ponieważ jest powiązany z zamówieniami.");
-          }
-        } catch (error) {
-          console.error("Błąd przy parsowaniu odpowiedzi jako JSON:", error);
-          alert("Błąd przy sprawdzaniu zależności.");
+        console.log("Odpowiedź serwera:", data);  // Logowanie odpowiedzi
+        if (data.canDelete) {  // Jeśli serwer odpowiada, że produkt może zostać usunięty
+          deleteProductFromServer(productId);
+        } else {
+          alert("Nie można usunąć tego produktu, ponieważ jest powiązany z zamówieniami.");
         }
       })
       .catch((error) => {
@@ -156,7 +172,6 @@ const Products = () => {
         alert("Błąd przy sprawdzaniu zależności.");
       });
   };
-  
 
   const deleteProduct = (productId) => {
     const storedUserData = JSON.parse(localStorage.getItem("userData"));
@@ -173,7 +188,6 @@ const Products = () => {
     // Sprawdzamy, czy produkt jest powiązany z jakimikolwiek zamówieniami
     checkIfProductCanBeDeleted(productId);
   };
-  
 
   if (loading) return <p>Ładowanie produktów...</p>;
 

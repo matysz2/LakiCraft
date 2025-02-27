@@ -63,7 +63,7 @@ const LacquerHeader = () => {
           <li onClick={() => handleNavigation("/lacquerer-dashboard")}>Strona główna</li>
           <li onClick={() => handleNavigation("/my-services")}>Moje usługi</li>
           <li onClick={() => handleNavigation("/my-order")}>Zamówienia</li>
-          <li onClick={() => handleNavigation("/lacquers")}>Zakup lakierów</li>
+          <li onClick={() => handleNavigation("/lacquers-shop")}>Zakup lakierów</li>
           <li onClick={() => handleNavigation("/account")}>Moje konto</li>
           <li onClick={handleLogout} className="logout-btn">Wyloguj</li>
         </ul>

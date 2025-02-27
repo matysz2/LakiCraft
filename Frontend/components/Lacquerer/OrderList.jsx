@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import LacquerHeader from "./LacquererHeader";
+
 
 const LacquerOrderList = () => {
   const [lacquerOrders, setLacquerOrders] = useState([]);
@@ -89,6 +91,7 @@ const LacquerOrderList = () => {
           lacquerOrders.map((order) => {
             return (
               <div className="lacquer-order-card" key={order.id}>
+                  <LacquerHeader />
                 <div
                   className="lacquer-order-header"
                   onClick={() => toggleOrderDetails(order.id)}
