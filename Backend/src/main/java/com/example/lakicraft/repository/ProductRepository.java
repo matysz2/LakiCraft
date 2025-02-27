@@ -19,7 +19,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> { // Zmi
     // Dodaj metodę do znajdowania produktów dla konkretnego użytkownika
     List<Product> findByUser(User user);
     
-   @Query("SELECT DISTINCT p.brand FROM Product p")
+
+@Query("SELECT DISTINCT p.brand FROM Product p")
 List<String> findDistinctBrands();
+
+//Zapytanie wszystkie produkty uzytkownika po brandzie
+List<Product> findByUserIdAndBrand(Long userId, String brand);
 
 }

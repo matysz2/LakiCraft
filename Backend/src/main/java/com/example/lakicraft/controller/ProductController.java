@@ -180,4 +180,11 @@ public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id,
             return ResponseEntity.status(500).body("Błąd przy dodawaniu produktu");
         }
     }
+
+
+    @GetMapping("/{userId}/{brand}")
+public List<Product> getProductsByBrandAndUser(@PathVariable Long userId, @PathVariable String brand) {
+    return productRepository.findByUserIdAndBrand(userId, brand);
+}
+
 }
