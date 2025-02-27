@@ -37,10 +37,19 @@ const LacquerShop = () => {
       .catch((error) => console.error("Błąd ładowania lakierów:", error));
   }, [navigate]);
 
+  const handleCardClick = (brand, userId) => {
+    // Przekierowanie na stronę z produktami dla danej marki i sprzedawcy
+    navigate(`/products/${userId}/${brand}`);
+  };
+
   return (
     <div className="lacquer-shop">
       {lacquers.map((lacquer) => (
-        <div className="lacquer-card" key={lacquer.id}>
+        <div
+          className="lacquer-card"
+          key={lacquer.id}
+          onClick={() => handleCardClick(lacquer.brand, lacquer.user.name)}
+        >
           {/* Warunkowe renderowanie zdjęcia, jeśli istnieje */}
           {lacquer.imagePath && (
             <img
@@ -50,7 +59,7 @@ const LacquerShop = () => {
             />
           )}
           <p className="lacquer-brand">
-            {lacquer.brand || "Brak marki"} <span>({lacquer.user.name})</span>
+            Marka: {lacquer.brand || "Brak marki"} <span> (Sprzedawca:{ lacquer.user.name})</span>
           </p>
         </div>
       ))}

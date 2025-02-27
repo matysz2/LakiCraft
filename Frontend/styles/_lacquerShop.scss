@@ -1,6 +1,6 @@
 .lacquer-shop {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* Cztery kolumny w jednym rzędzie */
+  grid-template-columns: repeat(5, 1fr); /* Pięć kolumn w jednym rzędzie */
   gap: 20px;
   padding: 50px;
   justify-content: center;
@@ -13,6 +13,8 @@
     padding: 15px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Płynne przejście */
     
     .lacquer-image {
       width: 100%;
@@ -29,6 +31,11 @@
         font-weight: normal;
         color: #666;
       }
+    }
+
+    &:hover {
+      transform: scale(1.05); /* Powiększenie elementu */
+      box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15); /* Zwiększenie cienia */
     }
   }
 }
