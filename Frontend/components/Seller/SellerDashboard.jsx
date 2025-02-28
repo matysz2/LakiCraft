@@ -129,9 +129,9 @@ const SellerDashboard = () => {
               <div className="product-item" key={product.id}>
                 <h3>Kod: {product.kod}</h3>
                 <h3>Nazwa: {product.name}</h3>
-                <p>Stan: {product.stock} sztuk</p>
+                <p>Stan: {product.stock} kg/l</p>
                 <p>Opakowanie: {product.packaging} kg/l</p>
-                <p>Cena: {product.price} zł</p>
+                <p>Cena: {product.price} zł/kg/l</p>
               </div>
             ))}
           </div>

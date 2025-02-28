@@ -12,7 +12,7 @@
   
     .products-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-template-columns: repeat(5, minmax(250px, 1fr));
       gap: 20px;
       justify-items: center;
   
@@ -33,7 +33,7 @@
   
         .product-image {
           width: 100%;
-          max-height: 200px;
+          max-height: 300px;
           object-fit: cover;
           margin-bottom: 10px;
           border-radius: 8px;
@@ -52,7 +52,104 @@
         }
       }
     }
-  
+.add-to-cart-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #45a049;
+  }
+
+  &.in-cart {
+    background-color: red; /* Kolor, gdy produkt jest w koszyku */
+    cursor: not-allowed; /* Zmiana kursora na blokujący */
+  }
+
+  &:disabled {
+    background-color: #ccc; /* Kolor przycisku zablokowanego */
+    cursor: not-allowed;
+  }
+}
+    
+    .cart {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f4f4f4;
+      border: 1px solid #ccc;
+      
+    }
+    
+    .cart-items {
+      margin-top: 10px;
+    }
+    
+    .cart-item {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    /* Okno promptu dla ilości */
+.quantity-prompt {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.quantity-prompt-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 300px;
+}
+
+.quantity-prompt h3 {
+  margin-bottom: 15px;
+}
+
+.quantity-prompt input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.quantity-prompt-actions button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.quantity-prompt-actions button:hover {
+  background-color: #45a049;
+}
+
+.quantity-prompt-actions button:nth-child(2) {
+  background-color: #f44336;
+}
+
+.quantity-prompt-actions button:nth-child(2):hover {
+  background-color: #e53935;
+}
+
     @media (max-width: 768px) {
        
             

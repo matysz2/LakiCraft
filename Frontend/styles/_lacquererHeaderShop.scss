@@ -50,10 +50,10 @@
       gap: 15px;
       cursor: pointer;
       list-style: none;
-      position: relative;
+      position: relative; // Pozycjonowanie dla li
 
       li {
-        position: relative;
+        position: relative; // Konieczne do użycia ::after na li
 
         // Efekt hover dla li
         &:hover::after {
@@ -79,37 +79,15 @@
       padding: 10px 0;
       width: 200px;
     }
-  }
-
-  /* Stylizacja ikony koszyka */
+      /* Stylizacja ikony koszyka */
   .cart-icon {
     cursor: pointer;
-    position: relative;  // Umożliwia pozycjonowanie pseudoelementu
-
-   
-
-    /* Opis "Koszyk" pojawiający się po najechaniu */
-    &::after {
-      content: "Koszyk";
-      position: absolute;
-      bottom: -25px;  // Zmniejszenie odstępu od ikony
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.9rem;
-      color: white;
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 5px 10px;
-      border-radius: 5px;
-      opacity: 0;
-      pointer-events: none;  // Zapobiega interakcji z opisem
-      visibility: hidden;  // Ukryte domyślnie
-      transition: opacity 0.3s, visibility 0.3s;
+    
+    img {
+      width: 30px;
+      height: 30px;
     }
-
-    &:hover::after {
-      opacity: 1;
-      visibility: visible;  // Pokaż opis po najechaniu
-    }
+  }
   }
 
   // Responsywność
@@ -149,7 +127,7 @@
         text-align: center;
         width: 100%;
         padding: 12px 0;
-        position: relative;
+        position: relative; // Konieczne do użycia ::after
       }
 
       .dropdown-menu li:hover::after {

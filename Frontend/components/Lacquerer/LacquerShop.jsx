@@ -48,8 +48,8 @@ const LacquerShop = () => {
         <div
           className="lacquer-card"
           key={lacquer.id}
-          onClick={() => handleCardClick(lacquer.brand, lacquer.user.name)}
-        >
+          onClick={() => handleCardClick(lacquer.brand, lacquer.user.id)}
+          >
           {/* Warunkowe renderowanie zdjęcia, jeśli istnieje */}
           {lacquer.imagePath && (
             <img
