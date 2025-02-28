@@ -130,7 +130,7 @@ const ProductsByBrand = () => {
   
     window.dispatchEvent(new Event("storage"));
   };
-  
+
   const uniqueUserNames = [...new Set(products.map(product => product.user.name))];
   console.log(uniqueUserNames); // ["Alfa"]
 
@@ -139,7 +139,7 @@ const ProductsByBrand = () => {
   return (
     <div className="products-by-brand">
       <LacquerHeaderShop cartCount={cartCount} /> {/* Przekazywanie liczby produktów */}
-      <h2>Produkty marki {brand} sprzedawcy {uniqueUserNames}</h2>
+      <h2>Produkty marki {brand} sprzedawcy {uniqueUserNames.join(", ")}</h2> {/* Poprawiono wyświetlanie nazw sprzedawców */}
       <div className="products-list">
         {error ? (
           <p>Wystąpił błąd: {error}</p>
@@ -172,7 +172,14 @@ const ProductsByBrand = () => {
         <div className="quantity-prompt">
           <div className="quantity-prompt-content">
             <h3>Wybierz ilość</h3>
-            <input type="number" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} min="1" max={selectedProduct.stock} />
+            <p>Kod produktu: {selectedProduct.kod}</p> {/* Dodajemy kod produktu */}
+            <input 
+              type="number" 
+              value={quantity} 
+              onChange={handleQuantityChange} 
+              min="1" 
+              max={selectedProduct.stock} 
+            />
             <div className="quantity-prompt-actions">
               <button onClick={handleQuantitySubmit}>Dodaj</button>
               <button onClick={() => setShowQuantityPrompt(false)}>Anuluj</button>

@@ -23,6 +23,7 @@ import MyOrder from "./components/Lacquerer/LacquerOrderPage";
 import PaintMessage from "./components/Lacquerer/PaintMessage";
 import LacquerShop from "./components/Lacquerer/LacquerShop";
 import ProductByBrand from "./components/Lacquerer/ProductByBrand";
+import Cart from "./components/Lacquerer/Cart";
 
 
 const App = () => {
@@ -79,6 +80,7 @@ const App = () => {
         <Route path="/paint-message/:orderId" element={<PaintMessage />} />
         <Route path="/lacquers-shop" element={<LacquerShop />} />
         <Route path="/products/:userId/:brand" element={<ProductByBrand />} />
+        <Route path="/cart" element={<Cart />} />
         </Routes>
 
       <Footer />
