@@ -53,14 +53,31 @@ const OrderList = () => {
   };
 
   const updateOrderStatus = (orderId, status) => {
+    // Pobranie userId z localStorage
+    const storedUserData = JSON.parse(localStorage.getItem("userData"));
+    const userId = storedUserData ? storedUserData.id : null;
+  
+    if (!userId) {
+      alert("Nie znaleziono danych użytkownika!");
+      return;
+    }
+  
     fetch(`http://localhost:8080/api/orders/${orderId}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({
+        status,
+        userId,  // Przekazanie userId z localStorage
+      }),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Błąd zmiany statusu zamówienia.");
+        }
+        return res.json();
+      })
       .then(() => {
         setOrders((prevOrders) =>
           prevOrders.map((order) =>
@@ -73,6 +90,7 @@ const OrderList = () => {
         setErrorMessage("Błąd zmiany statusu zamówienia.");
       });
   };
+  
 
   const sendMessage = async (orderId) => {
     const message = prompt("Wpisz wiadomość do klienta:");

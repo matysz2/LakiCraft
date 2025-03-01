@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import LacquerHeader from "./LacquererHeader";
 
 const MyHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -59,6 +60,7 @@ const MyHistory = () => {
 
   return (
     <div className="order-list">
+                        <LacquerHeader />
       <div className="order-list-content">
         {errorMessage ? (
           <div className="error-message">❌ {errorMessage}</div>

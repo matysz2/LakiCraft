@@ -3,56 +3,113 @@ import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const [cart, setCart] = useState([]);
-  const [cartCount, setCartCount] = useState(0); // Liczba unikalnych produktów w koszyku
-  const [isSingleSeller, setIsSingleSeller] = useState(true); // Sprawdzanie, czy produkty są od jednego sprzedawcy
-  const [totalPrice, setTotalPrice] = useState(0); // Całkowita cena koszyka
+  const [cartCount, setCartCount] = useState(0);
+  const [isSingleSeller, setIsSingleSeller] = useState(true);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [paymentDueDays, setPaymentDueDays] = useState(null);
+  const [orderPlaced, setOrderPlaced] = useState(false); // Stan do kontrolowania komunikatu
+  const [timeLeft, setTimeLeft] = useState(5); // Startujemy od 5 sekund
   const navigate = useNavigate();
 
   // Sprawdzenie, czy użytkownik jest zalogowany
   useEffect(() => {
-    const storedUserData = localStorage.getItem("userData");
+    const storedUserData = JSON.parse(localStorage.getItem("userData"));
     if (!storedUserData) {
-      navigate("/"); // Przekierowanie na stronę główną, jeśli użytkownik nie jest zalogowany
+      navigate("/");
+    } else {
+      setPaymentDueDays(storedUserData.paymentDueDays || 0);
     }
   }, [navigate]);
 
-  // Pobieranie koszyka z localStorage i aktualizowanie stanu
+  // Pobranie koszyka z localStorage
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(savedCart);
-    setCartCount(savedCart.length);
-
-    // Sprawdzanie, czy w koszyku są produkty od różnych sprzedawców
-    const sellers = new Set(savedCart.map(item => item.userId));
-    setIsSingleSeller(sellers.size === 1); // Jeśli więcej niż 1 sprzedawca, to false
-
-    // Obliczanie całkowitej ceny koszyka
-    const total = savedCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    setTotalPrice(total);
   }, []);
 
-  // Funkcja do usuwania produktu z koszyka
+  // Obliczanie ilości produktów, ceny i sprawdzanie sprzedawcy
+  useEffect(() => {
+    setCartCount(cart.length);
+    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    setTotalPrice(total);
+
+    const sellers = new Set(cart.map((item) => item.user.id));
+    setIsSingleSeller(sellers.size === 1);
+  }, [cart]);
+
+  // Usuwanie produktu z koszyka
   const handleRemoveFromCart = (productId) => {
-    const updatedCart = cart.filter(item => item.id !== productId);
+    const updatedCart = cart.filter((item) => item.id !== productId);
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-  // Funkcja do obsługi zamówienia
-  const handlePlaceOrder = () => {
+  // Obsługa składania zamówienia
+  const handlePlaceOrder = async () => {
     if (!isSingleSeller) {
       alert("Nie możesz złożyć zamówienia z produktów różnych sprzedawców.");
       return;
     }
 
-    // Przetwarzanie zamówienia, gdy produkty są od jednego sprzedawcy
-    // Można dodać logikę realizacji zamówienia lub przejście do strony płatności
-    navigate("/checkout"); // Przekierowanie do strony płatności (lub formularza zamówienia)
+    if (!window.confirm("Czy na pewno chcesz złożyć zamówienie?")) {
+      return;
+    }
+
+    const storedUserData = JSON.parse(localStorage.getItem("userData"));
+    if (!storedUserData) {
+      alert("Musisz być zalogowany, aby złożyć zamówienie.");
+      return;
+    }
+
+    const orderData = {
+      user: { id: storedUserData.id },
+      seller: { id: cart[0].user.id },
+      orderDate: new Date().toISOString(),
+      totalPrice,
+      status: "nowe",
+      shippingAddress: storedUserData.shippingAddress || "Brak adresu",
+      orderItems: cart.map((item) => ({
+        product: { id: item.id },
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/orders/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+      });
+
+      if (response.ok) {
+        setOrderPlaced(true); // Ustawienie stanu po złożeniu zamówienia
+        localStorage.removeItem("cart");
+        setCart([]);
+
+        // Rozpoczynamy odliczanie w useEffect
+        const countdown = setInterval(() => {
+          setTimeLeft((prevTime) => {
+            if (prevTime === 1) {
+              clearInterval(countdown);
+              navigate("/"); // Przekierowanie na stronę główną po zakończeniu odliczania
+            }
+            return prevTime - 1;
+          });
+        }, 1000);
+      } else {
+        alert("Wystąpił błąd podczas składania zamówienia.");
+      }
+    } catch (error) {
+      console.error("Błąd:", error);
+      alert("Nie udało się połączyć z serwerem.");
+    }
   };
 
-  // Funkcja do przejścia do płatności
-  const handleProceedToCheckout = () => {
-    navigate("/checkout");
+  // Funkcja przekierowująca na stronę PayPal
+  const redirectToPayPal = () => {
+    const payPalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=TWÓJ_PAYPAL_EMAIL&amount=${totalPrice.toFixed(2)}&currency_code=PLN&item_name=Zamówienie&return=http://localhost:3000/orders&cancel_return=http://localhost:3000/cart`;
+    window.location.href = payPalUrl;
   };
 
   return (
@@ -64,12 +121,14 @@ const Cart = () => {
         ) : (
           cart.map((item) => (
             <div key={item.id} className="cart-item">
-              <img src={item.image} alt={item.name} />
+              <p><strong>Kod: {item.kod}</strong></p>
+              <img src={`http://localhost:8080/${item.imagePath}`} alt={item.name} />
               <div className="cart-item-details">
-                <p>{item.name}</p>
+                <p><strong>{item.name}</strong></p>
+                <p>Sprzedawca: <strong>{item.user.name}</strong></p>
                 <p>{item.quantity} x {item.price} PLN</p>
-                <button 
-                  onClick={() => handleRemoveFromCart(item.id)} 
+                <button
+                  onClick={() => handleRemoveFromCart(item.id)}
                   className="remove-from-cart-btn"
                 >
                   Usuń
@@ -79,21 +138,34 @@ const Cart = () => {
           ))
         )}
       </div>
+
+      {/* Komunikat o złożeniu zamówienia */}
+      {orderPlaced && (
+        <div className="order-placed-message">
+          <p>Zamówienie zostało złożone!</p>
+          <p>Za {timeLeft} sekund zostaniesz przekierowany na stronę główną.</p>
+        </div>
+      )}
+
       <div className="cart-summary">
-        <p><strong>Całkowita cena: {totalPrice} PLN</strong></p>
-        <button
-          onClick={handlePlaceOrder}
-          disabled={!isSingleSeller} // Zablokowanie przycisku, jeśli są produkty różnych sprzedawców
-          className="place-order-btn"
-        >
-          {isSingleSeller ? "Złóż zamówienie" : "Możesz zamówić tylko produkty od jednego sprzedawcy"}
-        </button>
-        <button 
-          onClick={handleProceedToCheckout} 
-          className="proceed-to-checkout-btn"
-        >
-          Przejdź do płatności
-        </button>
+        <p><strong>Całkowita cena: {totalPrice.toFixed(2)} PLN</strong></p>
+        {paymentDueDays > 0 ? (
+          <button
+            onClick={handlePlaceOrder}
+            disabled={!isSingleSeller || cartCount === 0}
+            className="place-order-btn"
+          >
+            {isSingleSeller ? "Złóż zamówienie" : "Nie możesz złożyć zamówienia z różnych sprzedawców"}
+          </button>
+        ) : (
+          <button
+            onClick={redirectToPayPal}
+            disabled={!isSingleSeller || cartCount === 0}
+            className="paypal-btn"
+          >
+            Przejdź do PayPal
+          </button>
+        )}
       </div>
     </div>
   );
