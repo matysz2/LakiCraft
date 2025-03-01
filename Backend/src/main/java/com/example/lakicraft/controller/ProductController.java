@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -182,9 +183,14 @@ public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id,
     }
 
 
-    @GetMapping("/{userId}/{brand}")
-public List<Product> getProductsByBrandAndUser(@PathVariable Long userId, @PathVariable String brand) {
-    return productRepository.findByUserIdAndBrand(userId, brand);
+@GetMapping("/{userId}/{brand}")
+public List<Product> getProductsByBrandAndUser(@PathVariable String userId, @PathVariable String brand) {
+    try {
+        Long parsedUserId = Long.parseLong(userId);
+        return productRepository.findByUserIdAndBrand(parsedUserId, brand);
+    } catch (NumberFormatException e) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "userId must be a number");
+    }
 }
 
 }

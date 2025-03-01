@@ -35,12 +35,16 @@ public class User {
     private String firstName;
     private String lastName;
 
+    @Column(name = "shipping_address")
+    private String shippingAddress;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Relacja OneToMany: Jeden użytkownik do wielu produktów
+    @Column(name = "payment_due_days")
+    private Integer paymentDueDays; // Termin płatności w dniach
   
 }
