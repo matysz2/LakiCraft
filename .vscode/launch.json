@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "LakicraftApplication",
+            "request": "launch",
+            "mainClass": "com.example.lakicraft.LakicraftApplication",
+            "projectName": ""
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-LakicraftApplication<lakicraft>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
