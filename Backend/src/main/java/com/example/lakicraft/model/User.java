@@ -3,22 +3,15 @@ package com.example.lakicraft.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {
@@ -46,5 +39,9 @@ public class User {
 
     @Column(name = "payment_due_days")
     private Integer paymentDueDays; // Termin płatności w dniach
-  
+
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+     // Relacja z LacquerOrder (stolarz jest powiązany z zamówieniem lakierów)
+     @OneToMany(mappedBy = "carpenter", fetch = FetchType.EAGER)
+     private List<LacquerOrder> lacquerOrders; // Lista zamówień lakierów
 }

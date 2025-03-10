@@ -14,10 +14,14 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
      void deleteById(Integer id);
 
     // Pobieranie wszystkich terminów dla lakiernika
-    public List<Appointment> findByUserId(Long userId);
+   List<Appointment> findByUserId(Long userId);
 
     Optional<Appointment> findById(Integer id);
 
     List<Appointment> findByUserId(Integer userId);
 
+    List<Appointment> findAllByOrderByIdDesc();
+
+ // Find appointments with status "Wolny" and sort by date ascending
+ List<Appointment> findByStatusOrderByDateAsc(String status);
 }

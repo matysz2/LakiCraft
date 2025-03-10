@@ -3,6 +3,7 @@ package com.example.lakicraft.model;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -26,6 +27,7 @@ public class Appointment {
 
     private String description; // Opis terminu (np. "Lakierowanie szafki")
 
+    @JsonDeserialize
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // Powiązanie z użytkownikiem, który zarezerwował termin

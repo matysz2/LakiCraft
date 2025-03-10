@@ -15,4 +15,13 @@ public interface LacquerOrderRepository extends JpaRepository<LacquerOrder, Long
 
      List<LacquerOrder> findByClientIdAndStatus(Long userId, String status);
 
-}
+     List<LacquerOrder> findByCarpenterId(Long carpenterId);
+     
+     List<LacquerOrder> findByStatus(String status);
+
+     List<LacquerOrder> findByCarpenterIdOrderByIdDesc(Long carpenterId);
+
+     
+
+    
+    }

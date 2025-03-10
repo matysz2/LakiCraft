@@ -10,6 +10,8 @@ import com.example.lakicraft.model.Orders;
 
 public interface OrderRepository extends JpaRepository<Orders, Long> {
 
+
+    
     @Query("SELECT o FROM Orders o LEFT JOIN FETCH o.orderItems oi LEFT JOIN FETCH oi.product WHERE o.seller.id = :userId ORDER BY o.orderDate DESC")
     List<Orders> findBySellerId(@Param("userId") Long userId);
     
@@ -24,7 +26,9 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
         long countByProductId(Long productId);  // Liczymy, ile razy produkt jest powiązany z zamówieniami
 
 
-    
+        List<Orders> findTop5ByUserIdOrderByOrderDateDesc(Long userId); 
+
+        
             // Metoda licząca zamówienia dla danego produktu
             long countByOrderItems_Product_Id(Long productId);
 }

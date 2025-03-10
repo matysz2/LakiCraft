@@ -126,7 +126,7 @@ public class OrderController {
    
       @GetMapping("/customer")
     public ResponseEntity<List<Orders>> getOrdersByCustomer(@RequestHeader("userId") Long userId) {
-        List<Orders> orders = orderRepository.findByUserId(userId);
+        List<Orders> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);
         if (orders.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -140,10 +140,11 @@ public class OrderController {
         if (userId == null) {
             return ResponseEntity.badRequest().build();
         }
-        List<Orders> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);
+        List<Orders> orders = orderRepository.findTop5ByUserIdOrderByOrderDateDesc(userId);
         return ResponseEntity.ok(orders);
     }
-  
+
+    
    // Endpoint do sprawdzania, czy produkt może być usunięty
 @GetMapping("/order-items/check/{productId}")
 public ResponseEntity<Map<String, Boolean>> checkProductDeletion(@PathVariable Long productId) {
