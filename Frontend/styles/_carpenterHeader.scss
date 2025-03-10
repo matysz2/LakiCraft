@@ -1,6 +1,7 @@
+// Importowanie zmiennych
 @import "./variables";
 
-.lacquer-header {
+.carpenter-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -55,6 +56,7 @@
       li {
         position: relative;
 
+        // Efekt hover dla li
         &:hover::after {
           content: "";
           display: block;
@@ -72,7 +74,7 @@
       display: block;
       position: absolute;
       top: 50px;
-      right: 0;
+      left: -50px; // Przesunięcie w lewo
       background: #333;
       border-radius: 8px;
       padding: 10px 0;
@@ -80,35 +82,13 @@
     }
   }
 
-  .cart-icon {
-    cursor: pointer;
-    position: relative;
-
-    &::after {
-      content: "Koszyk";
-      position: absolute;
-      bottom: -25px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.9rem;
-      color: white;
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 5px 10px;
-      border-radius: 5px;
-      opacity: 0;
-      pointer-events: none;
-      visibility: hidden;
-      transition: opacity 0.3s, visibility 0.3s;
-    }
-
-    &:hover::after {
-      opacity: 1;
-      visibility: visible;
-    }
+  .logout-btn {
+    color: red;
   }
 
+  // Responsywność
   @media (max-width: 768px) {
-    .lacquer-header {
+    .carpenter-header {
       flex-direction: column;
       align-items: flex-start;
     }
@@ -127,8 +107,8 @@
         flex-direction: column;
         position: absolute;
         top: 100%;
-        left: -60px;  // Zmienione z -20px na -40px, żeby przesunąć jeszcze bardziej w lewo
-        width: 100%;
+        left: -30px; // Przesunięcie bardziej na lewo
+        width: 80%;
         background: #333;
         border-radius: 0;
         padding: 10px 0;
@@ -164,8 +144,4 @@
       }
     }
   }
-}
-
-.lacquer-header .logout-btn {
-  color: red;
 }

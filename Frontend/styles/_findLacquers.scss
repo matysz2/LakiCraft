@@ -1,0 +1,276 @@
+.find-lacquers {
+  padding: 20px;
+  margin-top: 7%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  background: #f8f8f8; // Lekki kolor tła dla lepszej widoczności
+
+  h2 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .lacquerers-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 600px;
+
+    .lacquerer-item {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      background: #fff;
+
+      h3 {
+        margin-bottom: 10px;
+        color: #222;
+      }
+
+      .toggle-btn {
+        background-color: #007bff;
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s, transform 0.2s;
+
+        &:hover {
+          background-color: #0056b3;
+          transform: scale(1.05);
+        }
+
+        &:focus {
+          outline: 2px solid #003f7f;
+        }
+      }
+
+      .available-dates {
+        margin-top: 15px;
+
+        h2 {
+          font-size: 20px;
+          color: #007bff;
+          text-align: left;
+          margin-bottom: 10px;
+          text-transform: none;
+        }
+
+        ul {
+          list-style-type: none;
+          padding: 0;
+
+          li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+
+            .reserve-btn {
+              background-color: #28a745;
+              color: white;
+              padding: 6px 12px;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+              font-size: 14px;
+              transition: background 0.3s, transform 0.2s;
+
+              &:hover {
+                background-color: #218838;
+                transform: scale(1.05);
+              }
+
+              &:focus {
+                outline: 2px solid #1e7e34;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Modal dla formularza rezerwacji
+  .reservation-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-align: center;
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+
+      button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.3s, transform 0.2s;
+
+        &.confirm {
+          background-color: #28a745;
+          color: white;
+
+          &:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+          }
+        }
+
+        &.cancel {
+          background-color: #dc3545;
+          color: white;
+
+          &:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+          }
+        }
+      }
+    }
+  }
+
+  // Modal z rezerwacją
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-align: center;
+
+    .modal-content {
+      h2 {
+        font-size: 22px;
+        margin-bottom: 15px;
+        color: #333;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        label {
+          display: flex;
+          flex-direction: column;
+          text-align: left;
+          font-size: 16px;
+          color: #555;
+        }
+
+        input {
+          padding: 8px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        }
+
+        button {
+          padding: 10px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          margin-top: 10px;
+          transition: background 0.3s, transform 0.2s;
+
+          &:hover {
+            transform: scale(1.05);
+          }
+
+          &.submit {
+            background-color: #007bff;
+
+            &:hover {
+              background-color: #0056b3;
+            }
+          }
+
+          &.cancel {
+            background-color: #dc3545;
+            color: white;
+
+            &:hover {
+              background-color: #c82333;
+            }
+           
+            
+          }
+        }
+      }
+    }
+  }
+
+  // Nakładka na tło przy aktywnym modalu
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+}
+
+// Responsywność
+@media (max-width: 768px) {
+  .find-lacquers {
+    margin-top: 15%;
+    h2 {
+      font-size: 20px;
+    }
+
+    .lacquerers-section {
+      width: 90%;
+    }
+
+    .reservation-modal,
+    .modal {
+      width: 90%;
+    }
+  }
+}

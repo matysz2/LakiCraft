@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SellerHeader from "./SellerHeaders";
 import LakiernikHeader from "../Lacquerer/LacquererHeader";
+import CarpenterHeader from "../Carpenter/CarpenterHeader";
 
 const Account = () => {
   const [user, setUser] = useState(null);
@@ -171,7 +172,10 @@ const Account = () => {
 
   return (
     <div className="account-container">
-      {user.role === "sprzedawca" ? <SellerHeader /> : user.role === "lakiernik" ? <LakiernikHeader /> : <BuyerHeader />}
+{user.role === "sprzedawca" ? <SellerHeader /> 
+  : user.role === "lakiernik" ? <LakiernikHeader /> 
+  : user.role === "stolarz" ? <CarpenterHeader /> 
+  : <div style={{ color: 'red', fontSize: '16px' }}>Błąd: Nieznana rola użytkownika</div>}
       <h2>Moje Konto</h2>
       <div className="account-details">
         {renderField("Nazwa Firmy", user.name, "name")}

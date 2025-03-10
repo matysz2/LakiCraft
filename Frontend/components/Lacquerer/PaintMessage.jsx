@@ -10,7 +10,7 @@ const OrderMessages = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-
+  
   const API_URL = "http://localhost:8080"; // Przechowywanie URL w zmiennej
 
   useEffect(() => {
@@ -36,6 +36,14 @@ const OrderMessages = () => {
 
         if (Array.isArray(data)) {
           setMessages(data);
+
+          // Pobranie ID lacquerOrder z odpowiedzi
+          const lacquerOrderIdFromApi = data[0]?.lacquerOrder?.id;
+          if (lacquerOrderIdFromApi) {
+            console.log("ID lacquerOrder:", lacquerOrderIdFromApi);
+          } else {
+            throw new Error("Brak ID lacquerOrder w odpowiedzi API");
+          }
         } else {
           throw new Error("Nieprawidłowy format danych");
         }
@@ -63,10 +71,17 @@ const OrderMessages = () => {
     const senderId = userData.id;  // Identyfikator użytkownika
     const senderRole = userData.role;
 
-    // Przypisanie lakiernika (możesz ustawić go na jakiegoś domyślnego lakiernika)
-    const lacquererId = senderRole === "stolarz" ? someDefaultLacquererId : senderId;
-
     try {
+      // Pobierz ID lacquerOrder z ostatniej wiadomości (z wcześniejszego API)
+      const lacquerOrderIdFromApi = messages[0]?.lacquerOrder?.id;
+
+      if (!lacquerOrderIdFromApi) {
+        setError("Brak ID lacquerOrder, nie można wysłać wiadomości.");
+        return;
+      }
+
+      const lacquererId = senderRole === "stolarz" ? senderId : lacquerOrderIdFromApi;  // Zmieniamy przypisanie ID lakiernika
+
       const response = await fetch(`${API_URL}/api/lacquerOrders/${orderId}/message`, {
         method: "POST",
         headers: {
@@ -77,6 +92,7 @@ const OrderMessages = () => {
           user: { id: senderId },  // Użytkownik wysyłający wiadomość
           lacquerer: { id: lacquererId },  // Lakiernik (zakładając, że stolarz wysyła wiadomość do lakiernika)
           orderId: orderId,       // Wysyłanie ID zamówienia
+          lacquerOrderId: lacquerOrderIdFromApi, // Wysłanie ID lacquerOrder z odpowiedzi API
         }),
       });
 

@@ -7,8 +7,8 @@ const Cart = () => {
   const [isSingleSeller, setIsSingleSeller] = useState(true);
   const [totalPrice, setTotalPrice] = useState(0);
   const [paymentDueDays, setPaymentDueDays] = useState(null);
-  const [orderPlaced, setOrderPlaced] = useState(false); // Stan do kontrolowania komunikatu
-  const [timeLeft, setTimeLeft] = useState(5); // Startujemy od 5 sekund
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(5);
   const navigate = useNavigate();
 
   // Sprawdzenie, czy użytkownik jest zalogowany
@@ -30,10 +30,11 @@ const Cart = () => {
   // Obliczanie ilości produktów, ceny i sprawdzanie sprzedawcy
   useEffect(() => {
     setCartCount(cart.length);
-    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const total = cart.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
     setTotalPrice(total);
 
-    const sellers = new Set(cart.map((item) => item.user.id));
+    // Sprawdzanie, czy produkty są od jednego sprzedawcy
+    const sellers = new Set(cart.map((item) => item?.user?.id).filter(Boolean));
     setIsSingleSeller(sellers.size === 1);
   }, [cart]);
 
@@ -61,9 +62,20 @@ const Cart = () => {
       return;
     }
 
+    if (cart.length === 0) {
+      alert("Twój koszyk jest pusty.");
+      return;
+    }
+
+    const sellerId = cart[0]?.user?.id;
+    if (!sellerId) {
+      alert("Błąd: Nie udało się określić sprzedawcy.");
+      return;
+    }
+
     const orderData = {
       user: { id: storedUserData.id },
-      seller: { id: cart[0].user.id },
+      seller: { id: sellerId },
       orderDate: new Date().toISOString(),
       totalPrice,
       status: "nowe",
@@ -83,16 +95,16 @@ const Cart = () => {
       });
 
       if (response.ok) {
-        setOrderPlaced(true); // Ustawienie stanu po złożeniu zamówienia
+        setOrderPlaced(true);
         localStorage.removeItem("cart");
         setCart([]);
 
-        // Rozpoczynamy odliczanie w useEffect
+        // Rozpoczęcie odliczania do przekierowania
         const countdown = setInterval(() => {
           setTimeLeft((prevTime) => {
             if (prevTime === 1) {
               clearInterval(countdown);
-              navigate("/"); // Przekierowanie na stronę główną po zakończeniu odliczania
+              navigate("/");
             }
             return prevTime - 1;
           });
@@ -122,10 +134,10 @@ const Cart = () => {
           cart.map((item) => (
             <div key={item.id} className="cart-item">
               <p><strong>Kod: {item.kod}</strong></p>
-              <img src={`http://localhost:8080/${item.imagePath}`} alt={item.name} />
+              {item.imagePath && <img src={`http://localhost:8080/${item.imagePath}`} alt={item.name} />}
               <div className="cart-item-details">
                 <p><strong>{item.name}</strong></p>
-                <p>Sprzedawca: <strong>{item.user.name}</strong></p>
+                <p>Sprzedawca: <strong>{item?.user?.name || "Nieznany sprzedawca"}</strong></p>
                 <p>{item.quantity} x {item.price} PLN</p>
                 <button
                   onClick={() => handleRemoveFromCart(item.id)}
@@ -139,7 +151,6 @@ const Cart = () => {
         )}
       </div>
 
-      {/* Komunikat o złożeniu zamówienia */}
       {orderPlaced && (
         <div className="order-placed-message">
           <p>Zamówienie zostało złożone!</p>

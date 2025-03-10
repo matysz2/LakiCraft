@@ -1,0 +1,116 @@
+.carpenter-dashboard {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  margin: 0 auto; /* Centrujemy dashboard */
+  width: 80%; /* Ustalamy szerokość dashboardu */
+  max-width: 1200px; /* Maksymalna szerokość */
+  min-height: 100vh; /* Ustawiamy minimalną wysokość na 100% widoku */
+  display: flex;
+  margin-top: 4%;
+  flex-direction: column;
+  justify-content: center; /* Wyrównanie w pionie */
+  align-items: center; /* Wyrównanie w poziomie */
+  box-sizing: border-box; /* Upewniamy się, że padding nie wpływa na szerokość */
+  position: relative;
+
+  h1 {
+    font-size: 24px;
+    margin-top: 78px;
+    margin-bottom: 20px;
+  }
+
+  .dashboard-sections {
+    width: 100%; /* Ustalamy szerokość sekcji */
+    .painting-orders,
+    .lacquer-purchases {
+      margin-bottom: 30px;
+      border: 1px solid green;
+    }
+
+    .order,
+    .purchase {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+
+    .order p,
+    .purchase p {
+      margin: 5px 0;
+    }
+
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+  }
+
+  button {
+    padding: 10px 15px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  footer {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    background-color: #f1f1f1;
+    position: absolute;
+    bottom: 0;
+  }
+
+  @media (max-width: 768px) {
+    padding: 10px;
+
+    h1 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      margin-top: 50px;
+    }
+
+    .dashboard-sections {
+      .painting-orders,
+      .lacquer-purchases {
+        margin-bottom: 15px;
+      }
+
+      .order,
+      .purchase {
+        padding: 6px;
+        margin-bottom: 10px;
+        font-size: 14px;
+      }
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 16px;
+    }
+
+    .order,
+    .purchase {
+      padding: 4px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    button {
+      padding: 8px;
+      font-size: 12px;
+    }
+  }
+}

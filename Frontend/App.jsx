@@ -4,7 +4,6 @@ import Header from "./components/Header";
 import MainContent from "./components/MainContent";
 import Footer from "./components/Footer";
 import AdminDashboard from "./components/Admin/AdminDashboard"; 
-import CarpenterPage from "./components/Carpenter/CarpenterPage"; 
 import SellerDashboard from "./components/Seller/SellerDashboard"; 
 import Account from "./components/Seller/Account"; 
 import Products from "./components/Seller/Products"; 
@@ -26,6 +25,14 @@ import ProductByBrand from "./components/Lacquerer/ProductByBrand";
 import Cart from "./components/Lacquerer/Cart";
 
 
+import CarpenterDashboard from "./components/Carpenter/CarpenterDashboard"; 
+import CarpenterHeader from "./components/Carpenter/CarpenterHeader"; 
+import LacquerOrders from "./components/Carpenter/LacquerOrders"; 
+import Orders from "./components/Carpenter/lacquer-orders";
+import FindLacquers from "./components/Carpenter/FindLacquers";
+
+
+
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [userRole, setUserRole] = useState(null);
@@ -33,7 +40,7 @@ const App = () => {
 
   useEffect(() => {
     const storedUserData = localStorage.getItem("userData");
-
+  
     if (storedUserData) {
       const userData = JSON.parse(storedUserData);
       setIsLoggedIn(true);
@@ -41,7 +48,8 @@ const App = () => {
     } else {
       setIsLoggedIn(false);
     }
-  }, []);
+  }, [location.pathname]); // Teraz efekt wykona się przy każdej zmianie ścieżki
+  
 
   if (isLoggedIn === null) {
     return <LoadingScreen />; // Pokazuje ekran ładowania, dopóki stan nie jest zaktualizowany
@@ -52,17 +60,24 @@ const App = () => {
 
   return (
     <div>
-      {/* Jeśli użytkownik ma rolę 'lakiernik' i jest na stronie lacquerer-dashboard, wyświetlamy LacquererHeader */}
+      {/* Jeśli użytkownik ma rolę 'lakiernik', wyświetlamy LacquererHeader */}
       {userRole === "lakiernik" ? (
         <LacquererHeader />
       ) : (
-        !isSellerPage && <Header />
+        // Jeśli użytkownik nie jest 'lakiernik', ale jest 'stolarz', wyświetlamy CarpenterHeader
+        userRole === "stolarz" ? (
+          <CarpenterHeader />
+        ) : (
+          // Jeśli użytkownik nie jest 'lakiernik' ani 'stolarz', a nie jesteśmy na stronie sprzedawcy, wyświetlamy Header
+          !isSellerPage && <Header />
+        )
       )}
+
+  
 
       <Routes>
         <Route path="/" element={<MainContent />} /> 
         <Route path="/admin-dashboard" element={<AdminDashboard />} /> 
-        <Route path="/carpenter-dashboard" element={<CarpenterPage />} /> 
         <Route path="/seller-dashboard" element={<SellerDashboard />} /> 
         <Route path="/account" element={<Account />} /> 
         <Route path="/products" element={<Products />} /> 
@@ -81,6 +96,12 @@ const App = () => {
         <Route path="/lacquers-shop" element={<LacquerShop />} />
         <Route path="/products/:userId/:brand" element={<ProductByBrand />} />
         <Route path="/cart" element={<Cart />} />
+
+        <Route path="/carpenter-dashboard" element={<CarpenterDashboard />} />
+        <Route path="/lacquer-orders" element={<LacquerOrders />} />
+        <Route path="/lacquer-shop" element={<Orders />} />
+        <Route path="/find-lacquerer" element={<FindLacquers />} />
+
         </Routes>
 
       <Footer />

@@ -1,0 +1,244 @@
+.lacquer-orders {
+  padding: 20px;
+  margin-top: 15%;
+  font-family: 'Arial', sans-serif;
+
+  .orders-section {
+    h2 {
+      font-size: 2rem;
+      margin-bottom: -80px;
+      font-weight: bold;
+    }
+
+    .order-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      position: relative;
+      transition: all 0.3s ease;
+      gap: 10px;
+
+      &:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .lacquerer-name {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: inherit;
+      }
+    }
+
+    .order-details {
+      display: flex;
+      gap: 20px;
+      flex-grow: 1;
+      flex-wrap: wrap;
+
+      p {
+        font-size: 1.2rem;
+        color: #333;
+        margin: 5px 0;
+      }
+
+      .order-status {
+        font-weight: bold;
+        text-transform: capitalize;
+      }
+    }
+
+    .order-actions {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+      align-items: flex-start;
+
+      button {
+        padding: 8px 15px;
+        font-size: 1rem;
+        font-weight: bold;
+        text-align: center;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+        width: 100%;
+
+        &:focus {
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.6);
+        }
+
+        &:hover {
+          transform: scale(1.05);
+        }
+
+        &:active {
+          background-color: #1d6ba8;
+        }
+      }
+
+      .status-btn {
+        background-color: #e9d355;
+
+        &:hover {
+          background-color: #4d8d2f;
+        }
+
+        &.cancel {
+          background-color: #e74c3c;
+          color: white;
+          &:hover {
+            background-color: #c0392b;
+          }
+        }
+
+        &.toggle-details {
+          background-color: #2ecc71;
+          color: white;
+          &:hover {
+            background-color: #27ae60;
+          }
+        }
+      }
+
+      .status-btn2 {
+        background-color: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+
+        &:hover {
+          background-color: #2980b9;
+          transform: scale(1.05);
+        }
+
+        &:focus {
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.6);
+        }
+
+        &:active {
+          background-color: #1d6ba8;
+        }
+      }
+
+      .find-lacquerer-btn {
+        background-color: #3498db;
+        color: white;
+        margin-top: 15px;
+        padding: 12px 20px;
+        width: 40%;
+        text-align: center;
+
+        &:hover {
+          background-color: #2980b9;
+          transform: scale(1.05);
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.6);
+        }
+
+        &:active {
+          background-color: #1d6ba8;
+        }
+      }
+    }
+  }
+
+  .error {
+    color: red;
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+    .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  }
+
+  .status-btn.write-message {
+    background-color: #2980b9;
+    color: white;
+
+    &:hover {
+      background-color: #1f6d94;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .lacquer-header {
+      flex-direction: column;
+      align-items: flex-start;
+ 
+    }
+.orders-section {
+  margin-top: 50px;
+}
+    .orders-section .order-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .order-actions {
+      flex-direction: column;
+      gap: 5px;
+      width: 100%;
+    }
+
+    .status-btn {
+      font-size: 0.9rem;
+      padding: 6px 12px;
+    }
+
+    .order-details {
+      margin-top: 10px;
+      padding: 12px;
+      width: 100%;
+    }
+
+    .order-item {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px;
+    }
+
+    .find-lacquerer-btn {
+      width: 100%;
+      margin-top: 10px;
+    }
+  }
+}
