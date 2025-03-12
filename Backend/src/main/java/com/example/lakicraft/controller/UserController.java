@@ -5,9 +5,13 @@ import com.example.lakicraft.repository.UserRepository;
 import com.example.lakicraft.service.PasswordService;
 import com.example.lakicraft.service.UserService;
 import jakarta.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -107,4 +111,38 @@ public class UserController {
             return ResponseEntity.status(500).body(Map.of("message", "Wystąpił błąd podczas wylogowania", "error", e.getMessage()));
         }
     }
+
+    
+
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        try {
+            // Sprawdzanie, czy użytkownik z podanym e-mailem już istnieje
+            if (userRepository.existsByEmail(user.getEmail())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                     .body("Użytkownik z tym adresem e-mail już istnieje.");
+            }
+    
+            // Ustawienie daty utworzenia i aktualizacji
+            user.setCreatedAt(LocalDateTime.now());
+            user.setUpdatedAt(LocalDateTime.now());
+            user.setAccountStatus("active");
+            user.setPaymentDueDays(0); // Możesz dostosować domyślną wartość
+    
+            // Zapis użytkownika do bazy danych
+            User registeredUser = userRepository.save(user);
+    
+            // Logowanie odpowiedzi
+            System.out.println("Zarejestrowany użytkownik: " + registeredUser);
+    
+            return ResponseEntity.ok(registeredUser);
+        } catch (Exception e) {
+            System.out.println("Błąd: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Błąd rejestracji użytkownika.");
+        }
+    }
+    
 }
+
+

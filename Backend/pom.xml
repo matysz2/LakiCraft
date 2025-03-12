@@ -41,7 +41,19 @@
 			<scope>runtime</scope>
 		</dependency>
 
+  
 
+        <!-- Email -->
+          <dependency>
+        <groupId>jakarta.mail</groupId>
+        <artifactId>jakarta.mail-api</artifactId>
+        <version>2.1.0</version>  <!-- Wersja zależna od Twoich potrzeb -->
+    </dependency>
+
+    <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
 
         <!-- Lombok -->
         <dependency>

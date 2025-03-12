@@ -127,6 +127,12 @@ public class LacquerOrderController {
             Appointment appointment = appointmentRepository.findById(lacquerOrderRequest.getAppointment().getId())
                     .orElseThrow(() -> new RuntimeException("Appointment not found"));
     
+            // Zmieniamy status Appointment na "zajęty"
+            appointment.setStatus("Zajęty");
+            
+            // Zapisujemy zaktualizowany status Appointment w bazie
+            appointmentRepository.save(appointment);
+    
             // Sprawdzanie, czy client i carpenter są przekazani poprawnie
             if (lacquerOrderRequest.getClient() == null) {
                 return ResponseEntity.badRequest().body("Client is required");
@@ -163,6 +169,7 @@ public class LacquerOrderController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
         }
     }
+    
     
     
 }
