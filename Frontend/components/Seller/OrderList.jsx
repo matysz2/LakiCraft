@@ -35,7 +35,6 @@ const OrderList = () => {
         return res.json();
       })
       .then((data) => {
-        console.log("Dane zamówień z backendu:", data); // DEBUG: Sprawdzenie zwróconych danych
         if (Array.isArray(data)) {
           setOrders(data);
         } else {
@@ -44,7 +43,7 @@ const OrderList = () => {
       })
       .catch((error) => {
         console.error("Błąd pobierania zamówień:", error);
-        setErrorMessage(error.message);
+        setErrorMessage("Brak zamówień.");
       });
   }, [navigate]);
 
@@ -53,7 +52,6 @@ const OrderList = () => {
   };
 
   const updateOrderStatus = (orderId, status) => {
-    // Pobranie userId z localStorage
     const storedUserData = JSON.parse(localStorage.getItem("userData"));
     const userId = storedUserData ? storedUserData.id : null;
   
@@ -90,7 +88,6 @@ const OrderList = () => {
         setErrorMessage("Błąd zmiany statusu zamówienia.");
       });
   };
-  
 
   const sendMessage = async (orderId) => {
     const message = prompt("Wpisz wiadomość do klienta:");
@@ -108,7 +105,6 @@ const OrderList = () => {
           throw new Error("Błąd podczas wysyłania wiadomości");
         }
   
-        // Po wysłaniu wiadomości przekierowanie na stronę wiadomości
         navigate(`/order/${orderId}/messages`);
       } catch (error) {
         console.error("Błąd wysyłania wiadomości:", error);
@@ -121,14 +117,15 @@ const OrderList = () => {
     <div className="order-list">
       <SellerHeader />
       <div className="order-list-content">
-        {errorMessage ? (
-          <div className="error-message">❌ {errorMessage}</div>
-        ) : orders.length === 0 ? (
+        {/* Display error message if there is one */}
+        {errorMessage && <div className="error-message">❌ {errorMessage}</div>}
+
+        {/* If there are no orders, display a message indicating so */}
+        {orders.length === 0 && !errorMessage ? (
           <div className="no-orders">📭 Brak zamówień do wyświetlenia.</div>
         ) : (
           orders.map((order) => {
             const normalizedStatus = order.status?.toLowerCase(); // Normalizacja statusu
-            console.log(`Zamówienie #${order.id} - Status: ${normalizedStatus}`); // DEBUG
 
             return (
               <div className="order-card" key={order.id}>

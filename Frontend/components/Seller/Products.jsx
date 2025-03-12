@@ -37,6 +37,8 @@ const Products = () => {
   }, [navigate]);
 
   const fetchProducts = (userId) => {
+    console.log("Pobieranie produktów dla użytkownika ID:", userId);
+    
     fetch("http://localhost:8080/api/products", {
       method: "GET",
       headers: { "user_id": userId },
@@ -48,6 +50,7 @@ const Products = () => {
         return res.json();
       })
       .then((data) => {
+        console.log("Otrzymane dane:", data);
         setProducts(data);
       })
       .catch(() => {
@@ -75,42 +78,40 @@ const Products = () => {
       price: editableProduct.price,
       stock: editableProduct.stock,
       brand: editableProduct.brand
-      // Usuwamy user_id, bo nie chcemy go przekazywać
     };
 
-    // Pobieramy user_id z localStorage
-  const userId = JSON.parse(localStorage.getItem("userData"))?.id;
-  if (!userId) {
-    alert("Brak ID użytkownika w localStorage.");
-    return;
-  }
+    const userId = JSON.parse(localStorage.getItem("userData"))?.id;
+    if (!userId) {
+      alert("Brak ID użytkownika w localStorage.");
+      return;
+    }
 
-  fetch(`http://localhost:8080/api/products/${editableProduct.id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "user_id": userId // Dodajemy user_id do nagłówka zapytania
-    },
-    body: JSON.stringify(productUpdate),  // Wysyłamy zaktualizowane dane
-  })
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error(`Błąd przy zapisywaniu produktu: ${res.status}`);
-      }
-      return res.json();
+    fetch(`http://localhost:8080/api/products/${editableProduct.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "user_id": userId
+      },
+      body: JSON.stringify(productUpdate),
     })
-    .then((updatedProduct) => {
-      setProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === editableProduct.id ? updatedProduct : product
-        )
-      );
-      setEditableProduct(null);
-    })
-    .catch(() => {
-      setError("Błąd przy zapisywaniu produktu.");
-    });
-};
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Błąd przy zapisywaniu produktu: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((updatedProduct) => {
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product.id === editableProduct.id ? updatedProduct : product
+          )
+        );
+        setEditableProduct(null);
+      })
+      .catch(() => {
+        setError("Błąd przy zapisywaniu produktu.");
+      });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -121,25 +122,24 @@ const Products = () => {
   };
 
   const deleteProductFromServer = (productId) => {
-    const userId = JSON.parse(localStorage.getItem("userData"))?.id; // Pobranie userId z localStorage
+    const userId = JSON.parse(localStorage.getItem("userData"))?.id;
     
     if (!userId) {
       console.error("Brak userId w localStorage.");
       return;
     }
-  
+
     fetch(`http://localhost:8080/api/products/${productId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "user_id": userId, // Teraz userId jest przekazywane w nagłówku
+        "user_id": userId,
       },
     })
       .then((res) => {
         if (!res.ok) {
           throw new Error(`Błąd przy usuwaniu produktu: ${res.status}`);
         }
-        // Jeśli usunięcie się powiedzie, usuwamy produkt lokalnie
         setProducts((prevProducts) => prevProducts.filter((product) => product.id !== productId));
         alert("Produkt został pomyślnie usunięty.");
       })
@@ -148,20 +148,17 @@ const Products = () => {
         alert("Błąd przy usuwaniu produktu: produkt powiązany z zamówieniem.");
       });
   };
-  
 
-  // Funkcja sprawdzająca, czy produkt może zostać usunięty
   const checkIfProductCanBeDeleted = (productId) => {
     fetch(`http://localhost:8080/api/orders/order-items/check/${productId}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`Błąd przy sprawdzaniu zależności: ${res.status}`);
         }
-        return res.json();  // Zmieniamy na .json(), aby obsługiwać dane jako JSON
+        return res.json();
       })
       .then((data) => {
-        console.log("Odpowiedź serwera:", data);  // Logowanie odpowiedzi
-        if (data.canDelete) {  // Jeśli serwer odpowiada, że produkt może zostać usunięty
+        if (data.canDelete) {
           deleteProductFromServer(productId);
         } else {
           alert("Nie można usunąć tego produktu, ponieważ jest powiązany z zamówieniami.");
@@ -176,71 +173,77 @@ const Products = () => {
   const deleteProduct = (productId) => {
     const storedUserData = JSON.parse(localStorage.getItem("userData"));
     const userId = storedUserData ? storedUserData.id : null;
-  
+
     if (!userId) {
       console.error("Brak userId w localStorage.");
       return;
     }
-  
+
     const confirmDelete = window.confirm("Czy na pewno chcesz usunąć ten produkt?");
     if (!confirmDelete) return;
-  
-    // Sprawdzamy, czy produkt jest powiązany z jakimikolwiek zamówieniami
+
     checkIfProductCanBeDeleted(productId);
   };
 
   if (loading) return <p>Ładowanie produktów...</p>;
 
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  console.log("Aktualny stan produktów:", products);
 
   return (
     <div className="products-container">
       <SellerHeader />
       <h1>Produkty</h1>
-
+      
+      {/* Przycisk "Dodaj nowy produkt" wyświetlany zawsze */}
       <button className="add-product-btn" onClick={() => navigate("/add-product")}>
         Dodaj nowy produkt
       </button>
-
-      <div className="products-list">
-        {products.map((product) => (
-          <div key={product.id} className="product-card">
-            {product.imagePath && (
-              <img
-                src={`http://localhost:8080/${product.imagePath}`}
-                alt={product.name}
-                className="product-image"
-              />
-            )}
-
-            {editableProduct?.id === product.id ? (
-              <>
-                <input type="text" name="kod" value={editableProduct?.kod || ""} onChange={handleChange} placeholder="Kod produktu" />
-                <input type="text" name="name" value={editableProduct?.name || ""} onChange={handleChange} placeholder="Nazwa produktu" />
-                <input type="text" name="packaging" value={editableProduct?.packaging || ""} onChange={handleChange} placeholder="Opakowanie" />
-                <input type="number" name="price" value={editableProduct?.price || ""} onChange={handleChange} placeholder="Cena" />
-                <input type="number" name="stock" value={editableProduct?.stock || ""} onChange={handleChange} placeholder="Stan magazynowy" />
-                <input type="text" name="brand" value={editableProduct?.brand || ""} onChange={handleChange} placeholder="Marka" />
-                <button onClick={saveProduct}>Zapisz</button>
-                <button onClick={() => setEditableProduct(null)}>Anuluj</button>
-              </>
-            ) : (
-              <>
-                <h4>Kod: {product.kod}</h4>
-                <h4>{product.name}</h4>
-                <p>Opakowanie: {product.packaging}</p>
-                <p>Cena: {product.price} zł</p>
-                <p>Stan magazynowy: {product.stock}</p>
-                <p>Marka: {product.brand}</p>
-                <button onClick={() => editProduct(product.id)}>Edytuj</button>
-                <button className="delete" onClick={() => deleteProduct(product.id)}>Usuń</button>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
+  
+      {products.length === 0 ? (
+        <div className="no-products">
+          <p>Brak produktów</p>
+        </div>
+      ) : (
+        <div className="products-list">
+          {products.map((product) => (
+            <div key={product.id} className="product-card">
+              {product.imagePath && (
+                <img
+                  src={`http://localhost:8080/${product.imagePath}`}
+                  alt={product.name}
+                  className="product-image"
+                />
+              )}
+  
+              {editableProduct?.id === product.id ? (
+                <>
+                  <input type="text" name="kod" value={editableProduct?.kod || ""} onChange={handleChange} placeholder="Kod produktu" />
+                  <input type="text" name="name" value={editableProduct?.name || ""} onChange={handleChange} placeholder="Nazwa produktu" />
+                  <input type="text" name="packaging" value={editableProduct?.packaging || ""} onChange={handleChange} placeholder="Opakowanie" />
+                  <input type="number" name="price" value={editableProduct?.price || ""} onChange={handleChange} placeholder="Cena" />
+                  <input type="number" name="stock" value={editableProduct?.stock || ""} onChange={handleChange} placeholder="Stan magazynowy" />
+                  <input type="text" name="brand" value={editableProduct?.brand || ""} onChange={handleChange} placeholder="Marka" />
+                  <button onClick={saveProduct}>Zapisz</button>
+                  <button onClick={() => setEditableProduct(null)}>Anuluj</button>
+                </>
+              ) : (
+                <>
+                  <h4>Kod: {product.kod}</h4>
+                  <h4>{product.name}</h4>
+                  <p>Opakowanie: {product.packaging}</p>
+                  <p>Cena: {product.price} zł</p>
+                  <p>Stan magazynowy: {product.stock}</p>
+                  <p>Marka: {product.brand}</p>
+                  <button onClick={() => editProduct(product.id)}>Edytuj</button>
+                  <button className="delete" onClick={() => deleteProduct(product.id)}>Usuń</button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
-};
+}  
 
 export default Products;

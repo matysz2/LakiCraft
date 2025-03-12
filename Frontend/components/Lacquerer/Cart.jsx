@@ -11,7 +11,6 @@ const Cart = () => {
   const [timeLeft, setTimeLeft] = useState(5);
   const navigate = useNavigate();
 
-  // Sprawdzenie, czy użytkownik jest zalogowany
   useEffect(() => {
     const storedUserData = JSON.parse(localStorage.getItem("userData"));
     if (!storedUserData) {
@@ -21,34 +20,29 @@ const Cart = () => {
     }
   }, [navigate]);
 
-  // Pobranie koszyka z localStorage
   useEffect(() => {
     const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(savedCart);
   }, []);
 
-  // Obliczanie ilości produktów, ceny i sprawdzanie sprzedawcy
   useEffect(() => {
     setCartCount(cart.length);
     const total = cart.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
     setTotalPrice(total);
 
-    // Sprawdzanie, czy produkty są od jednego sprzedawcy
     const sellers = new Set(cart.map((item) => item?.user?.id).filter(Boolean));
     setIsSingleSeller(sellers.size === 1);
   }, [cart]);
 
-  // Usuwanie produktu z koszyka
   const handleRemoveFromCart = (productId) => {
     const updatedCart = cart.filter((item) => item.id !== productId);
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-  // Obsługa składania zamówienia
   const handlePlaceOrder = async () => {
     if (!isSingleSeller) {
-      alert("Nie możesz złożyć zamówienia z produktów różnych sprzedawców.");
+      alert("Nie możesz złożyć zamówienia na lakiery od różnych sprzedawców.");
       return;
     }
 
@@ -99,7 +93,6 @@ const Cart = () => {
         localStorage.removeItem("cart");
         setCart([]);
 
-        // Rozpoczęcie odliczania do przekierowania
         const countdown = setInterval(() => {
           setTimeLeft((prevTime) => {
             if (prevTime === 1) {
@@ -118,7 +111,6 @@ const Cart = () => {
     }
   };
 
-  // Funkcja przekierowująca na stronę PayPal
   const redirectToPayPal = () => {
     const payPalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=TWÓJ_PAYPAL_EMAIL&amount=${totalPrice.toFixed(2)}&currency_code=PLN&item_name=Zamówienie&return=http://localhost:3000/orders&cancel_return=http://localhost:3000/cart`;
     window.location.href = payPalUrl;
@@ -139,45 +131,41 @@ const Cart = () => {
                 <p><strong>{item.name}</strong></p>
                 <p>Sprzedawca: <strong>{item?.user?.name || "Nieznany sprzedawca"}</strong></p>
                 <p>{item.quantity} x {item.price} PLN</p>
-                <button
-                  onClick={() => handleRemoveFromCart(item.id)}
-                  className="remove-from-cart-btn"
-                >
-                  Usuń
-                </button>
+                <button onClick={() => handleRemoveFromCart(item.id)} className="remove-from-cart-btn">Usuń</button>
               </div>
             </div>
           ))
         )}
       </div>
 
-      {orderPlaced && (
-        <div className="order-placed-message">
-          <p>Zamówienie zostało złożone!</p>
-          <p>Za {timeLeft} sekund zostaniesz przekierowany na stronę główną.</p>
-        </div>
-      )}
+   
 
-      <div className="cart-summary">
-        <p><strong>Całkowita cena: {totalPrice.toFixed(2)} PLN</strong></p>
-        {paymentDueDays > 0 ? (
-          <button
-            onClick={handlePlaceOrder}
-            disabled={!isSingleSeller || cartCount === 0}
-            className="place-order-btn"
-          >
-            {isSingleSeller ? "Złóż zamówienie" : "Nie możesz złożyć zamówienia z różnych sprzedawców"}
-          </button>
-        ) : (
-          <button
-            onClick={redirectToPayPal}
-            disabled={!isSingleSeller || cartCount === 0}
-            className="paypal-btn"
-          >
-            Przejdź do PayPal
-          </button>
-        )}
-      </div>
+<div className="cart-summary">
+  <p><strong>Całkowita cena: {totalPrice.toFixed(2)} PLN</strong></p>
+
+  {!isSingleSeller ? (
+    <button className="disabled-btn" disabled>
+      Nie możesz złożyć zamówienia na lakiery od różnych sprzedawców
+    </button>
+  ) : paymentDueDays > 0 ? (
+    <button
+      onClick={handlePlaceOrder}
+      disabled={cartCount === 0}
+      className="place-order-btn"
+    >
+      Złóż zamówienie
+    </button>
+  ) : (
+    <button
+      onClick={redirectToPayPal}
+      disabled={cartCount === 0}
+      className="paypal-btn"
+    >
+      Przejdź do PayPal
+    </button>
+  )}
+</div>
+
     </div>
   );
 };
