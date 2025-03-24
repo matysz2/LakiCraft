@@ -15,4 +15,8 @@ public interface SaleRepository extends JpaRepository<Sale, Integer> {
    @Query("SELECT COALESCE(SUM(s.amount), 0) FROM Sale s WHERE s.userId = :userId")
 BigDecimal getTotalSalesByUserId(@Param("userId") Long userId);
 
+
+@Query("SELECT COALESCE(SUM(s.totalPrice), 0) FROM Sale s")
+BigDecimal getTotalSales();
+
 }

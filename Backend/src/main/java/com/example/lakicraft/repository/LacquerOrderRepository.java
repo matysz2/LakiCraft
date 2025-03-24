@@ -2,6 +2,10 @@ package com.example.lakicraft.repository;
 
 import com.example.lakicraft.model.LacquerOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface LacquerOrderRepository extends JpaRepository<LacquerOrder, Long> {
@@ -20,6 +24,12 @@ public interface LacquerOrderRepository extends JpaRepository<LacquerOrder, Long
      List<LacquerOrder> findByStatus(String status);
 
      List<LacquerOrder> findByCarpenterIdOrderByIdDesc(Long carpenterId);
+    
+      // Zapytanie do obliczania łącznej liczby metrów malowania dla danego użytkownika
+      @Query("SELECT SUM(l.paintingMeters) FROM LacquerOrder l")
+    Double getTotalPaintingMeters();
+
+
 
      
 

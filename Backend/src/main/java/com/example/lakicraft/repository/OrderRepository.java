@@ -1,5 +1,6 @@
 package com.example.lakicraft.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,4 +32,7 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
         
             // Metoda licząca zamówienia dla danego produktu
             long countByOrderItems_Product_Id(Long productId);
+
+            long count();
+
 }

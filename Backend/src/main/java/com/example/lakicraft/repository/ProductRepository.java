@@ -26,4 +26,5 @@ List<String> findDistinctBrands();
 //Zapytanie wszystkie produkty uzytkownika po brandzie
 List<Product> findByUserIdAndBrand(Long userId, String brand);
 
+long count();
 }

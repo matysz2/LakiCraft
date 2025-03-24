@@ -14,5 +14,7 @@ import com.example.lakicraft.model.User;
         Optional<User> findById(Long id);
         
         boolean existsByEmail(String email);
+
+        long count();
 }
 
