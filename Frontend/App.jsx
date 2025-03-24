@@ -3,7 +3,6 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import MainContent from "./components/MainContent";
 import Footer from "./components/Footer";
-import AdminDashboard from "./components/Admin/AdminDashboard"; 
 import SellerDashboard from "./components/Seller/SellerDashboard"; 
 import Account from "./components/Seller/Account"; 
 import Products from "./components/Seller/Products"; 
@@ -30,6 +29,8 @@ import CarpenterHeader from "./components/Carpenter/CarpenterHeader";
 import LacquerOrders from "./components/Carpenter/LacquerOrders"; 
 import Orders from "./components/Carpenter/lacquer-orders";
 import FindLacquers from "./components/Carpenter/FindLacquers";
+
+import AdminDashboard from "./components/Admin/AdminDashboard";
 
 
 
@@ -101,6 +102,9 @@ const App = () => {
         <Route path="/lacquer-orders" element={<LacquerOrders />} />
         <Route path="/lacquer-shop" element={<Orders />} />
         <Route path="/find-lacquerer" element={<FindLacquers />} />
+        
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+
 
         </Routes>
 

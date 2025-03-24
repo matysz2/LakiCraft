@@ -1,0 +1,95 @@
+html, body {
+  height: 100%; /* Ustawiamy 100% wysokości dla całej strony */
+  margin: 0;
+}
+
+.admin-container {
+  display: flex;
+  min-height: 100vh; /* Zapewnia, że kontener będzie wypełniał całą wysokość */
+  position: relative;
+  margin-top: 90px;
+
+  .admin-sidebar {
+    width: 250px;
+    background-image: url(../image/headers.webp);
+    color: white;
+    padding: 20px;
+    position: absolute; /* Ustawienie na fixed, aby sidebar był widoczny na całej wysokości */
+    top: 0;
+    left: 0;
+    height: 100%; /* Zajmuje pełną wysokość */
+    z-index: 100; /* Upewnia się, że sidebar będzie na wierzchu */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow-y: auto; /* Dodaje przewijanie w przypadku długiej listy */
+    li {
+  margin-top: 50px;
+  cursor: pointer;
+    }
+  }
+
+  .admin-content {
+    margin-left: 250px; /* Tworzy przestrzeń dla sidebaru */
+    flex-grow: 1; /* Zajmuje resztę dostępnej przestrzeni */
+    padding: 20px;
+    overflow-y: auto; /* Zapewnia przewijanie w przypadku nadmiaru treści */
+  }
+
+
+
+  .admin-stats {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+
+    .stat {
+      background: #f4f4f4;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+  }
+
+  .loading,
+  .error {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-top: 50px;
+  }
+}
+
+
+
+// Responsywność
+@media (max-width: 768px) {
+  .admin-container {
+    flex-direction: column;
+    margin-left: 0; /* Usuwa przestrzeń po lewej stronie dla małych ekranów */
+    margin-top: 30%;
+
+    .admin-sidebar {
+      width: 100%;
+      position: relative; /* Zmienia pozycję sidebaru na względną */
+      height: auto; /* Zmienia wysokość sidebaru na automatyczną */
+      margin-bottom: 20px; /* Dodaje odstęp od treści */
+      text-align: center;
+
+      ul {
+        display: flex;
+        justify-content: space-around;
+      }
+    }
+
+    .admin-content {
+      margin-left: 0; /* Usuwa przestrzeń po lewej stronie na małych ekranach */
+      margin-top: 60px; /* Dodaje margines górny dla treści na małych ekranach */
+    }
+
+    .admin-stats {
+      flex-direction: column;
+    }
+  }
+}
