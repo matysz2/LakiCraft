@@ -31,6 +31,8 @@ import Orders from "./components/Carpenter/lacquer-orders";
 import FindLacquers from "./components/Carpenter/FindLacquers";
 
 import AdminDashboard from "./components/Admin/AdminDashboard";
+import AdminUsers from "./components/Admin/AdminUsers";
+import AdminProducts from "./components/Admin/AdminProducts";
 
 
 
@@ -104,6 +106,8 @@ const App = () => {
         <Route path="/find-lacquerer" element={<FindLacquers />} />
         
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/users" element={<AdminUsers />} />
+        <Route path="/adminproducts" element={<AdminProducts />} />
 
 
         </Routes>
