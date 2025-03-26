@@ -33,6 +33,9 @@ public class Product {
     @Column(name = "image_path") // Nowe pole na ścieżkę zdjęcia
     private String imagePath;
 
+    @Column(name = "status", nullable = false)
+private String status = "active"; // Domyślnie produkt jest aktywny
+
     // Gettery i Settery
     public Long getId() {
         return id;
@@ -112,5 +115,13 @@ public class Product {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

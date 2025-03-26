@@ -44,4 +44,9 @@ public class User {
      // Relacja z LacquerOrder (stolarz jest powiązany z zamówieniem lakierów)
      @OneToMany(mappedBy = "carpenter", fetch = FetchType.EAGER)
      private List<LacquerOrder> lacquerOrders; // Lista zamówień lakierów
+
+    public void setBlocked(boolean b) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setBlocked'");
+    }
 }

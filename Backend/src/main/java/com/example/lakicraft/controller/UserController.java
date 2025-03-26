@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -143,6 +145,59 @@ public class UserController {
         }
     }
     
+
+    // Pobieranie wszystkich użytkowników
+    @GetMapping("/users")
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    // Blokowanie użytkownika
+    @PostMapping("/blockUser/{userId}")
+    public ResponseEntity<Void> blockUser(@PathVariable Long userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            // Zakładamy, że blokowanie użytkownika to zmiana statusu
+            user.setBlocked(true); // Przykład ustawienia statusu blokady
+            userRepository.save(user); // Zapisz zaktualizowanego użytkownika
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+     // Usuwanie użytkownika
+     @DeleteMapping("/users/{userId}")
+     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+         Optional<User> userOptional = userRepository.findById(userId);
+         if (userOptional.isPresent()) {
+             userRepository.delete(userOptional.get());
+             return ResponseEntity.ok().build();
+         } else {
+             return ResponseEntity.notFound().build();
+         }
+     }
+ 
+     // Edytowanie użytkownika
+     @PutMapping("/users/{userId}")
+     public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody User updatedUser) {
+         Optional<User> userOptional = userRepository.findById(userId);
+         if (userOptional.isPresent()) {
+             User user = userOptional.get();
+             user.setFirstName(updatedUser.getFirstName());
+             user.setLastName(updatedUser.getLastName());
+             user.setEmail(updatedUser.getEmail());
+             user.setRole(updatedUser.getRole());
+             userRepository.save(user);
+             return ResponseEntity.ok(user);
+         } else {
+             return ResponseEntity.notFound().build();
+         }
+     }
+
+     
 }
 
 
