@@ -14,10 +14,10 @@ const AdminSidebar = () => {
     <div className="admin-sidebar">
       <h2>Admin Panel</h2>
       <ul>
-        <li onClick={() => navigate("/Admin")}>📊 Dashboard</li>
+        <li onClick={() => navigate("/admin-dashboard")}>📊 Dashboard</li>
         <li onClick={() => navigate("/users")}>👥 Użytkownicy</li>
         <li onClick={() => navigate("/adminproducts")}>🛒 Produkty</li>
-        <li onClick={() => navigate("/Admin/order-shop")}>📦 Zamówienia lakierów</li>
+        <li onClick={() => navigate("/admin-orders")}>📦 Zamówienia lakierów</li>
         <li onClick={() => navigate("/Admin/orders-lacquer")}>🎨 Zamówienia lakierowania</li>
         <li onClick={() => navigate("/Admin/stats")}>📈 Statystyki</li>
         <li onClick={handleLogout} style={{ color: "red", fontWeight: "bold" }}>

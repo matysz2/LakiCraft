@@ -10,7 +10,46 @@
       text-align: center;
       margin-bottom: 20px;
     }
-  
+    .search-input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #301616;
+      border-radius: 5px;
+    }
+    .btn-status {
+      padding: 8px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    
+      &.btn-list {
+        background-color: #28a745;  // Zielony kolor dla "Wystaw"
+        color: white;
+      }
+    
+      &.btn-block {
+        background-color: #5935dc;  // Czerwony kolor dla "Zablokuj"
+        color: white;
+      }
+    
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+    
+    .success-message {
+      background-color: #28a745;
+      color: white;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      text-align: center;
+    }
+    
     .btn-back {
       background: #333;
       color: #fff;
@@ -35,20 +74,39 @@
       th {
         background: #f4f4f4;
       }
-  
+    
       .btn-block {
-        background: red;
+        background: rgb(76, 0, 255);
         color: white;
         border: none;
-        padding: 5px 10px;
         cursor: pointer;
         border-radius: 4px;
         &:hover {
           background: darkred;
+        
         }
       }
-    }
-  }
+      .btn-delete {
+        padding: 8px 16px;
+        font-size: 14px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.1s;
+        background: #dc3545; // Czerwony kolor jak w Bootstrap
+        color: white;
+      
+        &:hover {
+          background: darkred;
+          opacity: 0.9;
+        }
+      
+        &:active {
+          background: #a71d2a;
+          transform: scale(0.95);
+        }
+      }
+      
   
   @media (max-width: 768px) {
     .admin-product-list {
@@ -63,4 +121,5 @@
       }
     }
   }
-  
+}
+}

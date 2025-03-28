@@ -31,8 +31,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (userData) {
-      fetch("/api/admin/stats")
-        .then((res) => {
+      fetch("http://localhost:8080/api/admin/stats")        .then((res) => {
           if (!res.ok) {
             throw new Error("Błąd pobierania danych");
           }

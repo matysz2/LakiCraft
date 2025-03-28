@@ -1,59 +1,63 @@
-@import "./variables";
+@import "./variables"; // Import zmiennych (np. breakpointów, kolorów)
 
+// Stopka (footer) jest stylizowana na elastyczny kontener
 footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-    background-image: url(/../image/footer.webp);
+    display: flex; // Użycie Flexbox do rozkładu elementów w stopce
+    justify-content: space-between; // Rozkłada elementy na przestrzeni, aby były równomiernie rozmieszczone
+    align-items: center; // Wyrównanie elementów w pionie do środka
+    text-align: center; // Wyrównanie tekstu w stopce na środku
+    padding: 20px; // Padding wewnętrzny stopki
+    background-image: url(/../image/footer.webp); // Tło stopki, obrazek
     p {
-        color: white;
+        color: white; // Kolor tekstu w stopce
     }
-    
+
+    // Dostosowanie układu w wersji mobilnej
     @media (max-width: $breakpoint-mobile) {
-        flex-direction: column;
-        align-items: center;
-        padding: 15px;
+        flex-direction: column; // Układ w kolumnie w przypadku małych ekranów
+        align-items: center; // Wyrównanie elementów w poziomie
+        padding: 15px; // Mniejszy padding w wersji mobilnej
     }
 }
 
+// Linki społecznościowe w stopce
 footer .social-links {
-    display: flex;
-    
+    display: flex; // Użycie Flexbox do rozmieszczenia linków
     @media (max-width: $breakpoint-mobile) {
-        margin-top: 10px;
+        margin-top: 10px; // Odstęp między linkami w wersji mobilnej
     }
-    
+
     a {
-        margin-right: 15px;
-        color: white;
-        text-decoration: none;
-        font-size: 1.2rem;
-        transition: color 0.3s ease;
-        
+        margin-right: 15px; // Odstęp między linkami
+        color: white; // Kolor linków
+        text-decoration: none; // Usunięcie podkreślenia
+        font-size: 1.2rem; // Rozmiar czcionki linków
+        transition: color 0.3s ease; // Animacja zmiany koloru
+
         &:hover {
-            color: #f0a500;
+            color: #f0a500; // Zmiana koloru linku na żółty podczas najechania
         }
-        
+
         @media (max-width: $breakpoint-mobile) {
-            margin-right: 10px;
+            margin-right: 10px; // Mniejszy odstęp na urządzeniach mobilnych
         }
     }
 }
 
+// Stylizacja tekstu stopki
 footer .footer-text {
-    margin-left: 20px;
+    margin-left: 20px; // Odstęp z lewej strony
 }
 
+// Informacje kontaktowe w stopce
 footer .contact-info {
-    text-align: right;
-    color: white;
-    margin-right: 20px;
-    font-size: 0.9rem;
+    text-align: right; // Wyrównanie tekstu do prawej
+    color: white; // Kolor tekstu
+    margin-right: 20px; // Odstęp z prawej strony
+    font-size: 0.9rem; // Mniejszy rozmiar czcionki dla informacji kontaktowych
     
     @media (max-width: $breakpoint-mobile) {
-        text-align: center;
-        margin-top: 10px;
+        text-align: center; // Wyrównanie do środka w wersji mobilnej
+        margin-top: 10px; // Dodanie marginesu górnego w wersji mobilnej
     }
 }
