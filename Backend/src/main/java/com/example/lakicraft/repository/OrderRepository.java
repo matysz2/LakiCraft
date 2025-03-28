@@ -4,10 +4,13 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.example.lakicraft.model.Orders;
+
+import jakarta.transaction.Transactional;
 
 public interface OrderRepository extends JpaRepository<Orders, Long> {
 
@@ -34,5 +37,8 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
             long countByOrderItems_Product_Id(Long productId);
 
             long count();
+
+   
+
 
 }

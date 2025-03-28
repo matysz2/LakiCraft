@@ -206,6 +206,23 @@ public ResponseEntity<Orders> createOrder(@RequestBody Orders orderRequest) {
 
 
 
+
+   // Endpoint do pobierania wszystkich zamówień
+   @GetMapping("/admin")
+   public List<Orders> getAllOrders() {
+       return orderRepository.findAll();
+   }
+
+   // Endpoint do aktualizacji statusu zamówienia
+   @PutMapping("/admin/{orderId}/status")
+   public Orders updateOrderStatus(@PathVariable Long orderId, @RequestBody Orders order) {
+       Orders existingOrder = orderRepository.findById(orderId)
+               .orElseThrow(() -> new RuntimeException("Zamówienie nie zostało znalezione"));
+
+       existingOrder.setStatus(order.getStatus());
+       return orderRepository.save(existingOrder);
+   }
+
 }
 
 

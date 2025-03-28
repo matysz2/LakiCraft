@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -192,5 +193,25 @@ public List<Product> getProductsByBrandAndUser(@PathVariable String userId, @Pat
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "userId must be a number");
     }
 }
+
+ // Pobranie wszystkich produktów
+ @GetMapping("/allproduct")
+ public ResponseEntity<List<Product>> getAllProducts() {
+     return ResponseEntity.ok(productRepository.findAll());
+ }
+
+ @PutMapping("/{productId}/status")
+ public ResponseEntity<?> updateProductStatus(@PathVariable Long productId, @RequestBody Map<String, String> request) {
+     Optional<Product> optionalProduct = productRepository.findById(productId);
+     if (optionalProduct.isPresent()) {
+         Product product = optionalProduct.get();
+         product.setStatus(request.get("status"));  // Pobranie statusu z JSON-a
+         productRepository.save(product);
+         return ResponseEntity.ok().body("Status updated successfully.");
+     }
+     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found.");
+ }
+ 
+ 
 
 }

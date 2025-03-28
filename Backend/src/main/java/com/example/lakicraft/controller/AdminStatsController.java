@@ -1,3 +1,7 @@
+
+
+    
+
 package com.example.lakicraft.controller;
 
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +59,3 @@ public class AdminStatsController {
         return ResponseEntity.ok(stats);
     }
 }
-
-    
-

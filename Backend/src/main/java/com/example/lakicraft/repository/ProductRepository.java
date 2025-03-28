@@ -1,6 +1,7 @@
 package com.example.lakicraft.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -19,6 +20,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> { // Zmi
     // Dodaj metodę do znajdowania produktów dla konkretnego użytkownika
     List<Product> findByUser(User user);
     
+@Modifying
+@Query("DELETE FROM OrderItem oi WHERE oi.product.id = :productId")
+void deleteByProductId(@Param("productId") Long productId);
 
 @Query("SELECT DISTINCT p.brand FROM Product p")
 List<String> findDistinctBrands();
@@ -26,5 +30,8 @@ List<String> findDistinctBrands();
 //Zapytanie wszystkie produkty uzytkownika po brandzie
 List<Product> findByUserIdAndBrand(Long userId, String brand);
 
-long count();
+@Query("SELECT COUNT(p) FROM Product p")
+long getRowCount();
 }
+
+

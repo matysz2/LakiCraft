@@ -180,8 +180,7 @@ public class UserController {
          }
      }
  
-     // Edytowanie użytkownika
-     @PutMapping("/users/{userId}")
+     @PutMapping("/admin/users/{userId}")
      public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody User updatedUser) {
          Optional<User> userOptional = userRepository.findById(userId);
          if (userOptional.isPresent()) {
@@ -190,12 +189,14 @@ public class UserController {
              user.setLastName(updatedUser.getLastName());
              user.setEmail(updatedUser.getEmail());
              user.setRole(updatedUser.getRole());
+             user.setAccountStatus(updatedUser.getAccountStatus()); // Dodana linia
              userRepository.save(user);
              return ResponseEntity.ok(user);
          } else {
              return ResponseEntity.notFound().build();
          }
      }
+     
 
      
 }
