@@ -38,7 +38,10 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
 
             long count();
 
-   
+            @Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o WHERE o.status != 'paid'")
+            BigDecimal calculateOutstandingPayments();
 
-
+            @Query("SELECT COUNT(o) FROM Orders o WHERE o.status = :status")
+            long countByStatus(@Param("status") String status);
+            
 }

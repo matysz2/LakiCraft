@@ -6,6 +6,7 @@ package com.example.lakicraft.controller;
 
 import org.springframework.web.bind.annotation.*;
 
+import com.example.lakicraft.model.LacquerOrder;
 import com.example.lakicraft.repository.LacquerOrderRepository;
 import com.example.lakicraft.repository.OrderRepository;
 import com.example.lakicraft.repository.ProductRepository;
@@ -57,5 +58,21 @@ public class AdminStatsController {
         );
 
         return ResponseEntity.ok(stats);
+    }
+
+
+       @PutMapping("/{orderId}/status")
+    public ResponseEntity<LacquerOrder> updateOrderStatus(@PathVariable Long orderId, @RequestBody StatusUpdateRequest request) {
+        return lacquerOrderRepository.findById(orderId).map(order -> {
+            order.setStatus(request.getStatus());
+            lacquerOrderRepository.save(order);
+            return ResponseEntity.ok(order);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    static class StatusUpdateRequest {
+        private String status;
+        public String getStatus() { return status; }
+        public void setStatus(String status) { this.status = status; }
     }
 }

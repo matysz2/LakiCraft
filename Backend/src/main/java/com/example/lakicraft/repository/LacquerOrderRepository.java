@@ -1,6 +1,8 @@
 package com.example.lakicraft.repository;
 
 import com.example.lakicraft.model.LacquerOrder;
+import com.example.lakicraft.model.PaintMessage;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,6 +31,14 @@ public interface LacquerOrderRepository extends JpaRepository<LacquerOrder, Long
       @Query("SELECT SUM(l.paintingMeters) FROM LacquerOrder l")
     Double getTotalPaintingMeters();
 
+
+    @Query("SELECT pm FROM PaintMessage pm JOIN FETCH pm.lacquerOrder WHERE pm.lacquerOrder.id = :lacquerOrderId")
+List<PaintMessage> findByLacquerOrderId(@Param("lacquerOrderId") Long lacquerOrderId);
+
+@Query("SELECT COUNT(l) FROM LacquerOrder l WHERE l.status = :status")
+long countByStatus(@Param("status") String status);
+
+ 
 
 
      

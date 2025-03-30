@@ -42,7 +42,7 @@ public class LacquerOrderController {
     }
 
     // Pobranie wszystkich zamówień lakierowania
-    @GetMapping
+    @GetMapping("/api/lacquer-orders")
     public List<LacquerOrder> getAllLacquerOrders() {
         return lacquerOrderRepository.findAll();
     }
@@ -62,8 +62,6 @@ public class LacquerOrderController {
     
 
     // Dodawanie zamówienia lakierowania
-    
-   
 
     @PutMapping("/{orderId}/status")
     public ResponseEntity<?> updateLacquerOrderStatus(@PathVariable Long orderId, @RequestBody Map<String, String> body) {
@@ -170,6 +168,11 @@ public class LacquerOrderController {
         }
     }
     
-    
-    
+
+
+   
+
+ 
 }
+    
+    

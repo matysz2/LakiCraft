@@ -61,5 +61,6 @@ public class LacquerOrder {
             this.totalPrice = pricePerMeter.multiply(new BigDecimal(this.paintingMeters));
         }
     }
+    
 }
 
