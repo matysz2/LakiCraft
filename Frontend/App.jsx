@@ -34,6 +34,8 @@ import AdminDashboard from "./components/Admin/AdminDashboard";
 import AdminUsers from "./components/Admin/AdminUsers";
 import AdminProducts from "./components/Admin/AdminProducts";
 import AdminOrders from "./components/Admin/AdminOrders";
+import AdminLacquerOrders from "./components/Admin/AdminLacquerOrders";
+import StatsPage from "./components/Admin/AdminStatsPage";
 
 
 
@@ -110,6 +112,8 @@ const App = () => {
         <Route path="/users" element={<AdminUsers />} />
         <Route path="/adminproducts" element={<AdminProducts />} />
         <Route path="/admin-orders" element={<AdminOrders />} />
+        <Route path="/admin-lacquerorders" element={<AdminLacquerOrders />} />
+        <Route path="/stats" element={<StatsPage />} />
 
 
         </Routes>

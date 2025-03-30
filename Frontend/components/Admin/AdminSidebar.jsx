@@ -18,8 +18,8 @@ const AdminSidebar = () => {
         <li onClick={() => navigate("/users")}>👥 Użytkownicy</li>
         <li onClick={() => navigate("/adminproducts")}>🛒 Produkty</li>
         <li onClick={() => navigate("/admin-orders")}>📦 Zamówienia lakierów</li>
-        <li onClick={() => navigate("/Admin/orders-lacquer")}>🎨 Zamówienia lakierowania</li>
-        <li onClick={() => navigate("/Admin/stats")}>📈 Statystyki</li>
+        <li onClick={() => navigate("/admin-lacquerorders")}>🎨 Zamówienia lakierowania</li>
+        <li onClick={() => navigate("/stats")}>📈 Statystyki</li>
         <li onClick={handleLogout} style={{ color: "red", fontWeight: "bold" }}>
           🚪 Wyloguj
         </li>

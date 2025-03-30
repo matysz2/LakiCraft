@@ -68,10 +68,20 @@ const Orders = () => {
         return res.json();
       })
       .then((updatedOrder) => {
-        setOrders(orders.map((order) => (order.id === updatedOrder.id ? updatedOrder : order)));
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order.id === updatedOrder.id ? { ...order, status: updatedOrder.status } : order
+          )
+        );
+        setFilteredOrders((prevFilteredOrders) =>
+          prevFilteredOrders.map((order) =>
+            order.id === updatedOrder.id ? { ...order, status: updatedOrder.status } : order
+          )
+        );
       })
       .catch((err) => setError(err.message));
   };
+  
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -115,7 +125,7 @@ const Orders = () => {
   return (
     <div className="orders">
       <Header />
-      <h1>Lista zamówień</h1>
+      <h1>Lista zamówień lakierów</h1>
 
       <div className="filters">
         <input

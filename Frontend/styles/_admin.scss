@@ -5,42 +5,49 @@ html, body {
 
 .admin-container {
   display: flex;
-  min-height: 100vh; /* Zapewnia, że kontener będzie wypełniał całą wysokość */
+  min-height: 100vh;
   position: relative;
-  margin-top: 90px;
+
 
   .admin-sidebar {
     width: 250px;
     background-image: url(../image/headers.webp);
     color: white;
     padding: 20px;
-    position: absolute; /* Ustawienie na fixed, aby sidebar był widoczny na całej wysokości */
+    position: absolute;
     top: 0;
     left: 0;
-    height: 100%; /* Zajmuje pełną wysokość */
-    z-index: 100; /* Upewnia się, że sidebar będzie na wierzchu */
+    height: 100%;
+    z-index: 100;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    overflow-y: auto; /* Dodaje przewijanie w przypadku długiej listy */
+    overflow-y: auto;
+
     li {
-  margin-top: 50px;
-  cursor: pointer;
+      margin-top: 50px;
+      cursor: pointer;
+      font-size: 18px;
+      list-style: none;
+
+      &:hover {
+        color: #f44336; /* Zmiana koloru na czerwony przy najechaniu */
+        text-decoration: underline; /* Podkreślenie tekstu */
+      }
     }
   }
 
   .admin-content {
-    margin-left: 250px; /* Tworzy przestrzeń dla sidebaru */
-    flex-grow: 1; /* Zajmuje resztę dostępnej przestrzeni */
-    padding: 20px;
-    overflow-y: auto; /* Zapewnia przewijanie w przypadku nadmiaru treści */
+    margin-left: 250px; // Ustawienie miejsca na sidebar
+   
+    width: 100%;
   }
-
 
 
   .admin-stats {
     display: flex;
+    width: 100%;
     gap: 15px;
     margin-top: 20px;
 
