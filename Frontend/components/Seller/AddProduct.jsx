@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/main.scss";
 import SellerHeaders from "./SellerHeaders";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const AddProduct = () => {
   const [formData, setFormData] = useState({
@@ -74,7 +75,7 @@ const AddProduct = () => {
     }
 
     // Wysłanie danych na backend
-    fetch("http://localhost:8080/api/products", {
+    fetch(`http://${BASE_URL}/api/products`, {
       method: "POST",
       body: formDataToSend,
       headers: {

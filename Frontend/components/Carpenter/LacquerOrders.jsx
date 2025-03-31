@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_lacquer-orders.scss";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const LacquerOrders = () => {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ const LacquerOrders = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8080/carpenter/${userData.id}`);
+        const response = await fetch(`http://${BASE_URL}/carpenter/${userData.id}`);
         if (!response.ok) throw new Error("Błąd podczas pobierania zleceń.");
         const data = await response.json();
         setOrders(data);
@@ -59,7 +60,7 @@ const LacquerOrders = () => {
 
   const handleDeleteOrder = async (orderId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/lacquerOrders/${orderId}`, {
+      const response = await fetch(`http://${BASE_URL}/api/lacquerOrders/${orderId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

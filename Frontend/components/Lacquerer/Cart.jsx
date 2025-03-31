@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const Cart = () => {
   const [cart, setCart] = useState([]);
@@ -82,7 +83,7 @@ const Cart = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/orders/create", {
+      const response = await fetch(`http://${BASE_URL}/api/orders/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
@@ -126,7 +127,7 @@ const Cart = () => {
           cart.map((item) => (
             <div key={item.id} className="cart-item">
               <p><strong>Kod: {item.kod}</strong></p>
-              {item.imagePath && <img src={`http://localhost:8080/${item.imagePath}`} alt={item.name} />}
+              {item.imagePath && <img src={`http://${BASE_URL}/${item.imagePath}`} alt={item.name} />}
               <div className="cart-item-details">
                 <p><strong>{item.name}</strong></p>
                 <p>Sprzedawca: <strong>{item?.user?.name || "Nieznany sprzedawca"}</strong></p>

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
+
 
 const AdminStats = () => {
   const [stats, setStats] = useState(null);
 
   // Funkcja do pobierania statystyk
   const fetchStats = () => {
-    fetch("http://localhost:8080/api/admin/stats")
+    fetch(`http://${BASE_URL}/api/admin/stats`)
       .then((res) => res.json())
       .then((data) => setStats(data))
       .catch(() => setStats(null));  // Możesz tu wyświetlić komunikat o błędzie, jeśli chcesz
@@ -21,7 +23,7 @@ const AdminStats = () => {
     if (!window.confirm(`Czy na pewno chcesz usunąć produkt ${productName}?`)) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/api/products/${productId}`, {
+      const res = await fetch(`http://${BASE_URL}/api/products/${productId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });

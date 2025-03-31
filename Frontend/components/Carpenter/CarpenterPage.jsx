@@ -1,4 +1,5 @@
 import React from 'react';
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 
 const CarpenterPage = () => {

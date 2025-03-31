@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_adminProduct.scss";
 import Header from "../Header";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const AdminProduct = () => {
   const [products, setProducts] = useState([]);
@@ -15,7 +16,7 @@ const AdminProduct = () => {
   // Funkcja do pobierania produktów z serwera
   const fetchProducts = () => {
     setLoading(true);
-    fetch("http://localhost:8080/api/products/allproduct", {
+    fetch(`http://${BASE_URL}/api/products/allproduct`, {
       method: "GET",
       headers: { "Cache-Control": "no-cache" }, // Unikaj cache
     })
@@ -61,7 +62,7 @@ const AdminProduct = () => {
     if (!window.confirm(`Czy na pewno chcesz ${actionText} produkt ${productName}?`)) return;
   
     try {
-      const res = await fetch(`http://localhost:8080/api/products/${productId}/status`, {
+      const res = await fetch(`http://${BASE_URL}/api/products/${productId}/status`, {
         credentials: "include",
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -85,7 +86,7 @@ const AdminProduct = () => {
     if (!window.confirm(`Czy na pewno chcesz usunąć produkt ${productName}?`)) return;
   
     try {
-      const res = await fetch(`http://localhost:8080/api/user/admin/${productId}`, {
+      const res = await fetch(`http://${BASE_URL}/api/user/admin/${productId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });

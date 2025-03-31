@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_OrdersAdmin.scss";
 import Header from "../Header";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
+
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -35,7 +37,7 @@ const Orders = () => {
     }
 
     // Fetch orders from the backend
-    fetch("http://localhost:8080/api/orders/admin")
+    fetch(`http://${BASE_URL}/api/orders/admin`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("Błąd podczas pobierania zamówień");
@@ -54,7 +56,7 @@ const Orders = () => {
   }, [navigate]);
 
   const handleUpdateStatus = (orderId, newStatus) => {
-    fetch(`http://localhost:8080/api/orders/admin/${orderId}/status`, {
+    fetch(`http://${BASE_URL}/api/orders/admin/${orderId}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

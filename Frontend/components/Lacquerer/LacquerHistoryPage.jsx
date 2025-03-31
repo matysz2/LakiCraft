@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LacquerHeader from "./LacquererHeader";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const MyHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -22,7 +23,7 @@ const MyHistory = () => {
     }
 
     // Zmieniamy metodę fetch, aby używać nagłówka zamiast query parameter
-    fetch("http://localhost:8080/api/orders/user-orders", {
+    fetch(`http://${BASE_URL}/api/orders/user-orders`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SellerHeader from "./SellerHeaders";
 import LakiernikHeader from "../Lacquerer/LacquererHeader";
 import CarpenterHeader from "../Carpenter/CarpenterHeader";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const Account = () => {
   const [user, setUser] = useState(null);
@@ -39,7 +40,7 @@ const Account = () => {
     }
 
     setLoading(true);
-    fetch(`http://localhost:8080/api/user?id=${userData.id}`, {
+    fetch(`http://${BASE_URL}/api/user?id=${userData.id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       }
@@ -71,7 +72,7 @@ const Account = () => {
 
     console.log("Dane do wysłania: ", editableUser);
 
-    fetch(`http://localhost:8080/api/user?id=${user.id}`, {
+    fetch(`http://${BASE_URL}/api/user?id=${user.id}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -114,7 +115,7 @@ const Account = () => {
     }
 
     if (window.confirm("Czy na pewno chcesz usunąć konto?")) {
-      fetch(`http://localhost:8080/api/user?id=${user.id}`, {
+      fetch(`http://${BASE_URL}/api/user?id=${user.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

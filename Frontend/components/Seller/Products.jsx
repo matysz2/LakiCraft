@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SellerHeader from "./SellerHeaders";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -39,7 +40,7 @@ const Products = () => {
   const fetchProducts = (userId) => {
     console.log("Pobieranie produktów dla użytkownika ID:", userId);
     
-    fetch("http://localhost:8080/api/products", {
+    fetch(`http://${BASE_URL}/api/products`, {
       method: "GET",
       headers: { "user_id": userId },
     })
@@ -86,7 +87,7 @@ const Products = () => {
       return;
     }
 
-    fetch(`http://localhost:8080/api/products/${editableProduct.id}`, {
+    fetch(`http://${BASE_URL}/api/products/${editableProduct.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -129,7 +130,7 @@ const Products = () => {
       return;
     }
 
-    fetch(`http://localhost:8080/api/products/${productId}`, {
+    fetch(`http://${BASE_URL}/api/products/${productId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -150,7 +151,7 @@ const Products = () => {
   };
 
   const checkIfProductCanBeDeleted = (productId) => {
-    fetch(`http://localhost:8080/api/orders/order-items/check/${productId}`)
+    fetch(`http://${BASE_URL}/api/orders/order-items/check/${productId}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`Błąd przy sprawdzaniu zależności: ${res.status}`);
@@ -209,7 +210,7 @@ const Products = () => {
             <div key={product.id} className="product-card">
               {product.imagePath && (
                 <img
-                  src={`http://localhost:8080/${product.imagePath}`}
+                  src={`http://${BASE_URL}/${product.imagePath}`}
                   alt={product.name}
                   className="product-image"
                 />

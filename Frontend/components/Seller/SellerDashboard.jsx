@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SellerHeader from "./SellerHeaders";
 import "../../styles/_SellerDashboard.scss";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const SellerDashboard = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const SellerDashboard = () => {
     setLoading(true);
     setError(null);
 
-    fetch("http://localhost:8080/api/sales/total", {
+    fetch(`http://${BASE_URL}/api/sales/total`, {
       method: "GET",
       headers: {
         "userid": userData.id, // Wysyłanie user_id w nagłówkach
@@ -62,7 +63,7 @@ const SellerDashboard = () => {
     setLoading(true);
     setError(null);
 
-    fetch("http://localhost:8080/api/products", {
+    fetch(`http://${BASE_URL}/api/products`, {
       method: "GET",
       headers: {
         "user_id": userData.id, // Wysyłanie user_id w nagłówkach

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SellerHeader from "./SellerHeaders";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
@@ -21,7 +22,7 @@ const OrderList = () => {
       return;
     }
 
-    fetch("http://localhost:8080/api/orders", {
+    fetch(`http://${BASE_URL}/api/orders`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -60,7 +61,7 @@ const OrderList = () => {
       return;
     }
   
-    fetch(`http://localhost:8080/api/orders/${orderId}/status`, {
+    fetch(`http://${BASE_URL}/api/orders/${orderId}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -93,7 +94,7 @@ const OrderList = () => {
     const message = prompt("Wpisz wiadomość do klienta:");
     if (message) {
       try {
-        const response = await fetch(`http://localhost:8080/api/orders/${orderId}/message`, {
+        const response = await fetch(`http://${BASE_URL}/api/orders/${orderId}/message`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

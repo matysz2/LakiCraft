@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LacquerHeader from "./LacquererHeader";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const MyServices = () => {
   const [cardData, setCardData] = useState(null);
@@ -34,7 +35,7 @@ const MyServices = () => {
       return;
     }
 
-    fetch(`http://localhost:8080/api/business-card?userId=${userId}`)
+    fetch(`http://${BASE_URL}/api/business-card?userId=${userId}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Błąd pobierania danych wizytówki.");
@@ -77,7 +78,7 @@ const MyServices = () => {
         formData.append("profileImage", selectedFile);
       }
 
-      fetch(`http://localhost:8080/api/business-card`, {
+      fetch(`http://${BASE_URL}/api/business-card`, {
         method: "PATCH", // Zamiast PUT, użyj PATCH
         body: formData,
       })

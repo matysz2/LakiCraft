@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_findLacquers.scss";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const FindLacquers = () => {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ const FindLacquers = () => {
     const fetchAppointments = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8080/api/appointments/available`);
+        const response = await fetch(`http://${BASE_URL}/api/appointments/available`);
         if (!response.ok) throw new Error("Błąd podczas pobierania dostępnych terminów.");
         const data = await response.json();
         setAppointments(data);
@@ -135,7 +136,7 @@ const FindLacquers = () => {
   
       console.log("Wysyłane zamówienie:", JSON.stringify(orderData, null, 2));
   
-      const response = await fetch("http://localhost:8080/api/lacquer-orders", {
+      const response = await fetch(`http://${BASE_URL}/api/lacquer-orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",  // Bez "charset=UTF-8"

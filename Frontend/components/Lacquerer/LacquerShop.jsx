@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const LacquerShop = () => {
   const [lacquers, setLacquers] = useState([]);
@@ -20,7 +21,7 @@ const LacquerShop = () => {
     }
 
     // Pobieranie lakierów przez fetch
-    fetch("http://localhost:8080/api/lacquers", {
+    fetch(`http://${BASE_URL}/api/lacquers`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +54,7 @@ const LacquerShop = () => {
           {/* Warunkowe renderowanie zdjęcia, jeśli istnieje */}
           {lacquer.imagePath && (
             <img
-              src={`http://localhost:8080/${lacquer.imagePath}`}
+              src={`http://${BASE_URL}/${lacquer.imagePath}`}
               alt={lacquer.name}
               className="lacquer-image"
             />

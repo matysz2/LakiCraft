@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_carpenterHeader.scss"; // Stylizacja nagłówka
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const CarpenterHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,7 +24,7 @@ const CarpenterHeader = () => {
       const sessionId = document.cookie.split(';').find(cookie => cookie.trim().startsWith('JSESSIONID='));
       const sessionIdValue = sessionId ? sessionId.split('=')[1] : null;
 
-      const response = await fetch("http://localhost:8080/api/user/logout", {
+      const response = await fetch(`http://${BASE_URL}/api/user/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

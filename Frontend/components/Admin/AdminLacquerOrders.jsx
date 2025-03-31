@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_AdminLacquerOrders.scss";
 import Header from "../Header";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
+
 
 const LacquerOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -20,7 +22,7 @@ const LacquerOrders = () => {
       return;
     }
 
-    fetch("http://localhost:8080/api/lacquer-orders")
+    fetch("http://${BASE_URL}/api/lacquer-orders")
       .then((res) => res.json())
       .then((data) => {
         setOrders(data);
@@ -54,7 +56,7 @@ const LacquerOrders = () => {
   }, [searchTerm, statusFilter, dateFilter, orders]);
 
   const handleUpdateStatus = (orderId, newStatus) => {
-    fetch(`http://localhost:8080/api/admin/stats/${orderId}/status`, {
+    fetch(`http://http://${BASE_URL}/api/admin/stats/${orderId}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: newStatus }),

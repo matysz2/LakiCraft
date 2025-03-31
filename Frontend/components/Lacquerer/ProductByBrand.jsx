@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import LacquerHeaderShop from "./LacquerHeaderShop";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const ProductsByBrand = () => {
   const { userId, brand } = useParams();
@@ -24,7 +25,7 @@ const ProductsByBrand = () => {
     setLoading(true);
     setError(null);
 
-    fetch(`http://localhost:8080/api/products/${userId}/${brand}`)
+    fetch(`http://${BASE_URL}/api/products/${userId}/${brand}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Błąd serwera");
@@ -149,7 +150,7 @@ const ProductsByBrand = () => {
           products.map((product) => (
             <div className="product-card" key={product.id}>
               {product.imagePath && (
-                <img src={`http://localhost:8080/${product.imagePath}`} alt={product.name} className="product-image" />
+                <img src={`http://${BASE_URL}/${product.imagePath}`} alt={product.name} className="product-image" />
               )}
               <p className="product-code">Kod: {product.kod}</p>
               <p className="product-name">{product.name}</p>

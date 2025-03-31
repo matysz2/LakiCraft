@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import BASE_URL from './config.js';  // Zmienna BASE_URL
+
 
 const MainContent = () => {
   const [email, setEmail] = useState("");
@@ -36,7 +38,7 @@ const MainContent = () => {
   
     try {
       const contactData = { name, email, message };
-      const response = await fetch("http://localhost:8080/api/contact", {
+      const response = await fetch(`http://${BASE_URL}/api/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(contactData),
@@ -104,7 +106,7 @@ const MainContent = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/api/user/login", {
+      const response = await fetch(`http://${BASE_URL}/api/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -162,7 +164,7 @@ const MainContent = () => {
         paymentDueDays: 0,
       };
 
-      const response = await fetch("http://localhost:8080/api/user/register", {
+      const response = await fetch(`http://${BASE_URL}/api/user/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),

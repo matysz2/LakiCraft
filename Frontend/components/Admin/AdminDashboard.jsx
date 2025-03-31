@@ -4,7 +4,7 @@ import AdminSidebar from "./AdminSidebar";
 import AdminStats from "./AdminStats";
 import "../../styles/_admin.scss";
 import Header from "../Header";
-
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 const AdminDashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,12 +31,14 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (userData) {
-      fetch("http://localhost:8080/api/admin/stats")        .then((res) => {
-          if (!res.ok) {
-            throw new Error("Błąd pobierania danych");
-          }
-          return res.json();
-        })
+      fetch(`http://${BASE_URL}/api/lacquer-orders`)
+      .then((res) => { 
+        if (!res.ok) {
+          throw new Error("Błąd pobierania danych");
+        }
+        return res.json();
+      })
+    
         .then(() => setLoading(false))
         .catch((err) => {
           setError(err.message);

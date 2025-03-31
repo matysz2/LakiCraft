@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import LoadingScreen from "../LoadingScreen";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const OrderMessages = () => {
   const { orderId } = useParams();
@@ -11,7 +12,7 @@ const OrderMessages = () => {
   const [newMessage, setNewMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   
-  const API_URL = "http://localhost:8080"; // Przechowywanie URL w zmiennej
+  const API_URL = "http://${BASE_URL}"; // Przechowywanie URL w zmiennej
 
   useEffect(() => {
     setIsLoading(true);

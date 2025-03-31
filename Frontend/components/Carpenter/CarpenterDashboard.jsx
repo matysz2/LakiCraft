@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_carpenterDashboard.scss";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
+
 
 const CarpenterDashboard = () => {
   const navigate = useNavigate();
@@ -67,7 +69,7 @@ const CarpenterDashboard = () => {
   }, [userData]);
 
   const fetchPaintingOrders = async (userId) => {
-    const response = await fetch("http://localhost:8080/api/lacquerOrders/new", {      
+    const response = await fetch(`http://${BASE_URL}/api/lacquerOrders/new`, {      
       headers: { "Content-Type": "application/json" },
     });
     
@@ -77,7 +79,7 @@ const CarpenterDashboard = () => {
   };
 
   const fetchLacquerPurchases = async (userId) => {
-    const response = await fetch(`http://localhost:8080/api/orders/user-orders`, {
+    const response = await fetch(`http://${BASE_URL}/api/orders/user-orders`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

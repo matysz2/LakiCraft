@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LacquerHeader from "./LacquererHeader";
 import "../../styles/_lacquererDashboard.scss";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const LacquererDashboard = () => {
   const navigate = useNavigate();
@@ -74,7 +75,7 @@ const LacquererDashboard = () => {
   }, [userData]);
 
   const fetchLacquerOrders = async (userId) => {
-    const response = await fetch(`http://localhost:8080/${userId}/pending`, {
+    const response = await fetch(`http://${BASE_URL}/${userId}/pending`, {
       headers: { "Content-Type": "application/json" },
     });
     if (!response.ok) throw new Error("Nie udało się pobrać zamówień lakierowania.");
@@ -82,7 +83,7 @@ const LacquererDashboard = () => {
   };
 
   const fetchCustomerOrders = async (userId) => {
-    const response = await fetch(`http://localhost:8080/api/orders/customer`, {
+    const response = await fetch(`http://${BASE_URL}/api/orders/customer`, {
       headers: { "userId": userId },
     });
     if (!response.ok) throw new Error("Błąd serwera przy pobieraniu zamówień klienta.");
@@ -90,7 +91,7 @@ const LacquererDashboard = () => {
   };
 
   const fetchAppointments = async (userId) => {
-    const response = await fetch(`http://localhost:8080/api/appointments?userId=${userData.id}`);
+    const response = await fetch(`http://${BASE_URL}/api/appointments?userId=${userData.id}`);
     if (!response.ok) throw new Error("Błąd serwera");
     return await response.json();
   };
@@ -127,7 +128,7 @@ const LacquererDashboard = () => {
     
 
     try {
-      const response = await fetch("http://localhost:8080/api/appointments", {
+      const response = await fetch(`http://${BASE_URL}/api/appointments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -153,7 +154,7 @@ const LacquererDashboard = () => {
 
   const handleDeleteAppointment = async (appointmentId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/appointments/${appointmentId}`, {
+      const response = await fetch(`http://${BASE_URL}/api/appointments/${appointmentId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

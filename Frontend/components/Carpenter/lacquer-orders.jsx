@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const Orders = () => {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8080/api/orders/customer`, {
+        const response = await fetch(`http://${BASE_URL}/api/orders/customer`, {
           headers: {
             "Content-Type": "application/json",
             "userId": userData.id,

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_admin.scss";
 import Header from "../Header";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const AdminUser = () => {
   const [users, setUsers] = useState([]);
@@ -31,7 +32,7 @@ const AdminUser = () => {
 
   useEffect(() => {
     if (role === "admin") {
-      fetch("http://localhost:8080/api/user/users")
+      fetch(`http://${BASE_URL}/api/user/users`)
         .then((res) => {
           if (!res.ok) {
             throw new Error("Błąd podczas pobierania użytkowników");
@@ -54,7 +55,7 @@ const AdminUser = () => {
     
     if (!isConfirmed) return;
   
-    fetch(`http://localhost:8080/api/user/users/${userId}`, {
+    fetch(`http://${BASE_URL}/api/user/users/${userId}`, {
       method: "DELETE",
     })
       .then((res) => {
@@ -72,7 +73,7 @@ const AdminUser = () => {
   };
 
   const handleSaveChanges = () => {
-    fetch(`http://localhost:8080/api/user/admin/users/${editingUser.id}`, {
+    fetch(`http://${BASE_URL}/api/user/admin/users/${editingUser.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

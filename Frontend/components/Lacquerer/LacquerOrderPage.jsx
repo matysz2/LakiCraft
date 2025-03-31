@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';  // Używamy useNavigate
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const LacquerOrderPage = () => {
   const navigate = useNavigate();  // Używamy useNavigate

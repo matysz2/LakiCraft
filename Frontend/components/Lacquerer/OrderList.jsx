@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LacquerHeader from "./LacquererHeader";
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 
 const LacquerOrderList = () => {
@@ -24,7 +25,7 @@ const LacquerOrderList = () => {
     }
 
     // Pobranie zamówień lakierowania dla użytkownika
-    fetch(`http://localhost:8080/api/lacquerOrders/user/${userId}`)
+    fetch(`http://${BASE_URL}/api/lacquerOrders/user/${userId}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`Błąd serwera: ${res.status} ${res.statusText}`);
@@ -46,7 +47,7 @@ const LacquerOrderList = () => {
   };
 
   const updateOrderStatus = (orderId, status) => {
-    fetch(`http://localhost:8080/${orderId}/status`, { // Zaktualizowany URL
+    fetch(`http://${BASE_URL}/${orderId}/status`, { // Zaktualizowany URL
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

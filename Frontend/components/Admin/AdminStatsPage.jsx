@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_adminstatspage.scss"; // Stylizacja nagłówka
+import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
 const StatsPage = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const StatsPage = () => {
 
     const fetchPaymentStats = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/stats/payment");
+        const response = await fetch(`http://${BASE_URL}/api/stats/payment`);
         const data = await response.json();
         setPaymentStats(data);
       } catch (error) {
@@ -29,7 +30,7 @@ const StatsPage = () => {
 
     const fetchSalesStats = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/stats/sales");
+        const response = await fetch(`http://${BASE_URL}/api/stats/sales`);
         const data = await response.json();
         setSalesStats(data);
       } catch (error) {
@@ -39,7 +40,7 @@ const StatsPage = () => {
 
     const fetchPaintingStats = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/stats/painting");
+        const response = await fetch(`http://${BASE_URL}/api/stats/painting`);
         const data = await response.json();
         setPaintingStats(data);
       } catch (error) {
@@ -49,7 +50,7 @@ const StatsPage = () => {
 
     const fetchLacquerOrdersCount = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/stats/lacquer-orders-count");
+        const response = await fetch(`http://${BASE_URL}/api/stats/lacquer-orders-count`);
         const data = await response.json();
         setLacquerOrdersCount(data);
       } catch (error) {
@@ -59,7 +60,7 @@ const StatsPage = () => {
 
     const fetchPaintingOrderStatuses = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/stats/painting-statuses");
+        const response = await fetch(`http://${BASE_URL}/api/stats/painting-statuses`);
         const data = await response.json();
         setPaintingOrderStatuses(data);
       } catch (error) {
@@ -69,7 +70,7 @@ const StatsPage = () => {
 
     const fetchSalesOrderStatuses = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/stats/sales-statuses");
+        const response = await fetch(`http://${BASE_URL}/api/stats/sales-statuses`);
         const data = await response.json();
         setSalesOrderStatuses(data);
       } catch (error) {

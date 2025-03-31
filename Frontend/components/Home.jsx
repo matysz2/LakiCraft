@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/main.scss";
+import BASE_URL from './config.js';  // Zmienna BASE_URL
 
 const MainContent = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const MainContent = () => {
           redirectUser(storedUserData.role);
         } else {
           // Sprawdzenie sesji z backendu, jeżeli brak w localStorage
-          const response = await fetch("http://localhost:8080/api/user/check-session", {
+          const response = await fetch(`http://${BASE_URL}/api/user/check-session`, {
             method: "GET",
             credentials: "include", // Wysyłanie cookies
           });
@@ -77,7 +78,7 @@ const MainContent = () => {
     const loginData = { email, password };
 
     try {
-      const response = await fetch("http://localhost:8080/api/user/login", {
+      const response = await fetch(`http://${BASE_URL}/api/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -108,7 +109,7 @@ const MainContent = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/user/logout", {
+      const response = await fetch(`http://${BASE_URL}/api/user/logout`, {
         method: "POST",
         credentials: "include", // Wysyłanie cookies
       });
