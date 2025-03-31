@@ -22,7 +22,7 @@ const LacquerOrders = () => {
       return;
     }
 
-    fetch("http://${BASE_URL}/api/lacquer-orders")
+    fetch(`http://${BASE_URL}/api/lacquer-orders`)
       .then((res) => res.json())
       .then((data) => {
         setOrders(data);
