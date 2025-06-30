@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  app:
+    image: lakicraft.war:latest # Podmień na obraz Twojej aplikacji
+    container_name: spring-boot-app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lakicraft # Połączenie do kontenera PostgreSQL
+      SPRING_DATASOURCE_USERNAME: kayalar_kayalarwol2_user
+      SPRING_DATASOURCE_PASSWORD: wv7DYxYyD8itU8KpK4cRuDiU3tmSofAK
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+    ports:
+      - "8080:8080" # Mapowanie portów
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16 # Wersja obrazu PostgreSQL
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: kayalar_kayalarwol2_user
+      POSTGRES_PASSWORD: wv7DYxYyD8itU8KpK4cRuDiU3tmSofAK
+      POSTGRES_DB: kayalar_kayalarwol2
+    ports:
+      - "5432:5432" # Mapowanie portów
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Utrwalanie danych
+
+volumes:
+  postgres_data:
