@@ -1,33 +1,26 @@
-# Etap 1: Budowanie aplikacji
-# Używamy oficjalnego obrazu Maven + Java 21 (Temurin)
+# Etap 1: Budowanie aplikacji WAR za pomocą Mavena i JDK 21
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 # Katalog roboczy
 WORKDIR /app
 
-# Kopiujemy plik pom.xml (dla buforowania zależności)
+# Kopiujemy pliki projektu
 COPY pom.xml .
-
-# Pobieramy zależności (tryb offline)
-RUN mvn dependency:go-offline -B
-
-# Kopiujemy kod źródłowy
 COPY src ./src
 
-# Budujemy aplikację bez testów i nadajemy stałą nazwę app.jar
-RUN mvn clean package -DskipTests && cp target/*.jar target/app.jar
+# Pobieramy zależności i budujemy plik WAR
+RUN mvn clean package -DskipTests
 
-# Etap 2: Obraz uruchomieniowy
-FROM eclipse-temurin:21-jre-alpine
+# Etap 2: Serwer Tomcat z wdrożonym plikiem WAR
+FROM tomcat:9.0-jdk21-temurin
 
-# Katalog roboczy
-WORKDIR /app
+# Usuwamy domyślne aplikacje Tomcata (opcjonalnie)
+RUN rm -rf /usr/local/tomcat/webapps/*
 
-# Kopiujemy zbudowany plik JAR
-COPY --from=builder /app/target/app.jar app.jar
+# Kopiujemy plik WAR i wdrażamy jako ROOT.war (czyli aplikacja będzie dostępna pod `/`)
+COPY --from=builder /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
 
-# Otwieramy port aplikacji
+# Otwieramy port 8080
 EXPOSE 8080
 
-# Komenda startowa aplikacji
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Tomcat startuje automatycznie, nie trzeba ustawiać ENTRYPOINT ani CMD
