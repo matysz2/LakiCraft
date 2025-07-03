@@ -1,44 +1,34 @@
-# Etap 1: Budowanie aplikacji (builder)
-# Używamy oficjalnego obrazu Maven, który zawiera już OpenJDK i Maven,
-# co eliminuje potrzebę ręcznej instalacji Mavena za pomocą apt-get.
-FROM maven:3.9.6-openjdk-21 AS builder
+# Etap 1: Budowanie aplikacji
+# Używamy oficjalnego obrazu Maven + Java 21 (temurin)
+FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
-# Ustawiamy katalog roboczy w kontenerze
+# Katalog roboczy
 WORKDIR /app
 
-# Kopiujemy plik pom.xml, aby Docker mógł buforować zależności Mavena.
-# To przyspiesza budowanie, jeśli tylko kod źródłowy się zmienia.
+# Kopiujemy plik pom.xml (dla buforowania zależności)
 COPY pom.xml .
 
-# Pobieramy zależności Mavena. -B oznacza tryb batch (nieinteraktywny).
+# Pobieramy zależności (offline build preparation)
 RUN mvn dependency:go-offline -B
 
-# Kopiujemy resztę kodu źródłowego aplikacji
+# Kopiujemy kod źródłowy
 COPY src ./src
 
-# Budujemy aplikację Spring Boot. Pomijamy testy, aby przyspieszyć budowanie obrazu.
-# Domyślnie Spring Boot tworzy plik JAR, a nie WAR, jeśli nie ma specjalnej konfiguracji.
-# Zmieniamy nazwę pliku wynikowego na app.jar dla uproszczenia.
+# Budujemy aplikację bez testów
 RUN mvn clean package -DskipTests
 
-# Etap 2: Uruchamianie aplikacji Spring Boot (finalny obraz)
-# Używamy lżejszego obrazu JRE (Java Runtime Environment), który zawiera tylko to,
-# co jest potrzebne do uruchomienia aplikacji, bez narzędzi deweloperskich (JDK).
-# To znacznie zmniejsza rozmiar końcowego obrazu Docker.
-FROM openjdk:21-jre-slim-bullseye
+# Etap 2: Uruchamianie aplikacji
+# Lekki obraz z Java 21 JRE (temurin)
+FROM eclipse-temurin:21-jre-alpine
 
-# Ustawiamy katalog roboczy w kontenerze
+# Katalog roboczy
 WORKDIR /app
 
-# Kopiujemy zbudowany plik JAR z etapu 'builder' do finalnego obrazu.
-# Używamy gwiazdki (*.jar), aby dopasować nazwę pliku JAR, która może zawierać wersję.
-# Zapisujemy go jako app.jar.
+# Kopiujemy zbudowany plik JAR z buildera
 COPY --from=builder /app/target/*.jar app.jar
 
-# Określamy port, na którym aplikacja nasłuchuje.
-# Render.com będzie kierował ruch na ten port.
+# Port, na którym działa Spring Boot
 EXPOSE 8080
 
-# Komenda uruchamiająca aplikację Spring Boot.
-# Uruchamiamy plik JAR.
+# Uruchomienie aplikacji
 ENTRYPOINT ["java", "-jar", "app.jar"]
