@@ -25,7 +25,7 @@ RUN mvn clean package -DskipTests
 # Używamy lżejszego obrazu JRE (Java Runtime Environment), który zawiera tylko to,
 # co jest potrzebne do uruchomienia aplikacji, bez narzędzi deweloperskich (JDK).
 # To znacznie zmniejsza rozmiar końcowego obrazu Docker.
-FROM openjdk:21-jre-slim
+FROM openjdk:21-jre-slim-bullseye
 
 # Ustawiamy katalog roboczy w kontenerze
 WORKDIR /app
