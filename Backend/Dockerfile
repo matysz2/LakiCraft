@@ -1,30 +1,44 @@
-# Etap 1: Budowanie aplikacji
-FROM openjdk:21-jdk AS builder
+# Etap 1: Budowanie aplikacji (builder)
+# Używamy oficjalnego obrazu Maven, który zawiera już OpenJDK i Maven,
+# co eliminuje potrzebę ręcznej instalacji Mavena za pomocą apt-get.
+FROM maven:3.9.6-openjdk-21 AS builder
 
-# Instalujemy Maven
-RUN apt-get update && apt-get install -y maven
-
-# Ustawiamy katalog roboczy
+# Ustawiamy katalog roboczy w kontenerze
 WORKDIR /app
 
-# Kopiujemy plik pom.xml i katalog źródeł aplikacji
-COPY pom.xml /app/
-COPY src /app/src
+# Kopiujemy plik pom.xml, aby Docker mógł buforować zależności Mavena.
+# To przyspiesza budowanie, jeśli tylko kod źródłowy się zmienia.
+COPY pom.xml .
 
-# Budujemy aplikację (pomijamy testy w procesie budowania)
+# Pobieramy zależności Mavena. -B oznacza tryb batch (nieinteraktywny).
+RUN mvn dependency:go-offline -B
+
+# Kopiujemy resztę kodu źródłowego aplikacji
+COPY src ./src
+
+# Budujemy aplikację Spring Boot. Pomijamy testy, aby przyspieszyć budowanie obrazu.
+# Domyślnie Spring Boot tworzy plik JAR, a nie WAR, jeśli nie ma specjalnej konfiguracji.
+# Zmieniamy nazwę pliku wynikowego na app.jar dla uproszczenia.
 RUN mvn clean package -DskipTests
 
-# Etap 2: Uruchamianie aplikacji Spring Boot
-FROM openjdk:21-jdk
+# Etap 2: Uruchamianie aplikacji Spring Boot (finalny obraz)
+# Używamy lżejszego obrazu JRE (Java Runtime Environment), który zawiera tylko to,
+# co jest potrzebne do uruchomienia aplikacji, bez narzędzi deweloperskich (JDK).
+# To znacznie zmniejsza rozmiar końcowego obrazu Docker.
+FROM openjdk:21-jre-slim
 
-# Ustawiamy katalog roboczy
+# Ustawiamy katalog roboczy w kontenerze
 WORKDIR /app
 
-# Kopiujemy zbudowany plik .war z etapu budowania
-COPY --from=builder /app/target/lakicraft-0.0.1-SNAPSHOT.war /app/lakicraft.war
+# Kopiujemy zbudowany plik JAR z etapu 'builder' do finalnego obrazu.
+# Używamy gwiazdki (*.jar), aby dopasować nazwę pliku JAR, która może zawierać wersję.
+# Zapisujemy go jako app.jar.
+COPY --from=builder /app/target/*.jar app.jar
 
-# Określamy polecenie uruchomienia aplikacji Spring Boot
-ENTRYPOINT ["java", "-jar", "/app/lakicraft.war"]
-
-# Otwieramy port 8080 (domyślny port aplikacji Spring Boot)
+# Określamy port, na którym aplikacja nasłuchuje.
+# Render.com będzie kierował ruch na ten port.
 EXPOSE 8080
+
+# Komenda uruchamiająca aplikację Spring Boot.
+# Uruchamiamy plik JAR.
+ENTRYPOINT ["java", "-jar", "app.jar"]
