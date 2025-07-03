@@ -1,5 +1,5 @@
 # Etap 1: Budowanie aplikacji
-FROM openjdk:21-jdk-slim AS builder
+FROM openjdk:21-jdk- AS builder
 
 # Instalujemy Maven
 RUN apt-get update && apt-get install -y maven
@@ -15,7 +15,7 @@ COPY src /app/src
 RUN mvn clean package -DskipTests
 
 # Etap 2: Uruchamianie aplikacji Spring Boot
-FROM openjdk:21-jdk-slim
+FROM openjdk:21-jdk-
 
 # Ustawiamy katalog roboczy
 WORKDIR /app
