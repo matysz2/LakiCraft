@@ -1,3 +1,3 @@
-export const BASE_URL = "localhost:8080";
+export const BASE_URL = "https://lakicraft.onrender.com";
 
 export default BASE_URL;
