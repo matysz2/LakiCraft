@@ -44,7 +44,7 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://${BASE_URL}/api/orders/customer`, {
+        const response = await fetch(`https://${BASE_URL}/api/orders/customer`, {
           headers: {
             "Content-Type": "application/json",
             "userId": userData.id,

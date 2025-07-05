@@ -35,7 +35,7 @@ const SellerDashboard = () => {
     setLoading(true);
     setError(null);
 
-    fetch(`http://${BASE_URL}/api/sales/total`, {
+    fetch(`https://${BASE_URL}/api/sales/total`, {
       method: "GET",
       headers: {
         "userid": userData.id, // Wysyłanie user_id w nagłówkach
@@ -63,7 +63,7 @@ const SellerDashboard = () => {
     setLoading(true);
     setError(null);
 
-    fetch(`http://${BASE_URL}/api/products`, {
+    fetch(`https://${BASE_URL}/api/products`, {
       method: "GET",
       headers: {
         "user_id": userData.id, // Wysyłanie user_id w nagłówkach

@@ -32,7 +32,7 @@ const AdminUser = () => {
 
   useEffect(() => {
     if (role === "admin") {
-      fetch(`http://${BASE_URL}/api/user/users`)
+      fetch(`https://${BASE_URL}/api/user/users`)
         .then((res) => {
           if (!res.ok) {
             throw new Error("Błąd podczas pobierania użytkowników");
@@ -55,7 +55,7 @@ const AdminUser = () => {
     
     if (!isConfirmed) return;
   
-    fetch(`http://${BASE_URL}/api/user/users/${userId}`, {
+    fetch(`https://${BASE_URL}/api/user/users/${userId}`, {
       method: "DELETE",
     })
       .then((res) => {
@@ -73,7 +73,7 @@ const AdminUser = () => {
   };
 
   const handleSaveChanges = () => {
-    fetch(`http://${BASE_URL}/api/user/admin/users/${editingUser.id}`, {
+    fetch(`https://${BASE_URL}/api/user/admin/users/${editingUser.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

@@ -31,7 +31,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (userData) {
-      fetch(`http://${BASE_URL}/api/lacquer-orders`)
+      fetch(`https://${BASE_URL}/api/lacquer-orders`)
       .then((res) => { 
         if (!res.ok) {
           throw new Error("Błąd pobierania danych");

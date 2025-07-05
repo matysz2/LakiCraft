@@ -25,7 +25,7 @@ const ProductsByBrand = () => {
     setLoading(true);
     setError(null);
 
-    fetch(`http://${BASE_URL}/api/products/${userId}/${brand}`)
+    fetch(`https://${BASE_URL}/api/products/${userId}/${brand}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Błąd serwera");
@@ -150,7 +150,7 @@ const ProductsByBrand = () => {
           products.map((product) => (
             <div className="product-card" key={product.id}>
               {product.imagePath && (
-                <img src={`http://${BASE_URL}/${product.imagePath}`} alt={product.name} className="product-image" />
+                <img src={`https://${BASE_URL}/${product.imagePath}`} alt={product.name} className="product-image" />
               )}
               <p className="product-code">Kod: {product.kod}</p>
               <p className="product-name">{product.name}</p>

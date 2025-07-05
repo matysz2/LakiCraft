@@ -21,7 +21,7 @@ const LacquerShop = () => {
     }
 
     // Pobieranie lakierów przez fetch
-    fetch(`http://${BASE_URL}/api/lacquers`, {
+    fetch(`https://${BASE_URL}/api/lacquers`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +54,7 @@ const LacquerShop = () => {
           {/* Warunkowe renderowanie zdjęcia, jeśli istnieje */}
           {lacquer.imagePath && (
             <img
-              src={`http://${BASE_URL}/${lacquer.imagePath}`}
+              src={`https://${BASE_URL}/${lacquer.imagePath}`}
               alt={lacquer.name}
               className="lacquer-image"
             />

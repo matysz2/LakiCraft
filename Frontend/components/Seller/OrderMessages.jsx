@@ -41,7 +41,7 @@ const OrderMessages = () => {
         await new Promise((resolve) => setTimeout(resolve, 2000)); // Symulacja czasu ładowania
         console.log("Przed wysłaniem żądania, orderId: ", orderId);
 
-        const response = await fetch(`http://${BASE_URL}/api/orders/${orderId}/messages`);
+        const response = await fetch(`https://${BASE_URL}/api/orders/${orderId}/messages`);
         if (!response.ok) throw new Error("Błąd sieci");
         const data = await response.json();
 
@@ -78,7 +78,7 @@ const OrderMessages = () => {
     const receiverId = 1; // Przykładowy id odbiorcy, można ustawić na dynamiczne w zależności od zamówienia
 
     try {
-      const response = await fetch(`http://${BASE_URL}/api/orders/${orderId}/messages`, {
+      const response = await fetch(`https://${BASE_URL}/api/orders/${orderId}/messages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

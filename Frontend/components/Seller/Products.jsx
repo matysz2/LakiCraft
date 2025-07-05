@@ -40,7 +40,7 @@ const Products = () => {
   const fetchProducts = (userId) => {
     console.log("Pobieranie produktów dla użytkownika ID:", userId);
     
-    fetch(`http://${BASE_URL}/api/products`, {
+    fetch(`https://${BASE_URL}/api/products`, {
       method: "GET",
       headers: { "user_id": userId },
     })
@@ -87,7 +87,7 @@ const Products = () => {
       return;
     }
 
-    fetch(`http://${BASE_URL}/api/products/${editableProduct.id}`, {
+    fetch(`https://${BASE_URL}/api/products/${editableProduct.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -130,7 +130,7 @@ const Products = () => {
       return;
     }
 
-    fetch(`http://${BASE_URL}/api/products/${productId}`, {
+    fetch(`https://${BASE_URL}/api/products/${productId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -151,7 +151,7 @@ const Products = () => {
   };
 
   const checkIfProductCanBeDeleted = (productId) => {
-    fetch(`http://${BASE_URL}/api/orders/order-items/check/${productId}`)
+    fetch(`https://${BASE_URL}/api/orders/order-items/check/${productId}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`Błąd przy sprawdzaniu zależności: ${res.status}`);
@@ -210,7 +210,7 @@ const Products = () => {
             <div key={product.id} className="product-card">
               {product.imagePath && (
                 <img
-                  src={`http://${BASE_URL}/${product.imagePath}`}
+                  src={`https://${BASE_URL}/${product.imagePath}`}
                   alt={product.name}
                   className="product-image"
                 />

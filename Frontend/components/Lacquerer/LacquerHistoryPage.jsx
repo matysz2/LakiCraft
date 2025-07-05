@@ -23,7 +23,7 @@ const MyHistory = () => {
     }
 
     // Zmieniamy metodę fetch, aby używać nagłówka zamiast query parameter
-    fetch(`http://${BASE_URL}/api/orders/user-orders`, {
+    fetch(`https://${BASE_URL}/api/orders/user-orders`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

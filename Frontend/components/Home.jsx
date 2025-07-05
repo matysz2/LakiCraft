@@ -24,7 +24,7 @@ const MainContent = () => {
           redirectUser(storedUserData.role);
         } else {
           // Sprawdzenie sesji z backendu, jeżeli brak w localStorage
-          const response = await fetch(`http://${BASE_URL}/api/user/check-session`, {
+          const response = await fetch(`https://${BASE_URL}/api/user/check-session`, {
             method: "GET",
             credentials: "include", // Wysyłanie cookies
           });
@@ -78,7 +78,7 @@ const MainContent = () => {
     const loginData = { email, password };
 
     try {
-      const response = await fetch(`http://${BASE_URL}/api/user/login`, {
+      const response = await fetch(`https://${BASE_URL}/api/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +109,7 @@ const MainContent = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`http://${BASE_URL}/api/user/logout`, {
+      const response = await fetch(`https://${BASE_URL}/api/user/logout`, {
         method: "POST",
         credentials: "include", // Wysyłanie cookies
       });

@@ -35,7 +35,7 @@ const MyServices = () => {
       return;
     }
 
-    fetch(`http://${BASE_URL}/api/business-card?userId=${userId}`)
+    fetch(`https://${BASE_URL}/api/business-card?userId=${userId}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Błąd pobierania danych wizytówki.");
@@ -78,7 +78,7 @@ const MyServices = () => {
         formData.append("profileImage", selectedFile);
       }
 
-      fetch(`http://${BASE_URL}/api/business-card`, {
+      fetch(`https://${BASE_URL}/api/business-card`, {
         method: "PATCH", // Zamiast PUT, użyj PATCH
         body: formData,
       })

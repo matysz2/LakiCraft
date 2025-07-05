@@ -40,7 +40,7 @@ const Account = () => {
     }
 
     setLoading(true);
-    fetch(`http://${BASE_URL}/api/user?id=${userData.id}`, {
+    fetch(`https://${BASE_URL}/api/user?id=${userData.id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       }
@@ -72,7 +72,7 @@ const Account = () => {
 
     console.log("Dane do wysłania: ", editableUser);
 
-    fetch(`http://${BASE_URL}/api/user?id=${user.id}`, {
+    fetch(`https://${BASE_URL}/api/user?id=${user.id}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -115,7 +115,7 @@ const Account = () => {
     }
 
     if (window.confirm("Czy na pewno chcesz usunąć konto?")) {
-      fetch(`http://${BASE_URL}/api/user?id=${user.id}`, {
+      fetch(`https://${BASE_URL}/api/user?id=${user.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

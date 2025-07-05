@@ -40,7 +40,7 @@ const LacquerOrders = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://${BASE_URL}/carpenter/${userData.id}`);
+        const response = await fetch(`https://${BASE_URL}/carpenter/${userData.id}`);
         if (!response.ok) throw new Error("Błąd podczas pobierania zleceń.");
         const data = await response.json();
         setOrders(data);
@@ -60,7 +60,7 @@ const LacquerOrders = () => {
 
   const handleDeleteOrder = async (orderId) => {
     try {
-      const response = await fetch(`http://${BASE_URL}/api/lacquerOrders/${orderId}`, {
+      const response = await fetch(`https://${BASE_URL}/api/lacquerOrders/${orderId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

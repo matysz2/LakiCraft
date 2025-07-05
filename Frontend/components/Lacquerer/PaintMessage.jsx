@@ -12,7 +12,7 @@ const OrderMessages = () => {
   const [newMessage, setNewMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   
-  const API_URL = "http://${BASE_URL}"; // Przechowywanie URL w zmiennej
+  const API_URL = "https://${BASE_URL}"; // Przechowywanie URL w zmiennej
 
   useEffect(() => {
     setIsLoading(true);

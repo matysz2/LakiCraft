@@ -24,7 +24,7 @@ const CarpenterHeader = () => {
       const sessionId = document.cookie.split(';').find(cookie => cookie.trim().startsWith('JSESSIONID='));
       const sessionIdValue = sessionId ? sessionId.split('=')[1] : null;
 
-      const response = await fetch(`http://${BASE_URL}/api/user/logout`, {
+      const response = await fetch(`https://${BASE_URL}/api/user/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

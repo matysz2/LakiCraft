@@ -37,7 +37,7 @@ const Orders = () => {
     }
 
     // Fetch orders from the backend
-    fetch(`http://${BASE_URL}/api/orders/admin`)
+    fetch(`https://${BASE_URL}/api/orders/admin`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("Błąd podczas pobierania zamówień");
@@ -56,7 +56,7 @@ const Orders = () => {
   }, [navigate]);
 
   const handleUpdateStatus = (orderId, newStatus) => {
-    fetch(`http://${BASE_URL}/api/orders/admin/${orderId}/status`, {
+    fetch(`https://${BASE_URL}/api/orders/admin/${orderId}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
