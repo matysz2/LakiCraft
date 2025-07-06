@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+    "http://localhost:3000",
+    "https://lakicraft.netlify.app"
+})
+
 @RestController
 @RequestMapping("/api/orders")
 public class MessageController {

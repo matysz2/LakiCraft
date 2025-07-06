@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.lakicraft.repository.SaleRepository;
 
-@CrossOrigin(origins = "http://localhost:3000") // Upewnij się, że CORS jest poprawnie ustawione dla aplikacji React
+@CrossOrigin(origins = {
+    "http://localhost:3000",
+    "https://lakicraft.netlify.app"
+})
+ // Upewnij się, że CORS jest poprawnie ustawione dla aplikacji React
 @RequestMapping("/api")
 @RestController
 public class SaleController {

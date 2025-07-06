@@ -12,7 +12,11 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/lacquers")
-@CrossOrigin(origins = "http://localhost:3000") // Dostosuj do adresu frontendu
+@CrossOrigin(origins = {
+    "http://localhost:3000",
+    "https://lakicraft.netlify.app"
+})
+ // Dostosuj do adresu frontendu
 public class LacquerController {
 
     private final ProductRepository productRepository;

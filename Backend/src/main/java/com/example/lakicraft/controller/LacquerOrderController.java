@@ -21,7 +21,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+    "http://localhost:3000",
+    "https://lakicraft.netlify.app"
+})
+
 @RestController
 @RequestMapping("")
 public class LacquerOrderController {
