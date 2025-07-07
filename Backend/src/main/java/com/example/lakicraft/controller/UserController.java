@@ -36,11 +36,6 @@ public ResponseEntity<Map<String, Object>> testCors() {
         "timestamp", LocalDateTime.now()
     ));
 }
-@GetMapping("/test")
-public ResponseEntity<String> test() {
-    return ResponseEntity.ok("OK działa");
-}
-
 
     public UserController(UserService userService, PasswordService passwordService, UserRepository userRepository) {
         this.userService = userService;
