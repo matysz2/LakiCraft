@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Pliki środowiskowe – NIE powinny trafiać do repo
+.env
+.env.*
+

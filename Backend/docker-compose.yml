@@ -1,13 +1,36 @@
 version: '3.8'
 
 services:
-  app:
-    image: lakicraft:latest # Upewnij się, że tak nazywa się obraz Twojej aplikacji (np. JAR w Dockerfile)
-    container_name: spring-boot-app
-    # Zmienne środowiskowe dla połączenia z bazą danych (np. SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD)
-    # będą dostarczone przez Render.com. Ustawisz je w panelu administracyjnym Render.com dla tego serwisu.
-    # Nie umieszczamy ich bezpośrednio tutaj, aby zachować elastyczność i bezpieczeństwo.
+  backend:
+    build:
+      context: .
+    image: lakicraft:latest
+    container_name: lakicraft_backend
     ports:
-      - "8080:8080" # Mapowanie portów: port 8080 kontenera jest wystawiany na port 8080 hosta (Render.com)
-    # Ponieważ baza danych jest na Railway, nie potrzebujesz tutaj sekcji 'depends_on' ani 'networks'
-    # dla bazy danych. Render.com zarządza siecią dla Twojej aplikacji.
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    container_name: lakicraft_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
