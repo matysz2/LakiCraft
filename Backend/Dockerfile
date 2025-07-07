@@ -18,7 +18,7 @@ FROM tomcat:9.0-jdk21-temurin
 RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Kopiujemy plik WAR i wdrażamy jako ROOT.war (czyli aplikacja będzie dostępna pod `/`)
-COPY --from=builder /app/target/lakicraft-0.0.1.war /usr/local/tomcat/webapps/lakicraft-0.0.1.war
+COPY --from=builder /app/target/lakicraft-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/lakicraft-0.0.1-SNAPSHOT.war
 
 # Otwieramy port 8080
 EXPOSE 8080
