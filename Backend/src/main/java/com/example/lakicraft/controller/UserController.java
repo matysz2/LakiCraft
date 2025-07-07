@@ -36,7 +36,10 @@ public ResponseEntity<Map<String, Object>> testCors() {
         "timestamp", LocalDateTime.now()
     ));
 }
-
+    @GetMapping("/test")
+    public String hello() {
+        return "Działa!";
+    }
     public UserController(UserService userService, PasswordService passwordService, UserRepository userRepository) {
         this.userService = userService;
         this.passwordService = passwordService; // Możesz usunąć, jeśli nie jest już używane
