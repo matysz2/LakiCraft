@@ -19,6 +19,8 @@ import java.util.Optional;
 
 
 @RestController
+
+
 @RequestMapping("/api/user")
 public class UserController {
 
@@ -26,7 +28,15 @@ public class UserController {
     private final PasswordService passwordService; // Możesz teraz usunąć tę usługę, jeśli nie będzie potrzebna
     private final UserRepository userRepository;
 
-    
+    // Testowy endpoint do sprawdzenia działania CORS
+@GetMapping("/test-cors")
+public ResponseEntity<Map<String, Object>> testCors() {
+    return ResponseEntity.ok(Map.of(
+        "message", "CORS działa poprawnie!",
+        "timestamp", LocalDateTime.now()
+    ));
+}
+
     public UserController(UserService userService, PasswordService passwordService, UserRepository userRepository) {
         this.userService = userService;
         this.passwordService = passwordService; // Możesz usunąć, jeśli nie jest już używane
