@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.lakicraft.repository.OrderItemRepository;
 
 
-@CrossOrigin(origins = {
-    "http://localhost:3000",
-    "https://lakicraft.netlify.app"
-})
+
 
 @RestController
 @RequestMapping

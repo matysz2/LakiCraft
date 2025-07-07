@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-@CrossOrigin(origins = {
-    "http://localhost:3000",
-    "https://lakicraft.netlify.app"
-})
+
 
 @RestController
 @RequestMapping("/api/user")  // Ustawienie wspólnego prefiksu dla endpointów

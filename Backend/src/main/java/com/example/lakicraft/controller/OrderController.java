@@ -26,10 +26,7 @@ import com.example.lakicraft.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 
-@CrossOrigin(origins = {
-    "http://localhost:3000",
-    "https://lakicraft.netlify.app"
-})
+
  // Upewnij się, że CORS jest poprawnie ustawione dla aplikacji React
 @RestController
 @RequestMapping("/api/orders")

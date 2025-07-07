@@ -19,10 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-@CrossOrigin(origins = {
-    "http://localhost:3000",
-    "https://lakicraft.netlify.app"
-})
+
  // Upewnij się, że CORS jest poprawnie ustawione dla aplikacji React
 @RestController
 @RequestMapping("/api/products")

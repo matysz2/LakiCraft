@@ -16,10 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-@CrossOrigin(origins = {
-    "http://localhost:3000",
-    "https://lakicraft.netlify.app"
-})
+
 
 @RestController
 @RequestMapping("/api/business-card")
