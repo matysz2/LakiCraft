@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import react from '09bab9525ba9.ngrok-free.app';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   base: "/",
