@@ -4,13 +4,13 @@
   "version": "4.5.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-        "build-css": "sass src/styles/main.scss dist/styles/main.css --no-source-map"
+    "dev": "vite",                      // Uruchamia Vite w trybie deweloperskim
+    "build": "vite build",               // Buduje projekt z użyciem Vite
+    "preview": "vite preview",           // Podgląd po zbudowaniu
+    "build-css": "sass src/styles/main.scss dist/styles/main.css --no-source-map"  // Kompilacja SCSS do CSS
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.4",
+    "@vitejs/plugin-react": "^4.0.4",    // Plugin React dla Vite
     "eslint": "8.49.0",
     "eslint-config-prettier": "9.0.0",
     "eslint-config-react-app": "7.0.1",
@@ -18,12 +18,12 @@
     "vite": "4.4.5"
   },
   "dependencies": {
-    "LAKICRAF": "file:",
-    "LAKICRAFT": "file:",
+    "LAKICRAF": "file:",                 // Jeśli masz lokalny pakiet
+    "LAKICRAFT": "file:",                // Jeśli masz lokalny pakiet
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^6.29.0",
-    "sass": "^1.67.0"
+    "sass": "^1.67.0"                    // Sass do kompilacji SCSS
   }
 }
