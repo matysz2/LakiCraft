@@ -1,26 +1,24 @@
-# Etap 1: Budowanie aplikacji WAR za pomocą Mavena i JDK 21
+# Etap 1: Budowanie JAR za pomocą Mavena i JDK 21
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
-# Katalog roboczy
 WORKDIR /app
 
-# Kopiujemy pliki projektu
-COPY pom.xml .
-COPY src ./src
+# Kopiowanie całego projektu (pom.xml + src + inne potrzebne pliki)
+COPY . .
 
-# Pobieramy zależności i budujemy plik WAR
-RUN mvn clean package -DskipTests
+# Kompilacja projektu i tworzenie pliku .jar
+RUN chmod +x mvnw && ./mvnw clean package -DskipTests
 
-# Etap 2: Serwer Tomcat z wdrożonym plikiem WAR
-FROM tomcat:9.0-jdk21-temurin
+# Etap 2: Tworzenie obrazu z gotowym .jar
+FROM eclipse-temurin:21-jdk
 
-# Usuwamy domyślne aplikacje Tomcata (opcjonalnie)
-RUN rm -rf /usr/local/tomcat/webapps/*
+WORKDIR /app
 
-# Kopiujemy plik WAR i wdrażamy jako ROOT.war (czyli aplikacja będzie dostępna pod `/`)
-COPY --from=builder /app/target/lakicraft-0.0.1-SNAPSHOT.jar /usr/local/tomcat/webapps/lakicraft-0.0.1-SNAPSHOT.jar
+# Kopiujemy .jar z poprzedniego etapu
+COPY --from=builder /app/target/lakicraft-0.0.1-SNAPSHOT.jar app.jar
 
 # Otwieramy port 8080
 EXPOSE 8080
 
-# Tomcat startuje automatycznie, nie trzeba ustawiać ENTRYPOINT ani CMD
+# Domyślna komenda do uruchomienia Spring Boota
+ENTRYPOINT ["java", "-jar", "app.jar"]
