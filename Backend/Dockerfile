@@ -1,19 +1,19 @@
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
-# Ustawiamy katalog roboczy
 WORKDIR /app
 
-# Kopiujemy plik pom.xml i katalog Backend (z kodem źródłowym)
+# Kopiujemy tylko pom.xml i src, jeśli struktura jest standardowa
 COPY Backend/pom.xml /app/pom.xml
 COPY Backend/src /app/src
 
-# Debug - sprawdzamy wersje JDK i Mavena
+# Debug wersji
 RUN java -version
 RUN javac -version
 RUN mvn -version
 
-# Budujemy aplikację pomijając testy
+# Budujemy aplikację bez mvnw
 RUN mvn clean package -DskipTests
+
 
 # Etap uruchamiania
 FROM eclipse-temurin:21-jre
