@@ -1,6 +1,29 @@
 {
+  "name": "LAKICRAFT",
+  "private": true,
+  "version": "4.5.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",                     
+    "build": "vite build",            
+    "preview": "vite preview",           
+    "build-css": "sass src/styles/main.scss dist/styles/main.css --no-source-map" 
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.4",   
+    "eslint": "8.49.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-config-react-app": "7.0.1",
+    "prettier": "3.0.3",
+    "vite": "4.4.5"
+  },
   "dependencies": {
-    "@paypal/react-paypal-js": "^8.8.2",
-    "axios": "^1.7.9"
+    "LAKICRAF": "file:",                 
+    "LAKICRAFT": "file:",                
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^6.29.0",
+    "sass": "^1.67.0"                   
   }
 }
