@@ -53,7 +53,7 @@ const LacquerHeader = () => {
   return (
     <header className="lacquer-header">
        <div className="logo">
-        <img src="/image/logo.png" alt="Logo" />
+        <img src="../../image/logo.png" alt="Logo" />
         <span>LakiCraft</span>
       </div>
       <div className={`user-menu ${menuOpen ? "open" : ""}`}>
