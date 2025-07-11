@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BASE_URL from '../config.js';  // Zmienna BASE_URL
+import logo from "../../image/logo.png"; // Prawidłowy import obrazu
+import shoppingCartIcon from "../../image/shopping_cart2.png";
+
 
 const LacquerHeaderShop = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -81,7 +84,7 @@ const LacquerHeaderShop = () => {
   return (
     <header className="lacquer-header">
       <div className="logo">
-        <img src="/image/logo.png" alt="Logo" />
+               <img src={logo} alt="Logo" />
         <span>LakiCraft</span>
       </div>
 
@@ -107,7 +110,7 @@ const LacquerHeaderShop = () => {
 
       {/* Ikona koszyka z liczbą unikalnych produktów */}
       <div className="cart-icon" onClick={() => navigate("/cart")}>
-        <img src="/image/shopping_cart2.png" alt="Koszyk" />
+        <img src={shoppingCartIcon} alt="Koszyk" />
         {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
       </div>
     </header>
