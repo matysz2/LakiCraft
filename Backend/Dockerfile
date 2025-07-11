@@ -2,7 +2,7 @@ FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 WORKDIR /app/Backend
 
-COPY Backend /app
+COPY Backend /app/Backend
 
 # Debug - sprawdzamy wersje JDK i Mavena
 RUN java -version
