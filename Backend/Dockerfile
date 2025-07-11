@@ -1,24 +1,32 @@
-# Etap 1: Budowanie JAR za pomocą Mavena i JDK 21
+# Etap 1: Budowanie aplikacji JAR za pomocą Mavena i JDK 21
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
+# Katalog roboczy
 WORKDIR /app
 
-# Kopiowanie całego projektu (pom.xml + src + inne potrzebne pliki)
-COPY . .
+# Skopiuj cały folder Backend do obrazu
+COPY Backend /app
 
-# Kompilacja projektu i tworzenie pliku .jar
-RUN chmod +x mvnw && ./mvnw clean package -DskipTests
+# Nadanie uprawnień do wykonywania mvnw
+RUN chmod +x ./mvnw
 
-# Etap 2: Tworzenie obrazu z gotowym .jar
+# Buduj aplikację bez testów
+RUN ./mvnw clean package -DskipTests
+
+# Etap 2: Obraz uruchomieniowy z JDK 21
 FROM eclipse-temurin:21-jdk
 
+# Katalog roboczy
 WORKDIR /app
 
-# Kopiujemy .jar z poprzedniego etapu
-COPY --from=builder /app/target/lakicraft-0.0.1-SNAPSHOT.jar app.jar
+# Skopiuj zbudowany plik JAR z poprzedniego etapu
+COPY --from=builder /app/target/*.jar app.jar
 
-# Otwieramy port 8080
+# Ustaw zmienną środowiskową PORT (Railway ją nadpisze automatycznie)
+ENV PORT=8080
+
+# Otwórz port 8080
 EXPOSE 8080
 
-# Domyślna komenda do uruchomienia Spring Boota
+# Komenda uruchamiająca aplikację
 ENTRYPOINT ["java", "-jar", "app.jar"]
