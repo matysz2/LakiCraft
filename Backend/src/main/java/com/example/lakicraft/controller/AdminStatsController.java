@@ -1,7 +1,3 @@
-
-
-    
-
 package com.example.lakicraft.controller;
 
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +10,7 @@ import com.example.lakicraft.repository.SaleRepository;
 import com.example.lakicraft.repository.UserRepository;
 
 import org.springframework.http.ResponseEntity;
+import java.util.HashMap;
 import java.util.Map;
 import java.math.BigDecimal;
 
@@ -27,8 +24,6 @@ public class AdminStatsController {
     private final SaleRepository saleRepository;
     private final LacquerOrderRepository lacquerOrderRepository;
 
- 
-
     public AdminStatsController(UserRepository userRepository, ProductRepository productRepository,
             OrderRepository orderRepository, SaleRepository saleRepository,
             LacquerOrderRepository lacquerOrderRepository) {
@@ -39,8 +34,6 @@ public class AdminStatsController {
         this.lacquerOrderRepository = lacquerOrderRepository;
     }
 
-
-
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAdminStats() {
         long userCount = userRepository.count();
@@ -49,19 +42,21 @@ public class AdminStatsController {
         Double lacquerorderCount = lacquerOrderRepository.getTotalPaintingMeters();
         BigDecimal totalSales = saleRepository.getTotalSales();
 
-        Map<String, Object> stats = Map.of(
-            "users", userCount,
-            "products", productCount,
-            "orders", orderCount,
-            "orderslacquer", lacquerorderCount,
-            "sales", totalSales
-        );
+        // Zamiana null na wartości domyślne
+        double lacquerOrderCountSafe = lacquerorderCount != null ? lacquerorderCount : 0.0;
+        BigDecimal totalSalesSafe = totalSales != null ? totalSales : BigDecimal.ZERO;
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("users", userCount);
+        stats.put("products", productCount);
+        stats.put("orders", orderCount);
+        stats.put("orderslacquer", lacquerOrderCountSafe);
+        stats.put("sales", totalSalesSafe);
 
         return ResponseEntity.ok(stats);
     }
 
-
-       @PutMapping("/{orderId}/status")
+    @PutMapping("/{orderId}/status")
     public ResponseEntity<LacquerOrder> updateOrderStatus(@PathVariable Long orderId, @RequestBody StatusUpdateRequest request) {
         return lacquerOrderRepository.findById(orderId).map(order -> {
             order.setStatus(request.getStatus());
