@@ -1,3 +1,3 @@
-export const BASE_URL = "09bab9525ba9.ngrok-free.app";
+export const BASE_URL = "lakicraft-production.up.railway.app";
 
 export default BASE_URL;
