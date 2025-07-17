@@ -74,13 +74,16 @@ const LacquererDashboard = () => {
     fetchData();
   }, [userData]);
 
-  const fetchLacquerOrders = async (userId) => {
-    const response = await fetch(`https://${BASE_URL}/${userId}/pending`, {
-      headers: { "Content-Type": "application/json" },
-    });
-    if (!response.ok) throw new Error("Nie udało się pobrać zamówień lakierowania.");
-    return await response.json();
-  };
+const fetchLacquerOrders = async (userId) => {
+  const response = await fetch(`https://${BASE_URL}/${userId}/pending`, {
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!response.ok) throw new Error("Nie udało się pobrać zamówień lakierowania.");
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : []; // <-- Pusta odpowiedź zostanie zamieniona na []
+};
 
   const fetchCustomerOrders = async (userId) => {
     const response = await fetch(`https://${BASE_URL}/api/orders/customer`, {
