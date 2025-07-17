@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import BASE_URL from '../config.js';
 
 // Import obrazów lokalnych
-import paintImage from '../image/paint.webp';
-import emptyImage from '../image/shopoing_cart.png';
+import paintImage from '../../image/paint.webp';
+import emptyImage from '../../image/shopping_cart.png';
+
 
 const LacquerOrderPage = () => {
   const navigate = useNavigate();
