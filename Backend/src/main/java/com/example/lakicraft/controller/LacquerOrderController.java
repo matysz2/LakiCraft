@@ -15,13 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-
 
 @RestController
 @RequestMapping("")
@@ -29,13 +25,11 @@ public class LacquerOrderController {
 
     private final LacquerOrderRepository lacquerOrderRepository;
 
-   @Autowired
+    @Autowired
     private UserRepository userRepository;
 
-
-        @Autowired
+    @Autowired
     private AppointmentRepository appointmentRepository;
-
 
     @Autowired
     public LacquerOrderController(LacquerOrderRepository lacquerOrderRepository) {
@@ -48,132 +42,125 @@ public class LacquerOrderController {
         return lacquerOrderRepository.findAll();
     }
 
-  
-    // Pobranie oczekujących zamówień lakierowania (wszystkich oprócz "zrealizowanych")
+    // Pobranie oczekujących zamówień lakierowania (status "nowe")
     @GetMapping("/{userId}/pending")
     public List<LacquerOrder> getNewLacquerOrdersByUser(@PathVariable Long userId) {
-        return lacquerOrderRepository.findByClientIdAndStatus(userId, "nowe"); // Zmieniono status na "nowe"
+        return lacquerOrderRepository.findByClientIdAndStatus(userId, "nowe");
     }
-    
+
+    // Pobranie zamówień lakierowania danego użytkownika (klienta)
     @GetMapping("/api/lacquerOrders/user/{userId}")
     public List<LacquerOrder> getLacquerOrdersByUser(@PathVariable Long userId) {
         return lacquerOrderRepository.findByClientIdOrderByIdDesc(userId);
     }
-    
-    
 
-    // Dodawanie zamówienia lakierowania
-
+    // Aktualizacja statusu zamówienia lakierowania
     @PutMapping("/{orderId}/status")
     public ResponseEntity<?> updateLacquerOrderStatus(@PathVariable Long orderId, @RequestBody Map<String, String> body) {
         if (!body.containsKey("status")) {
             return ResponseEntity.badRequest().body(Map.of("error", "Brak pola 'status' w żądaniu."));
         }
-    
+
         String status = body.get("status");
         Optional<LacquerOrder> optionalOrder = lacquerOrderRepository.findById(orderId);
-    
+
         if (optionalOrder.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Zamówienie lakierowania o ID " + orderId + " nie istnieje."));
         }
-    
+
         LacquerOrder order = optionalOrder.get();
         order.setStatus(status);
         lacquerOrderRepository.save(order);
-    
+
         return ResponseEntity.ok().body(Map.of("message", "Status zamówienia zaktualizowany na: " + status));
     }
-    
 
-       // Pobranie zleceń lakierowania przypisanych do stolarza
-       
-       @GetMapping("/{userId}/painting-orders")
-       public List<LacquerOrder> getPaintingOrdersByUser(@PathVariable Long userId) {
-           return lacquerOrderRepository.findByCarpenterId(userId);  // Pobieranie zleceń na podstawie ID użytkownika
-       }
-       
-       @GetMapping("/api/lacquerOrders/new")
-       public List<LacquerOrder> getNewLacquerOrders() {
-           return lacquerOrderRepository.findByStatus("nowe");
-       }
+    // Pobranie zleceń lakierowania przypisanych do stolarza
+    @GetMapping("/{userId}/painting-orders")
+    public List<LacquerOrder> getPaintingOrdersByUser(@PathVariable Long userId) {
+        return lacquerOrderRepository.findByCarpenterId(userId);
+    }
 
-       @GetMapping("/carpenter/{carpenterId}")
-       public ResponseEntity<List<LacquerOrder>> getOrdersByCarpenter(@PathVariable Long carpenterId) {
-           // Sortowanie zamówień malejąco według id
-           List<LacquerOrder> orders = lacquerOrderRepository.findByCarpenterIdOrderByIdDesc(carpenterId);
-           return ResponseEntity.ok(orders);
-       }
-       
-    // Metoda usuwania zamówienia
+    // Pobranie wszystkich nowych zamówień
+    @GetMapping("/api/lacquerOrders/new")
+    public List<LacquerOrder> getNewLacquerOrders() {
+        return lacquerOrderRepository.findByStatus("nowe");
+    }
+
+    // Pobranie zamówień według stolarza, posortowanych malejąco po ID
+    @GetMapping("/carpenter/{carpenterId}")
+    public ResponseEntity<List<LacquerOrder>> getOrdersByCarpenter(@PathVariable Long carpenterId) {
+        List<LacquerOrder> orders = lacquerOrderRepository.findByCarpenterIdOrderByIdDesc(carpenterId);
+        return ResponseEntity.ok(orders);
+    }
+
+    // Usuwanie zamówienia
     @DeleteMapping("/api/lacquerOrders/{orderId}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long orderId) {
         if (lacquerOrderRepository.existsById(orderId)) {
             lacquerOrderRepository.deleteById(orderId);
-            return ResponseEntity.noContent().build(); // Usunięto bez zawartości w odpowiedzi
+            return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.notFound().build(); // Jeśli zamówienie nie istnieje
+            return ResponseEntity.notFound().build();
         }
     }
+
+    // Tworzenie zamówienia lakierowania
     @PostMapping("/api/lacquer-orders")
     public ResponseEntity<?> createLacquerOrder(@RequestBody LacquerOrder lacquerOrderRequest) {
         try {
-            // Sprawdzanie, czy appointment jest poprawnie załadowane
             if (lacquerOrderRequest.getAppointment() == null || lacquerOrderRequest.getAppointment().getId() == null) {
                 return ResponseEntity.badRequest().body("AppointmentId is required");
             }
-    
-            // Pobranie Appointment z bazy danych za pomocą ID
+
             Appointment appointment = appointmentRepository.findById(lacquerOrderRequest.getAppointment().getId())
                     .orElseThrow(() -> new RuntimeException("Appointment not found"));
-    
-            // Zmieniamy status Appointment na "zajęty"
+
             appointment.setStatus("Zajęty");
-            
-            // Zapisujemy zaktualizowany status Appointment w bazie
             appointmentRepository.save(appointment);
-    
-            // Sprawdzanie, czy client i carpenter są przekazani poprawnie
+
             if (lacquerOrderRequest.getClient() == null) {
                 return ResponseEntity.badRequest().body("Client is required");
             }
             if (lacquerOrderRequest.getCarpenter() == null) {
                 return ResponseEntity.badRequest().body("Carpenter is required");
             }
-    
-            // Pobranie Client i Carpenter z bazy danych
+
             User client = userRepository.findById(lacquerOrderRequest.getClient().getId())
                     .orElseThrow(() -> new RuntimeException("Client not found"));
             User carpenter = userRepository.findById(lacquerOrderRequest.getCarpenter().getId())
                     .orElseThrow(() -> new RuntimeException("Carpenter not found"));
-    
-            // Ustawienie załadowanych obiektów w zamówieniu
+
             lacquerOrderRequest.setAppointment(appointment);
             lacquerOrderRequest.setClient(client);
             lacquerOrderRequest.setCarpenter(carpenter);
-    
-            // Obliczanie ceny na podstawie liczby metrów malowania
+
             BigDecimal totalPrice = new BigDecimal(lacquerOrderRequest.getPaintingMeters()).multiply(new BigDecimal("10"));
             lacquerOrderRequest.setTotalPrice(totalPrice);
-    
-            // Zapisanie zamówienia
+
             LacquerOrder lacquerOrder = lacquerOrderRepository.save(lacquerOrderRequest);
-    
-            // Zwrócenie zamówienia w odpowiedzi
             return ResponseEntity.ok(lacquerOrder);
         } catch (RuntimeException e) {
-            // Obsługa błędów
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         } catch (Exception e) {
-            // Obsługa nieoczekiwanych błędów
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
         }
     }
-    
 
+    // NOWY ENDPOINT - zwraca URL-e obrazków potrzebnych na frontendzie
+    @GetMapping("/api/lacquer-order-images")
+    public ResponseEntity<Map<String, String>> getLacquerOrderImages() {
+        String baseUrl = System.getenv("APP_URL");
+        if (baseUrl == null || baseUrl.isBlank()) {
+            baseUrl = "http://localhost:8080";
+        }
 
-   
+        Map<String, String> images = Map.of(
+                "lacquerOrders", baseUrl + "/uploads/paint.webp",
+                "lacquerHistory", baseUrl + "/uploads/empty.webp"
+        );
 
- 
+        return ResponseEntity.ok(images);
+    }
+
 }
-    
-    

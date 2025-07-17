@@ -123,26 +123,32 @@ const MyServices = () => {
         </div>
       ) : (
         <>
-          <div className="card-header">
-       <img
-  src={editableCardData.profileImageUrl || defaultAvatar}
-  alt="Zdjęcie profilowe"
-  width={150}
-  height={150}
-/>
+  <div className="card-header">
+  <img
+    src={
+      editableCardData.profileImageUrl && editableCardData.profileImageUrl.startsWith('http')
+        ? editableCardData.profileImageUrl
+        : defaultAvatar
+    }
+    alt="Zdjęcie profilowe"
+    width={150}
+    height={150}
+    style={{ objectFit: 'cover', borderRadius: '50%' }}
+  />
 
-            {isEditing ? (
-              <input
-                type="text"
-                name="name"
-                value={editableCardData.name || ""}
-                onChange={handleChange}
-                placeholder="Imię i nazwisko"
-              />
-            ) : (
-              <h2>{cardData?.name}</h2>
-            )}
-          </div>
+  {isEditing ? (
+    <input
+      type="text"
+      name="name"
+      value={editableCardData.name || ""}
+      onChange={handleChange}
+      placeholder="Imię i nazwisko"
+    />
+  ) : (
+    <h2>{cardData?.name}</h2>
+  )}
+</div>
+
           <div className="card-body">
             <p>
               <strong>Specjalizacja:</strong>{" "}
