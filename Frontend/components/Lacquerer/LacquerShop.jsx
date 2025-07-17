@@ -52,16 +52,17 @@ const LacquerShop = () => {
           onClick={() => handleCardClick(lacquer.brand, lacquer.user.id)}
           >
           {/* Warunkowe renderowanie zdjęcia, jeśli istnieje */}
-     {lacquer.imagePath ? (
+{lacquer.imageUrl ? (
   <img
-    src={`https://${BASE_URL}/${lacquer.imagePath}`}
+    src={lacquer.imageUrl}
     alt={lacquer.name}
     className="lacquer-image"
-    onError={(e) => { e.target.onerror = null; e.target.src = '/default-image.png'; }}
+    onError={(e) => { e.target.onerror = null; e.target.src = '/uploads/default-image.png'; }}
   />
 ) : (
-  <img src="/default-image.png" alt="Brak zdjęcia" className="lacquer-image" />
+  <img src="/uploads/default-image.png" alt="Brak zdjęcia" className="lacquer-image" />
 )}
+
 
           <p className="lacquer-brand">
             Marka: {lacquer.brand || "Brak marki"} <span> (Sprzedawca:{ lacquer.user.name})</span>
