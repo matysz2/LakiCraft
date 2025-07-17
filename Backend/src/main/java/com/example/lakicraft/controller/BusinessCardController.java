@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.example.lakicraft.model.BusinessCard;
 import com.example.lakicraft.repository.BusinessCardRepository;
+
 import jakarta.transaction.Transactional;
 
 import java.io.File;
@@ -15,8 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-
-
 
 @RestController
 @RequestMapping("/api/business-card")
@@ -39,24 +38,39 @@ public class BusinessCardController {
         return ResponseEntity.ok(card);
     }
 
-    // Aktualizacja wizytówki (bez zdjęcia)
-    @PutMapping
-    @Transactional
-    public ResponseEntity<?> updateBusinessCard(@RequestParam Long userId, @RequestBody BusinessCard updatedCard) {
-        BusinessCard card = businessCardRepository.findByUserId(userId);
-        if (card == null) {
-            return ResponseEntity.notFound().build();
+    // Tworzenie wizytówki
+    @PostMapping("/create")
+    public ResponseEntity<?> createBusinessCard(
+            @RequestParam Long userId,
+            @RequestParam String name,
+            @RequestParam String jobTitle,
+            @RequestParam String bio,
+            @RequestParam String contactEmail,
+            @RequestParam(required = false) MultipartFile profileImage) {
+
+        if (businessCardRepository.findByUserId(userId) != null) {
+            return ResponseEntity.badRequest().body("Wizytówka już istnieje.");
         }
-        card.setName(updatedCard.getName());
-        card.setJobTitle(updatedCard.getJobTitle());
-        card.setBio(updatedCard.getBio());
-        card.setContactEmail(updatedCard.getContactEmail());
+
+        BusinessCard card = new BusinessCard();
+        card.setUserId(userId);
+        card.setName(name);
+        card.setJobTitle(jobTitle);
+        card.setBio(bio);
+        card.setContactEmail(contactEmail);
+
+        if (profileImage != null && !profileImage.isEmpty()) {
+            String fileName = saveImage(profileImage, userId);
+            card.setProfileImageUrl(getImageUrl(fileName));
+        }
+
         businessCardRepository.save(card);
         return ResponseEntity.ok(card);
     }
 
-    // Aktualizacja wizytówki z obrazkiem (zmiana na PATCH)
+    // Aktualizacja lub częściowa edycja wizytówki
     @PatchMapping
+    @Transactional
     public ResponseEntity<?> updateBusinessCardWithImage(
             @RequestParam Long userId,
             @RequestParam(required = false) String name,
@@ -64,6 +78,7 @@ public class BusinessCardController {
             @RequestParam(required = false) String bio,
             @RequestParam(required = false) String contactEmail,
             @RequestParam(required = false) MultipartFile profileImage) {
+
         BusinessCard card = businessCardRepository.findByUserId(userId);
         if (card == null) {
             return ResponseEntity.notFound().build();
@@ -75,54 +90,55 @@ public class BusinessCardController {
         if (contactEmail != null) card.setContactEmail(contactEmail);
 
         if (profileImage != null && !profileImage.isEmpty()) {
-            // Walidacja rozszerzenia pliku
             if (!isValidImageExtension(profileImage.getOriginalFilename())) {
-                return ResponseEntity.badRequest().body("Niedozwolony format pliku. Dozwolone formaty: jpg, jpeg, png, gif.");
+                return ResponseEntity.badRequest().body("Niedozwolony format pliku. Dozwolone: jpg, jpeg, png, gif.");
             }
-
-            try {
-                // Obsługuje plik
-                String fileName = userId + "_profile." + getFileExtension(profileImage.getOriginalFilename());
-                String filePath = UPLOAD_DIR + fileName;
-
-                // Tworzymy katalog, jeśli nie istnieje
-                File uploadDir = new File(UPLOAD_DIR);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdirs();
-                }
-
-                // Zapisujemy plik
-                Files.copy(profileImage.getInputStream(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
-                card.setProfileImageUrl("http://localhost:8080/uploads/" + fileName);
-
-                logger.info("Plik zapisał się poprawnie: {}", filePath);
-            } catch (IOException e) {
-                logger.error("Błąd zapisu pliku. Ścieżka: {}", UPLOAD_DIR, e);
-                return ResponseEntity.internalServerError().body("Błąd zapisu pliku.");
-            }
+            String fileName = saveImage(profileImage, userId);
+            card.setProfileImageUrl(getImageUrl(fileName));
         }
 
         businessCardRepository.save(card);
         return ResponseEntity.ok(card);
     }
 
-    // Walidacja rozszerzenia pliku
+    // Obsługa zapisu zdjęcia
+    private String saveImage(MultipartFile file, Long userId) {
+        try {
+            String ext = getFileExtension(file.getOriginalFilename());
+            String fileName = userId + "_profile." + ext;
+
+            File dir = new File(UPLOAD_DIR);
+            if (!dir.exists()) dir.mkdirs();
+
+            Files.copy(file.getInputStream(), Paths.get(UPLOAD_DIR + fileName), StandardCopyOption.REPLACE_EXISTING);
+            logger.info("Zapisano plik: {}", fileName);
+            return fileName;
+        } catch (IOException e) {
+            logger.error("Błąd zapisu pliku", e);
+            throw new RuntimeException("Błąd zapisu pliku", e);
+        }
+    }
+
+    // Generowanie pełnego URL do zdjęcia (obsługuje Railway i localhost)
+    private String getImageUrl(String fileName) {
+        String baseUrl = System.getenv("APP_URL");
+        if (baseUrl == null || baseUrl.isEmpty()) {
+            baseUrl = "http://localhost:8080";
+        }
+        return baseUrl + "/uploads/" + fileName;
+    }
+
     private boolean isValidImageExtension(String fileName) {
         String[] validExtensions = {"jpg", "jpeg", "png", "gif"};
-        String fileExtension = getFileExtension(fileName).toLowerCase();
-        
-        for (String ext : validExtensions) {
-            if (ext.equals(fileExtension)) {
-                return true;
-            }
+        String ext = getFileExtension(fileName).toLowerCase();
+        for (String valid : validExtensions) {
+            if (valid.equals(ext)) return true;
         }
         return false;
     }
 
     private String getFileExtension(String fileName) {
-        if (fileName == null || fileName.lastIndexOf('.') == -1) {
-            return ""; // Zwraca pusty ciąg, jeśli plik nie ma rozszerzenia
-        }
+        if (fileName == null || !fileName.contains(".")) return "";
         return fileName.substring(fileName.lastIndexOf('.') + 1);
     }
 }

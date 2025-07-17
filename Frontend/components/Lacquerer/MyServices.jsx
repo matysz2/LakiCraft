@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LacquerHeader from "./LacquererHeader";
-import BASE_URL from '../config.js';  // Zmienna BASE_URL
+import BASE_URL from "../config.js";
 
 const MyServices = () => {
   const [cardData, setCardData] = useState(null);
-  const [editableCardData, setEditableCardData] = useState(null);
+  const [editableCardData, setEditableCardData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -37,14 +37,21 @@ const MyServices = () => {
 
     fetch(`https://${BASE_URL}/api/business-card?userId=${userId}`)
       .then((response) => {
+        if (response.status === 404) {
+          setCardData(null);
+          setLoading(false);
+          return null;
+        }
         if (!response.ok) {
           throw new Error("Błąd pobierania danych wizytówki.");
         }
         return response.json();
       })
       .then((data) => {
-        setCardData(data);
-        setEditableCardData(data);
+        if (data) {
+          setCardData(data);
+          setEditableCardData(data);
+        }
       })
       .catch((err) => {
         setError(err.message);
@@ -65,65 +72,73 @@ const MyServices = () => {
     setSelectedFile(e.target.files[0]);
   };
 
-  const handleEditSave = () => {
-    if (isEditing) {
-      // Jeśli w trybie edycji, zapisujemy zmiany
-      const formData = new FormData();
-      formData.append("userId", userId);
-      formData.append("name", editableCardData.name);
-      formData.append("jobTitle", editableCardData.jobTitle);
-      formData.append("bio", editableCardData.bio);
-      formData.append("contactEmail", editableCardData.contactEmail);
-      if (selectedFile) {
-        formData.append("profileImage", selectedFile);
-      }
-
-      fetch(`https://${BASE_URL}/api/business-card`, {
-        method: "PATCH", // Zamiast PUT, użyj PATCH
-        body: formData,
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Błąd zapisywania danych wizytówki.");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setCardData(data);
-          setSaveStatus("Dane zapisane poprawnie.");
-          setIsEditing(false);
-        })
-        .catch((err) => {
-          setError(err.message);
-          console.error(err);
-        });
-    } else {
-      // Jeśli nie w trybie edycji, przełączamy w tryb edycji
-      setIsEditing(true);
+  const handleSave = () => {
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("name", editableCardData.name || "");
+    formData.append("jobTitle", editableCardData.jobTitle || "");
+    formData.append("bio", editableCardData.bio || "");
+    formData.append("contactEmail", editableCardData.contactEmail || "");
+    if (selectedFile) {
+      formData.append("profileImage", selectedFile);
     }
+
+    const url = `https://${BASE_URL}/api/business-card${cardData ? "" : "/create"}`;
+    const method = cardData ? "PATCH" : "POST";
+
+    fetch(url, {
+      method: method,
+      body: formData,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Błąd zapisu wizytówki.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setCardData(data);
+        setEditableCardData(data);
+        setSaveStatus("Dane zapisane poprawnie.");
+        setIsEditing(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        console.error(err);
+      });
   };
+
+  if (loading) return <div>Ładowanie...</div>;
 
   return (
     <div className="my-services">
       <LacquerHeader />
-      {!cardData ? (
-        <div className="card-empty">Brak danych wizytówki.</div>
+      {error && <p className="error">{error}</p>}
+      {!cardData && !isEditing ? (
+        <div className="card-empty">
+          Brak wizytówki.
+          <button onClick={() => setIsEditing(true)}>Dodaj wizytówkę</button>
+        </div>
       ) : (
         <>
           <div className="card-header">
-            <img src={cardData.profileImageUrl} alt="Zdjęcie" />
-            <h2>
-              {isEditing ? (
-                <input
-                  type="text"
-                  name="name"
-                  value={editableCardData.name}
-                  onChange={handleChange}
-                />
-              ) : (
-                cardData.name
-              )}
-            </h2>
+            <img
+              src={editableCardData.profileImageUrl || "/default-avatar.png"}
+              alt="Zdjęcie profilowe"
+              width={150}
+              height={150}
+            />
+            {isEditing ? (
+              <input
+                type="text"
+                name="name"
+                value={editableCardData.name || ""}
+                onChange={handleChange}
+                placeholder="Imię i nazwisko"
+              />
+            ) : (
+              <h2>{cardData?.name}</h2>
+            )}
           </div>
           <div className="card-body">
             <p>
@@ -132,11 +147,11 @@ const MyServices = () => {
                 <input
                   type="text"
                   name="jobTitle"
-                  value={editableCardData.jobTitle}
+                  value={editableCardData.jobTitle || ""}
                   onChange={handleChange}
                 />
               ) : (
-                cardData.jobTitle
+                cardData?.jobTitle
               )}
             </p>
             <p>
@@ -144,24 +159,24 @@ const MyServices = () => {
               {isEditing ? (
                 <textarea
                   name="bio"
-                  value={editableCardData.bio}
+                  value={editableCardData.bio || ""}
                   onChange={handleChange}
                 />
               ) : (
-                cardData.bio
+                cardData?.bio
               )}
             </p>
             <p>
               <strong>Kontakt:</strong>{" "}
               {isEditing ? (
                 <input
-                  type="text"
+                  type="email"
                   name="contactEmail"
-                  value={editableCardData.contactEmail}
+                  value={editableCardData.contactEmail || ""}
                   onChange={handleChange}
                 />
               ) : (
-                cardData.contactEmail
+                cardData?.contactEmail
               )}
             </p>
             {isEditing && (
@@ -171,14 +186,16 @@ const MyServices = () => {
               </p>
             )}
           </div>
+          <div className="actions">
+            {isEditing ? (
+              <button onClick={handleSave}>Zapisz</button>
+            ) : (
+              <button onClick={() => setIsEditing(true)}>Edytuj</button>
+            )}
+          </div>
         </>
       )}
       {saveStatus && <p className="status">{saveStatus}</p>}
-      <div className="actions">
-        <button onClick={handleEditSave}>
-          {isEditing ? "Zapisz" : "Edytuj"}
-        </button>
-      </div>
     </div>
   );
 };
