@@ -125,14 +125,11 @@ public class OrderController {
     }
     
    
-      @GetMapping("/customer")
-    public ResponseEntity<List<Orders>> getOrdersByCustomer(@RequestHeader("userId") Long userId) {
-        List<Orders> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);
-        if (orders.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(orders);
-    }
+ @GetMapping("/customer")
+public ResponseEntity<List<Orders>> getOrdersByCustomer(@RequestHeader("userId") Long userId) {
+    List<Orders> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);
+    return ResponseEntity.ok(orders); // ZAWSZE zwraca 200 OK + lista (pusta lub nie)
+}
 
 
     @Transactional
