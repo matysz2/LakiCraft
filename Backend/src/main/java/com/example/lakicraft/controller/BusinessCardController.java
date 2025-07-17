@@ -60,6 +60,9 @@ public class BusinessCardController {
         card.setContactEmail(contactEmail);
 
         if (profileImage != null && !profileImage.isEmpty()) {
+            if (!isValidImageExtension(profileImage.getOriginalFilename())) {
+                return ResponseEntity.badRequest().body("Niedozwolony format pliku. Dozwolone: jpg, jpeg, png, gif.");
+            }
             String fileName = saveImage(profileImage, userId);
             card.setProfileImageUrl(getImageUrl(fileName));
         }
@@ -68,10 +71,10 @@ public class BusinessCardController {
         return ResponseEntity.ok(card);
     }
 
-    // Aktualizacja lub częściowa edycja wizytówki
+    // Aktualizacja lub częściowa edycja wizytówki z uploadem obrazka
     @PatchMapping
     @Transactional
-    public ResponseEntity<?> updateBusinessCardWithImage(
+    public ResponseEntity<?> updateBusinessCard(
             @RequestParam Long userId,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String jobTitle,
@@ -101,7 +104,7 @@ public class BusinessCardController {
         return ResponseEntity.ok(card);
     }
 
-    // Obsługa zapisu zdjęcia
+    // Metoda do zapisu zdjęcia na dysk
     private String saveImage(MultipartFile file, Long userId) {
         try {
             String ext = getFileExtension(file.getOriginalFilename());
@@ -119,10 +122,10 @@ public class BusinessCardController {
         }
     }
 
-    // Generowanie pełnego URL do zdjęcia (obsługuje Railway i localhost)
+    // Generowanie URL do zdjęcia (uwzględnia zmienną środowiskową lub localhost)
     private String getImageUrl(String fileName) {
         String baseUrl = System.getenv("APP_URL");
-        if (baseUrl == null || baseUrl.isEmpty()) {
+        if (baseUrl == null || baseUrl.isBlank()) {
             baseUrl = "http://localhost:8080";
         }
         return baseUrl + "/uploads/" + fileName;
