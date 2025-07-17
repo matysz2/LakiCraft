@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LacquerHeader from "./LacquererHeader";
 import BASE_URL from "../config.js";
-import defaultAvatar from '../assets/default-avatar.png';
+
 
 
 const MyServices = () => {

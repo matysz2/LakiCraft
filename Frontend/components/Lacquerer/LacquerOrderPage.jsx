@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BASE_URL from '../config.js';
 
-// Statyczne fallbacki
-import paintImage from '../image/paint.webp';
-import emptyImage from '../image/empty.webp';
+
 
 const LacquerOrderPage = () => {
   const navigate = useNavigate();
