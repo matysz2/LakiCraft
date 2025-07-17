@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';  // Używamy useNavigate
 import BASE_URL from '../config.js';  // Zmienna BASE_URL
 
+// Import obrazów jako zmienne
+import paintImage from '../image/paint.webp';
+import emptyImage from '../image/empty.webp';
+
 const LacquerOrderPage = () => {
   const navigate = useNavigate();  // Używamy useNavigate
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -37,7 +41,7 @@ const LacquerOrderPage = () => {
       >
         <div className="section-title">Zlecenia Lakierowania</div>
         <div className="section-content">
-          <img src="../../image/paint.webp" alt="Zlecenia Lakierowania" />
+          <img src={paintImage} alt="Zlecenia Lakierowania" />
         </div>
       </div>
 
@@ -47,7 +51,7 @@ const LacquerOrderPage = () => {
       >
         <div className="section-title">Zamówienia Lakierów</div>
         <div className="section-content">
-          <img src="../../image/empty.webp" alt="Zamówienia Lakierów" />
+          <img src={emptyImage} alt="Zamówienia Lakierów" />
         </div>
       </div>
     </div>
