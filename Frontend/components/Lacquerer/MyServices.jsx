@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LacquerHeader from "./LacquererHeader";
 import BASE_URL from "../config.js";
+import defaultAvatar from '../assets/default-avatar.png';
+
 
 const MyServices = () => {
   const [cardData, setCardData] = useState(null);
@@ -122,12 +124,13 @@ const MyServices = () => {
       ) : (
         <>
           <div className="card-header">
-            <img
-              src={editableCardData.profileImageUrl || "/default-avatar.png"}
-              alt="Zdjęcie profilowe"
-              width={150}
-              height={150}
-            />
+       <img
+  src={editableCardData.profileImageUrl || defaultAvatar}
+  alt="Zdjęcie profilowe"
+  width={150}
+  height={150}
+/>
+
             {isEditing ? (
               <input
                 type="text"
