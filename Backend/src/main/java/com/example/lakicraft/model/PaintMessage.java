@@ -3,8 +3,10 @@ package com.example.lakicraft.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.example.lakicraft;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Getter
 @Setter

@@ -1,4 +1,4 @@
-package main.java.com.example.lakicraft.controller;
+package com.example.lakicraft;
 
 import com.example.lakicraft.model.LacquerOrder;
 import com.fasterxml.jackson.core.JsonGenerator;
