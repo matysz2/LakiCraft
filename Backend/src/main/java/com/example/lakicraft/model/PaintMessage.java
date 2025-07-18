@@ -19,7 +19,7 @@ public class PaintMessage {
 
     @ManyToOne
     @JoinColumn(name = "lacquer_order_id", nullable = false)
-    @JsonSerialize(using = LacquerOrderSerializer.class) // <- tu, na polu
+
     private LacquerOrder lacquerOrder;
 
     @Column(nullable = false)
