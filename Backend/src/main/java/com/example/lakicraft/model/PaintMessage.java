@@ -17,7 +17,8 @@ public class PaintMessage {
 
     @ManyToOne
     @JoinColumn(name = "lacquer_order_id", nullable = false)
-    private LacquerOrder lacquerOrder; // Zamówienie lakierowania, do którego należy wiadomość
+    @JsonSerialize(using = LacquerOrderSerializer.class) // <- tu, na polu
+    private LacquerOrder lacquerOrder;
 
     @Column(nullable = false)
     private String message; // Treść wiadomości

@@ -50,30 +50,32 @@ const LacquerShop = () => {
           className="lacquer-card"
           key={lacquer.id}
           onClick={() => handleCardClick(lacquer.brand, lacquer.user.id)}
-          >
+        >
           {/* Warunkowe renderowanie zdjęcia, jeśli istnieje */}
-{lacquer.imagePath ? (
-  <img
-    src={`https://${BASE_URL}/${lacquer.imagePath}`} 
-    alt={lacquer.name}
-    className="lacquer-image"
-    onError={(e) => {
-      e.target.onerror = null;
-      e.target.src = '/uploads/default-image.png'; // obrazek domyślny
-    }}
-  />
-) : (
-  <img
-    src="/uploads/default-image.png"
-    alt="Brak zdjęcia"
-    className="lacquer-image"
-  />
-)}
-
-
+          {lacquer.imagePath ? (
+            <img
+              src={
+                lacquer.imagePath.startsWith("http://") || lacquer.imagePath.startsWith("https://")
+                  ? lacquer.imagePath
+                  : `https://${BASE_URL}/${lacquer.imagePath.replace(/^\/+/, "")}`
+              }
+              alt={lacquer.name || "Zdjęcie lakieru"}
+              className="lacquer-image"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/uploads/default-image.png"; // fallback na obraz domyślny
+              }}
+            />
+          ) : (
+            <img
+              src="/uploads/default-image.png"
+              alt="Brak zdjęcia"
+              className="lacquer-image"
+            />
+          )}
 
           <p className="lacquer-brand">
-            Marka: {lacquer.brand || "Brak marki"} <span> (Sprzedawca:{ lacquer.user.name})</span>
+            Marka: {lacquer.brand || "Brak marki"} <span> (Sprzedawca: {lacquer.user.name})</span>
           </p>
         </div>
       ))}
