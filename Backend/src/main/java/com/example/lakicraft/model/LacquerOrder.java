@@ -42,10 +42,11 @@ public class LacquerOrder {
     @Column(nullable = false)
     private String shippingAddress; // Adres dostawy
 
-    @JsonIdentityReference
-    @ManyToOne
-    @JoinColumn(name = "carpenter_id", nullable = false) // Stolarz zamawiający lakierowanie
-    private User carpenter; 
+   @ManyToOne
+@JoinColumn(name = "carpenter_id")
+@JsonBackReference
+private User carpenter;
+
 
     @ManyToOne
     @JoinColumn(name = "appointment_id", nullable = true) // Relacja do Appointment
