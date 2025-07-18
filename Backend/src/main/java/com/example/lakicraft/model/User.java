@@ -40,9 +40,10 @@ public class User {
     @Column(name = "payment_due_days")
     private Integer paymentDueDays; // Termin płatności w dniach
 
-   @OneToMany(mappedBy = "carpenter", fetch = FetchType.EAGER)
-@JsonManagedReference
-private List<LacquerOrder> lacquerOrders;
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+     // Relacja z LacquerOrder (stolarz jest powiązany z zamówieniem lakierów)
+     @OneToMany(mappedBy = "carpenter", fetch = FetchType.EAGER)
+     private List<LacquerOrder> lacquerOrders; // Lista zamówień lakierów
 
     public void setBlocked(boolean b) {
         // TODO Auto-generated method stub
