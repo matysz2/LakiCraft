@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import LacquerHeader from "./LacquererHeader";
 import BASE_URL from "../config.js";
 
-
-
 const MyServices = () => {
   const [cardData, setCardData] = useState(null);
   const [editableCardData, setEditableCardData] = useState({});
@@ -101,8 +99,9 @@ const MyServices = () => {
       .then((data) => {
         setCardData(data);
         setEditableCardData(data);
-        setSaveStatus("Dane zapisane poprawnie.");
+        setSaveStatus("✅ Dane zapisane poprawnie.");
         setIsEditing(false);
+        setSelectedFile(null);
       })
       .catch((err) => {
         setError(err.message);
@@ -116,38 +115,41 @@ const MyServices = () => {
     <div className="my-services">
       <LacquerHeader />
       {error && <p className="error">{error}</p>}
+
       {!cardData && !isEditing ? (
         <div className="card-empty">
           Brak wizytówki.
-          <button onClick={() => setIsEditing(true)}>Dodaj wizytówkę</button>
+          <button onClick={() => setIsEditing(true)}>➕ Dodaj wizytówkę</button>
         </div>
       ) : (
         <>
-  <div className="card-header">
-  <img
-    src={
-      editableCardData.profileImageUrl && editableCardData.profileImageUrl.startsWith('http')
-        ? editableCardData.profileImageUrl
-        : defaultAvatar
-    }
-    alt="Zdjęcie profilowe"
-    width={150}
-    height={150}
-    style={{ objectFit: 'cover', borderRadius: '50%' }}
-  />
+          <div className="card-header">
+            {editableCardData.profileImageUrl && editableCardData.profileImageUrl.startsWith("http") ? (
+              <img
+                src={editableCardData.profileImageUrl}
+                alt="Zdjęcie profilowe"
+                width={150}
+                height={150}
+                style={{ objectFit: "cover", borderRadius: "50%" }}
+              />
+            ) : (
+              // Jeśli chcesz, tutaj możesz dodać jakiś placeholder, np.:
+              // <div style={{ width: 150, height: 150, borderRadius: "50%", backgroundColor: "#ccc" }}></div>
+              null
+            )}
 
-  {isEditing ? (
-    <input
-      type="text"
-      name="name"
-      value={editableCardData.name || ""}
-      onChange={handleChange}
-      placeholder="Imię i nazwisko"
-    />
-  ) : (
-    <h2>{cardData?.name}</h2>
-  )}
-</div>
+            {isEditing ? (
+              <input
+                type="text"
+                name="name"
+                value={editableCardData.name || ""}
+                onChange={handleChange}
+                placeholder="Imię i nazwisko"
+              />
+            ) : (
+              <h2>{cardData?.name}</h2>
+            )}
+          </div>
 
           <div className="card-body">
             <p>
@@ -163,6 +165,7 @@ const MyServices = () => {
                 cardData?.jobTitle
               )}
             </p>
+
             <p>
               <strong>O mnie:</strong>{" "}
               {isEditing ? (
@@ -175,6 +178,7 @@ const MyServices = () => {
                 cardData?.bio
               )}
             </p>
+
             <p>
               <strong>Kontakt:</strong>{" "}
               {isEditing ? (
@@ -188,6 +192,7 @@ const MyServices = () => {
                 cardData?.contactEmail
               )}
             </p>
+
             {isEditing && (
               <p>
                 <strong>Zdjęcie profilowe:</strong>{" "}
@@ -195,15 +200,17 @@ const MyServices = () => {
               </p>
             )}
           </div>
+
           <div className="actions">
             {isEditing ? (
-              <button onClick={handleSave}>Zapisz</button>
+              <button onClick={handleSave}>💾 Zapisz</button>
             ) : (
-              <button onClick={() => setIsEditing(true)}>Edytuj</button>
+              <button onClick={() => setIsEditing(true)}>✏️ Edytuj</button>
             )}
           </div>
         </>
       )}
+
       {saveStatus && <p className="status">{saveStatus}</p>}
     </div>
   );

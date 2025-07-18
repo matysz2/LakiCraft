@@ -123,13 +123,16 @@ public class BusinessCardController {
     }
 
     // Generowanie URL do zdjęcia (uwzględnia zmienną środowiskową lub localhost)
-    private String getImageUrl(String fileName) {
-        String baseUrl = System.getenv("APP_URL");
-        if (baseUrl == null || baseUrl.isBlank()) {
-            baseUrl = "http://localhost:8080";
-        }
-        return baseUrl + "/uploads/" + fileName;
+private String getImageUrl(String fileName) {
+    // Pobieramy URL aplikacji z ENV (Railway)
+    String baseUrl = System.getenv("APP_URL");
+    
+    if (baseUrl == null || baseUrl.isBlank()) {
+        // fallback lokalnie
+        baseUrl = "http://localhost:8080";
     }
+    return baseUrl + "/uploads/" + fileName;
+}
 
     private boolean isValidImageExtension(String fileName) {
         String[] validExtensions = {"jpg", "jpeg", "png", "gif"};
