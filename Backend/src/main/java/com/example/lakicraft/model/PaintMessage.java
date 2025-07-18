@@ -15,10 +15,12 @@ public class PaintMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @ManyToOne
     @JoinColumn(name = "lacquer_order_id", nullable = false)
-    private LacquerOrder lacquerOrder; // Zamówienie lakierowania, do którego należy wiadomość
-
+    private LacquerOrder lacquerOrder;
+    
     @Column(nullable = false)
     private String message; // Treść wiadomości
 
