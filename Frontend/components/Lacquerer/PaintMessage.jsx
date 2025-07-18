@@ -31,7 +31,7 @@ const OrderMessages = () => {
     const fetchMessages = async () => {
       try {
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        const response = await fetch(`${API_URL}/api/lacquerOrders/${orderId}/messages`);
+        const response = await fetch(`https://${BASE_URL}/api/lacquerOrders/${orderId}/messages`);
         if (!response.ok) throw new Error("Błąd sieci");
         const data = await response.json();
 
