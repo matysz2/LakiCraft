@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_SellerHeader.scss"; // Stylizacja nagłówka
 import BASE_URL from '../config.js';  // Zmienna BASE_URL
-import logo from '../image/logo.png';
-
+import logo from "../../image/logo.png";
 
 const SellerHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
