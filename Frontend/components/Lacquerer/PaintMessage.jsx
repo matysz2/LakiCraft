@@ -12,7 +12,7 @@ const OrderMessages = () => {
   const [newMessage, setNewMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   
-  const API_URL = "https://${BASE_URL}"; // Przechowywanie URL w zmiennej
+  c // Przechowywanie URL w zmiennej
 
   useEffect(() => {
     setIsLoading(true);
@@ -83,8 +83,7 @@ const OrderMessages = () => {
 
       const lacquererId = senderRole === "stolarz" ? senderId : lacquerOrderIdFromApi;  // Zmieniamy przypisanie ID lakiernika
 
-      const response = await fetch(`${API_URL}/api/lacquerOrders/${orderId}/message`, {
-        method: "POST",
+      const response = await fetch(`https://${BASE_URL}/api/lacquerOrders/${orderId}/message`, {
         headers: {
           "Content-Type": "application/json",
         },
