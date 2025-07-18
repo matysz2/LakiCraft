@@ -1,84 +1,86 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import BASE_URL from '../config.js';  // Zmienna BASE_URL
+import BASE_URL from '../config.js';
 
 const LacquerShop = () => {
   const [lacquers, setLacquers] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Sprawdzenie logowania
-    const storedUserData = localStorage.getItem("userData");
-    if (!storedUserData) {
-      navigate("/");
-      return;
-    }
+    const checkAndFetch = async () => {
+      const storedUserData = localStorage.getItem("userData");
+      if (!storedUserData) {
+        navigate("/");
+        return;
+      }
 
-    const userId = JSON.parse(storedUserData)?.id;
-    if (!userId) {
-      navigate("/");
-      return;
-    }
+      const userId = JSON.parse(storedUserData)?.id;
+      if (!userId) {
+        navigate("/");
+        return;
+      }
 
-    // Pobieranie lakierów przez fetch
-    fetch(`https://${BASE_URL}/api/lacquers`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "userId": userId, // Wysyłamy userId w nagłówku
-      },
-    })
-      .then((response) => {
+      try {
+        const response = await fetch(`https://${BASE_URL}/api/lacquers`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "userId": userId,
+          },
+        });
+
         if (!response.ok) {
           throw new Error("Błąd podczas pobierania lakierów");
         }
-        return response.json();
-      })
-      .then((data) => setLacquers(data))
-      .catch((error) => console.error("Błąd ładowania lakierów:", error));
+
+        const data = await response.json();
+        setLacquers(data);
+      } catch (error) {
+        console.error("Błąd ładowania lakierów:", error);
+      }
+    };
+
+    checkAndFetch();
   }, [navigate]);
 
   const handleCardClick = (brand, userId) => {
-    // Przekierowanie na stronę z produktami dla danej marki i sprzedawcy
     navigate(`/products/${userId}/${brand}`);
   };
 
+  const fallbackImage = "https://via.placeholder.com/150?text=Brak+zdjęcia";
+
   return (
     <div className="lacquer-shop">
-      {lacquers.map((lacquer) => (
-        <div
-          className="lacquer-card"
-          key={lacquer.id}
-          onClick={() => handleCardClick(lacquer.brand, lacquer.user.id)}
-        >
-          {/* Warunkowe renderowanie zdjęcia, jeśli istnieje */}
-          {lacquer.imagePath ? (
-            <img
-              src={
-                lacquer.imagePath.startsWith("http://") || lacquer.imagePath.startsWith("https://")
-                  ? lacquer.imagePath
-                  : `https://${BASE_URL}/${lacquer.imagePath.replace(/^\/+/, "")}`
-              }
-              alt={lacquer.name || "Zdjęcie lakieru"}
-              className="lacquer-image"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "/uploads/default-image.png"; // fallback na obraz domyślny
-              }}
-            />
-          ) : (
-            <img
-              src="/uploads/default-image.png"
-              alt="Brak zdjęcia"
-              className="lacquer-image"
-            />
-          )}
+      {lacquers.length === 0 ? (
+        <p>Ładowanie lakierów lub brak dostępnych produktów.</p>
+      ) : (
+        lacquers.map((lacquer) => {
+          const imageUrl = lacquer.imagePath
+            ? (lacquer.imagePath.startsWith("http://") || lacquer.imagePath.startsWith("https://")
+                ? lacquer.imagePath
+                : `https://${BASE_URL}/${lacquer.imagePath.replace(/^\/+/, "")}`)
+            : fallbackImage;
 
-          <p className="lacquer-brand">
-            Marka: {lacquer.brand || "Brak marki"} <span> (Sprzedawca: {lacquer.user.name})</span>
-          </p>
-        </div>
-      ))}
+          return (
+            <div
+              className="lacquer-card"
+              key={lacquer.id}
+              onClick={() => handleCardClick(lacquer.brand, lacquer.user.id)}
+              style={{ cursor: "pointer" }}
+            >
+              <img
+                src={imageUrl}
+                alt={lacquer.name || "Zdjęcie lakieru"}
+                className="lacquer-image"
+                onError={(e) => { e.target.onerror = null; e.target.src = fallbackImage; }}
+              />
+              <p className="lacquer-brand">
+                Marka: {lacquer.brand || "Brak marki"} <span> (Sprzedawca: {lacquer.user.name || "Brak danych"})</span>
+              </p>
+            </div>
+          );
+        })
+      )}
     </div>
   );
 };
