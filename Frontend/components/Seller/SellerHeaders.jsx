@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_SellerHeader.scss"; // Stylizacja nagłówka
 import BASE_URL from '../config.js';  // Zmienna BASE_URL
+import logo from '../image/logo.png';
+
 
 const SellerHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -54,7 +56,7 @@ const SellerHeader = () => {
   return (
     <header className="header">
       <div className="logo">
-        <img src="/image/logo.png" alt="Logo" />
+        <img src={logo} alt="Logo" />
         <span>LakiCraft</span>
       </div>
       <div className={`user-menu ${menuOpen ? "open" : ""}`}>
