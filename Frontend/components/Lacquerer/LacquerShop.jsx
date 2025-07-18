@@ -55,7 +55,7 @@ const LacquerShop = () => {
         lacquers.map((lacquer) => {
           // Budujemy URL tylko jeśli jest imagePath
           const imageUrl = lacquer.imagePath
-            ? `https://lakicraft-production.up.railway.app/uploads/${lacquer.imagePath.replace(/^\/+/, "")}`
+            ? `https://lakicraft-production.up.railway.app/${lacquer.imagePath}`
             : null;
 
           return (
