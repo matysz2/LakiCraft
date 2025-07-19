@@ -124,18 +124,29 @@ const MyServices = () => {
       ) : (
         <>
           <div className="card-header">
-            {editableCardData.profileImageUrl && editableCardData.profileImageUrl.startsWith("http") ? (
+            {editableCardData.profileImageUrl ? (
               <img
-                src={editableCardData.profileImageUrl}
+                src={editableCardData.profileImageUrl.startsWith("http")
+                  ? editableCardData.profileImageUrl
+                  : `https://${BASE_URL}/${editableCardData.profileImageUrl}`
+                }
                 alt="Zdjęcie profilowe"
                 width={150}
                 height={150}
                 style={{ objectFit: "cover", borderRadius: "50%" }}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/default-avatar.png";
+                }}
               />
             ) : (
-              // Jeśli chcesz, tutaj możesz dodać jakiś placeholder, np.:
-              // <div style={{ width: 150, height: 150, borderRadius: "50%", backgroundColor: "#ccc" }}></div>
-              null
+              <img
+                src="/default-avatar.png"
+                alt="Brak zdjęcia"
+                width={150}
+                height={150}
+                style={{ objectFit: "cover", borderRadius: "50%" }}
+              />
             )}
 
             {isEditing ? (
