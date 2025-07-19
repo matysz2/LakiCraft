@@ -12,6 +12,7 @@ const MyServices = () => {
   const [saveStatus, setSaveStatus] = useState("");
   const [userId, setUserId] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [showImage, setShowImage] = useState(true); // Dodane: kontrola widoczności zdjęcia
 
   const navigate = useNavigate();
 
@@ -51,6 +52,7 @@ const MyServices = () => {
         if (data) {
           setCardData(data);
           setEditableCardData(data);
+          setShowImage(true); // Przy ponownym załadowaniu resetuj flagę
         }
       })
       .catch((err) => {
@@ -102,6 +104,7 @@ const MyServices = () => {
         setSaveStatus("✅ Dane zapisane poprawnie.");
         setIsEditing(false);
         setSelectedFile(null);
+        setShowImage(true); // Resetuj flagę po zapisie
       })
       .catch((err) => {
         setError(err.message);
@@ -124,7 +127,7 @@ const MyServices = () => {
       ) : (
         <>
           <div className="card-header">
-            {editableCardData.profileImageUrl ? (
+            {editableCardData.profileImageUrl && showImage && (
               <img
                 src={editableCardData.profileImageUrl.startsWith("http")
                   ? editableCardData.profileImageUrl
@@ -134,18 +137,7 @@ const MyServices = () => {
                 width={150}
                 height={150}
                 style={{ objectFit: "cover", borderRadius: "50%" }}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "/default-avatar.png";
-                }}
-              />
-            ) : (
-              <img
-                src="/default-avatar.png"
-                alt="Brak zdjęcia"
-                width={150}
-                height={150}
-                style={{ objectFit: "cover", borderRadius: "50%" }}
+                onError={() => setShowImage(false)} // Jeśli błąd ładowania, ukryj zdjęcie
               />
             )}
 
