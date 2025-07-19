@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import LoadingScreen from "../LoadingScreen";
-import BASE_URL from '../config.js';  // Zmienna BASE_URL
+import BASE_URL from '../config.js';
 
 const OrderMessages = () => {
   const { orderId } = useParams();
@@ -11,8 +11,8 @@ const OrderMessages = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  
-   // Przechowywanie URL w zmiennej
+
+  const [lacquererId, setLacquererId] = useState(null); // ✅ automatycznie przypiszemy lakiernika do wiadomości
 
   useEffect(() => {
     setIsLoading(true);
@@ -30,23 +30,23 @@ const OrderMessages = () => {
 
     const fetchMessages = async () => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // małe opóźnienie dla LoadingScreen
         const response = await fetch(`https://${BASE_URL}/api/lacquerOrders/${orderId}/messages`);
-        if (!response.ok) throw new Error("Błąd sieci");
+
+        if (!response.ok) throw new Error("Błąd sieci przy pobieraniu wiadomości");
         const data = await response.json();
 
         if (Array.isArray(data)) {
           setMessages(data);
 
-          // Pobranie ID lacquerOrder z odpowiedzi
-          const lacquerOrderIdFromApi = data[0]?.lacquerOrder?.id;
-          if (lacquerOrderIdFromApi) {
-            console.log("ID lacquerOrder:", lacquerOrderIdFromApi);
-          } else {
-            throw new Error("Brak ID lacquerOrder w odpowiedzi API");
+          // ✅ Wyciągamy ID lakiernika z pierwszej wiadomości (jeśli istnieje)
+          const lacquererFromApi = data[0]?.lacquerer?.id || data[0]?.lacquerOrder?.lacquerer?.id;
+          if (lacquererFromApi) {
+            setLacquererId(lacquererFromApi);
           }
+
         } else {
-          throw new Error("Nieprawidłowy format danych");
+          throw new Error("Nieprawidłowy format danych z API");
         }
       } catch (err) {
         console.error("Błąd pobierania wiadomości:", err);
@@ -69,35 +69,37 @@ const OrderMessages = () => {
     }
 
     const userData = JSON.parse(storedUserData);
-    const senderId = userData.id;  // Identyfikator użytkownika
+    const senderId = userData.id;
     const senderRole = userData.role;
 
+    let finalLacquererId = lacquererId;
+
+    // ✅ Jeśli użytkownik to lakiernik, to sam jest "lacquererem"
+    if (senderRole === "lakiernik") {
+      finalLacquererId = senderId;
+    }
+
+    // ✅ Jeśli użytkownik to stolarz, a brak lacquerera w API, zgłoś błąd
+    if (!finalLacquererId) {
+      setError("Nie znaleziono przypisanego lakiernika do tego zamówienia.");
+      return;
+    }
+
     try {
-      // Pobierz ID lacquerOrder z ostatniej wiadomości (z wcześniejszego API)
-      const lacquerOrderIdFromApi = messages[0]?.lacquerOrder?.id;
-
-      if (!lacquerOrderIdFromApi) {
-        setError("Brak ID lacquerOrder, nie można wysłać wiadomości.");
-        return;
-      }
-
-      const lacquererId = senderRole === "stolarz" ? senderId : lacquerOrderIdFromApi;  // Zmieniamy przypisanie ID lakiernika
-
       const response = await fetch(`https://${BASE_URL}/api/lacquerOrders/${orderId}/message`, {
+        method: "POST", // ✅ WAŻNE: metoda POST
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           message: newMessage,
-          user: { id: senderId },  // Użytkownik wysyłający wiadomość
-          lacquerer: { id: lacquererId },  // Lakiernik (zakładając, że stolarz wysyła wiadomość do lakiernika)
-          orderId: orderId,       // Wysyłanie ID zamówienia
-          lacquerOrderId: lacquerOrderIdFromApi, // Wysłanie ID lacquerOrder z odpowiedzi API
+          user: { id: senderId },        // ✅ wysyłający wiadomość
+          lacquerer: { id: finalLacquererId } // ✅ przypisany lakiernik
         }),
       });
 
       if (!response.ok) {
-        const errorText = await response.text(); // Pobranie treści błędu z odpowiedzi
+        const errorText = await response.text();
         console.error("Błąd wysyłania wiadomości:", errorText);
         throw new Error("Błąd wysyłania wiadomości");
       }
@@ -106,11 +108,12 @@ const OrderMessages = () => {
       setMessages((prevMessages) => [...prevMessages, messageData]);
       setNewMessage("");
       setSuccessMessage("Wiadomość została wysłana pomyślnie!");
-      setTimeout(() => setSuccessMessage(""), 3000); // Usuwanie komunikatu po 3 sekundach
+      setTimeout(() => setSuccessMessage(""), 3000);
+
     } catch (error) {
       console.error("Błąd wysyłania wiadomości:", error);
       setError("Nie udało się wysłać wiadomości.");
-      setTimeout(() => setError(null), 3000); // Usuwanie komunikatu o błędzie po 3 sekundach
+      setTimeout(() => setError(null), 3000);
     }
   };
 
@@ -121,8 +124,10 @@ const OrderMessages = () => {
   return (
     <div className="order-messages">
       <h2>Historia wiadomości dla zamówienia #{orderId}</h2>
+
       {error && <div className="error">{error}</div>}
       {successMessage && <div className="success">{successMessage}</div>}
+
       {messages.length === 0 ? (
         <div className="no-messages">Brak wiadomości</div>
       ) : (
