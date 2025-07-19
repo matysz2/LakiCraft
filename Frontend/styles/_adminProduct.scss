@@ -107,17 +107,39 @@
         }
       }
       
-  
-  @media (max-width: 768px) {
-    .admin-product-list {
-      padding: 10px;
-  
-      table {
-        font-size: 14px;
-  
-        th, td {
-          padding: 8px;
-        }
+ @media (max-width: 768px) {
+    table {
+      font-size: 12px;
+      
+      th, td {
+        padding: 6px 5px;
+      }
+
+      td {
+        white-space: normal !important; // Pozwól na zawijanie tekstu w komórkach
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    table {
+      font-size: 10px;
+
+      th, td {
+        padding: 4px 3px;
+      }
+
+      // Jeśli bardzo ciasno, zmniejsz szerokość niektórych kolumn
+      th:nth-child(4), td:nth-child(4), // Stock
+      th:nth-child(5), td:nth-child(5), // Cena
+      th:nth-child(6), td:nth-child(6), // Marka
+      th:nth-child(7), td:nth-child(7), // Status
+      th:nth-child(8), td:nth-child(8)  // Sprzedawca
+      {
+        max-width: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }
