@@ -144,13 +144,26 @@
     }
   }
 
-  @media (max-width: 768px) {
-    table {
+    @media (max-width: 768px) {
       font-size: 14px;
 
       th, td {
-        padding: 8px;
+        padding: 6px 8px;
+      }
+
+      // Tabela w komórce ma nie przekraczać kontenera
+      max-width: 100%;
+      display: block;   // wymusza scroll w poziomie jeśli za szeroko
+      overflow-x: auto;
+      white-space: nowrap; // zapobiega zawijaniu tekstu na małych ekranach
+    }
+
+    @media (max-width: 480px) {
+      font-size: 12px;
+
+      th, td {
+        padding: 4px 6px;
       }
     }
-  }
+  
 }
