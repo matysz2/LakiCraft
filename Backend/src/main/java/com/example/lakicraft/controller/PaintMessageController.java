@@ -79,6 +79,13 @@ this.userRepository = userRepository;  // Ensuring that userRepository is initia
         return new ResponseEntity<>(savedMessage, HttpStatus.CREATED);
     }
     
+    @GetMapping("/{orderId}")
+    public ResponseEntity<LacquerOrder> getOrderById(@PathVariable Long orderId) {
+    return lacquerOrderRepository.findById(orderId)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+}
+
     }
 
 
