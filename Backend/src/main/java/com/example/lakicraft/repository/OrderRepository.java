@@ -26,8 +26,11 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
 
     List<Orders> findByUserId(Long userId);
 
-        List<Orders> findByUserIdOrderByOrderDateDesc(Long userId);
-        long countByProductId(Long productId);  // Liczymy, ile razy produkt jest powiązany z zamówieniami
+      @EntityGraph(attributePaths = "orderItems")
+List<Orders> findByUserIdOrderByOrderDateDesc(Long userId);
+
+long countByOrderItemsProductId(Long productId);
+  // Liczymy, ile razy produkt jest powiązany z zamówieniami
 
 
         List<Orders> findTop5ByUserIdOrderByOrderDateDesc(Long userId); 
