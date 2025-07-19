@@ -14,6 +14,7 @@ const OrderMessages = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const [lacquererId, setLacquererId] = useState(null); // ✅ przypisany lakiernik
+  const [orderData, setOrderData] = useState(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -31,38 +32,29 @@ const OrderMessages = () => {
 
     const fetchData = async () => {
       try {
-        // ✅ 1. Pobierz wiadomości
+        // ✅ 1. Pobierz dane zamówienia (kluczowe dla lacquerera)
+        const orderResponse = await fetch(
+          `https://${BASE_URL}/api/lacquerOrders/${orderId}`
+        );
+        if (!orderResponse.ok) throw new Error("Nie udało się pobrać zamówienia");
+        const orderJson = await orderResponse.json();
+        setOrderData(orderJson);
+
+        // W zamówieniu: client = lakiernik
+        if (orderJson?.client?.id) {
+          setLacquererId(orderJson.client.id);
+        }
+
+        // ✅ 2. Pobierz wiadomości
         const messagesResponse = await fetch(
           `https://${BASE_URL}/api/lacquerOrders/${orderId}/messages`
         );
         if (!messagesResponse.ok)
           throw new Error("Błąd sieci przy pobieraniu wiadomości");
 
-        const messagesData = await messagesResponse.json();
-        if (Array.isArray(messagesData)) {
-          setMessages(messagesData);
-
-          // Spróbuj wyciągnąć lakiernika z pierwszej wiadomości (jeśli istnieje)
-          const lacquererFromApi =
-            messagesData[0]?.lacquerer?.id ||
-            messagesData[0]?.lacquerOrder?.lacquerer?.id;
-          if (lacquererFromApi) {
-            setLacquererId(lacquererFromApi);
-          }
-        }
-
-        // ✅ 2. Pobierz dane zamówienia (dla pewności, nawet jeśli brak wiadomości)
-        const orderResponse = await fetch(
-          `https://${BASE_URL}/api/lacquerOrders/${orderId}`
-        );
-
-        if (orderResponse.ok) {
-          const orderData = await orderResponse.json();
-
-          // Jeśli zamówienie ma przypisanego lakiernika → ustaw go
-          if (orderData?.lacquerer?.id) {
-            setLacquererId(orderData.lacquerer.id);
-          }
+        const messagesJson = await messagesResponse.json();
+        if (Array.isArray(messagesJson)) {
+          setMessages(messagesJson);
         }
       } catch (err) {
         console.error("Błąd pobierania danych:", err);
@@ -90,12 +82,17 @@ const OrderMessages = () => {
 
     let finalLacquererId = lacquererId;
 
-    // ✅ Jeśli użytkownik to lakiernik → sam jest lacquererem
-    if (senderRole === "lakiernik") {
-      finalLacquererId = senderId;
+    // ✅ Jeśli użytkownik to lakiernik, nadal backend wymaga lacquerera, czyli client.id
+    if (senderRole === "lakiernik" && orderData?.client?.id) {
+      finalLacquererId = orderData.client.id;
     }
 
-    // ✅ Jeśli użytkownik to stolarz i dalej brak przypisanego lakiernika → błąd
+    // ✅ Jeśli stolarz – lacquerer = client.id
+    if (senderRole === "stolarz" && orderData?.client?.id) {
+      finalLacquererId = orderData.client.id;
+    }
+
+    // ✅ Jeśli nadal brak – błąd
     if (!finalLacquererId) {
       setError("Nie znaleziono przypisanego lakiernika do tego zamówienia.");
       return;
@@ -112,7 +109,7 @@ const OrderMessages = () => {
           body: JSON.stringify({
             message: newMessage,
             user: { id: senderId },
-            lacquerer: { id: finalLacquererId },
+            lacquerer: { id: finalLacquererId }, // zawsze client.id
           }),
         }
       );
