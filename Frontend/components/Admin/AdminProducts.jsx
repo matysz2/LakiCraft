@@ -158,31 +158,32 @@ const AdminProduct = () => {
             <th>Akcje</th>
           </tr>
         </thead>
-        <tbody>
-          {filteredProducts.map((product) => (
-            <tr key={product.id}>
-              <td>{product.id}</td>
-              <td>{product.name}</td>
-              <td>{product.kod}</td>
-              <td>{product.stock}</td>
-              <td>{product.price} zł</td>
-              <td>{product.brand}</td>
-              <td>{product.status}</td>
-              <td>{product.user?.name || "Nieznany"}</td>
-              <td>
-                <button
-                  className={`btn-status ${product.status === "blocked" ? "btn-list" : "btn-block"}`}
-                  onClick={() => handleToggleProductStatus(product.id, product.name, product.status)}
-                >
-                  {product.status === "blocked" ? "Wystaw" : "Zablokuj"}
-                </button>
-                <button className="btn-delete" onClick={() => handleDeleteProduct(product.id, product.name)}>
-                  Usuń
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+   <tbody>
+  {filteredProducts.map((product) => (
+    <tr key={product.id}>
+      <td data-label="ID">{product.id}</td>
+      <td data-label="Nazwa">{product.name}</td>
+      <td data-label="Kod">{product.kod}</td>
+      <td data-label="Stock">{product.stock}</td>
+      <td data-label="Cena">{product.price} zł</td>
+      <td data-label="Marka">{product.brand}</td>
+      <td data-label="Status">{product.status}</td>
+      <td data-label="Sprzedawca">{product.user?.name || "Nieznany"}</td>
+      <td data-label="Akcje">
+        <button
+          className={`btn-status ${product.status === "blocked" ? "btn-list" : "btn-block"}`}
+          onClick={() => handleToggleProductStatus(product.id, product.name, product.status)}
+        >
+          {product.status === "blocked" ? "Wystaw" : "Zablokuj"}
+        </button>
+        <button className="btn-delete" onClick={() => handleDeleteProduct(product.id, product.name)}>
+          Usuń
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
       </table>
     </div>
   );

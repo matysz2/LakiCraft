@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                     "https://lakicraft.netlify.app", // produkcja
-                    "http://localhost:3000"          // lokalne dev
+                    "https://localhost:3000"          // lokalne dev
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")

@@ -7,10 +7,20 @@
   min-height: calc(100vh - 80px);
   margin-top: 50px;
 
+  h1 {
+    color: #333;
+    font-size: 28px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  /* === FILTRY === */
   .filters {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
 
     input[type="text"],
     select,
@@ -22,54 +32,29 @@
       width: 200px;
       transition: border-color 0.3s ease;
       box-sizing: border-box;
-    }
-
-    input[type="text"],
-    select {
-      &:focus {
-        border-color: #007bff;
-        outline: none;
-      }
-
-      &:hover {
-        border-color: #007bff;
-      }
-
-      @media (max-width: 768px) {
-        width: 100%;
-      }
-    }
-
-    input[type="date"] {
-      cursor: pointer;
-      -webkit-appearance: none;
-      -moz-appearance: textfield;
-      appearance: none;
-      background: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"%3E%3Cpath fill="%23ccc" d="M8 5.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5zM3 7a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V7zM4.5 8a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-.5.5h-6a.5.5 0 0 1-.5-.5V8z"%3E%3C/path%3E%3C/svg%3E') no-repeat scroll right center;
-      background-size: 16px 16px;
-      background-position: right 10px center;
 
       &:focus {
         border-color: #007bff;
         outline: none;
       }
-
       &:hover {
         border-color: #007bff;
       }
+    }
 
-      @media (max-width: 768px) {
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+
+      input[type="text"],
+      select,
+      input[type="date"] {
         width: 100%;
       }
     }
   }
 
-  h1 {
-    color: #333;
-    font-size: 28px;
-    margin-bottom: 20px;
-  }
-
+  /* === TABELA === */
   table {
     width: 100%;
     border-collapse: collapse;
@@ -99,7 +84,6 @@
     .btn-update {
       background-color: #4CAF50;
       color: white;
-
       &:hover {
         background-color: #45a049;
       }
@@ -108,7 +92,6 @@
     .btn-cancel {
       background-color: #f44336;
       color: white;
-
       &:hover {
         background-color: #e53935;
       }
@@ -129,7 +112,7 @@
   }
 
   .btn-revert {
-    background-color: #ffcc00; // Żółty kolor dla wyróżnienia
+    background-color: #ffcc00;
     color: #000;
     border: none;
     padding: 8px 12px;
@@ -144,26 +127,44 @@
     }
   }
 
-    @media (max-width: 768px) {
+  /* === WERSJA MOBILNA === */
+  @media (max-width: 768px) {
+
+    
+    table, thead, tbody, th, td, tr {
+      display: block;
+    }
+
+    thead {
+      display: none; /* chowamy nagłówki tabeli */
+    }
+
+    tbody tr {
+      background: white;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    tbody td {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      border-bottom: none;
       font-size: 14px;
-
-      th, td {
-        padding: 6px 8px;
-      }
-
-      // Tabela w komórce ma nie przekraczać kontenera
-      max-width: 100%;
-      display: block;   // wymusza scroll w poziomie jeśli za szeroko
-      overflow-x: auto;
-      white-space: nowrap; // zapobiega zawijaniu tekstu na małych ekranach
     }
 
-    @media (max-width: 480px) {
+    tbody td::before {
+      content: attr(data-label); /* Dodajemy etykietę z nazwą kolumny */
+      font-weight: bold;
+      color: #333;
+    }
+  }
+
+  @media (max-width: 480px) {
+    tbody td {
       font-size: 12px;
-
-      th, td {
-        padding: 4px 6px;
-      }
     }
-  
+  }
 }

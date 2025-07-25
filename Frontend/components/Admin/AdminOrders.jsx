@@ -90,22 +90,20 @@ const Orders = () => {
     const updatedFilters = { ...filters, [name]: value };
     setFilters(updatedFilters);
 
-    const filteredData = orders.filter((order) => {
-      const customerName = `${order.user.firstName} ${order.user.lastName}`.toLowerCase();
-      const sellerName = `${order.seller.firstName} ${order.seller.lastName}`.toLowerCase();
+const filteredData = orders.filter((order) => {
+  const customerName = order.userName?.toLowerCase() || "";
+  const sellerName = order.sellerName?.toLowerCase() || "";
+  const orderDate = new Date(order.orderDate).toLocaleDateString("en-CA"); // YYYY-MM-DD
 
-      const orderDate = new Date(order.orderDate).toLocaleDateString("en-CA"); // Format YYYY-MM-DD
+  return (
+    (order.id.toString().includes(updatedFilters.id.toLowerCase()) || updatedFilters.id === "") &&
+    (customerName.includes(updatedFilters.customerName.toLowerCase()) || updatedFilters.customerName === "") &&
+    (sellerName.includes(updatedFilters.sellerName.toLowerCase()) || updatedFilters.sellerName === "") &&
+    (order.status.toLowerCase().includes(updatedFilters.status.toLowerCase()) || updatedFilters.status === "") &&
+    (orderDate.includes(updatedFilters.date) || updatedFilters.date === "")
+  );
+});
 
-      // Używamy porównania daty w formacie 'YYYY-MM-DD'
-      return (
-        (order.id.toString().includes(updatedFilters.id.toLowerCase()) || updatedFilters.id === "") &&
-        (customerName.includes(updatedFilters.customerName.toLowerCase()) || updatedFilters.customerName === "") &&
-        (sellerName.includes(updatedFilters.sellerName.toLowerCase()) || updatedFilters.sellerName === "") &&
-        (order.status.toLowerCase().includes(updatedFilters.status.toLowerCase()) || updatedFilters.status === "") &&
-        // Filtrowanie po dacie
-        (orderDate.includes(updatedFilters.date) || updatedFilters.date === "")
-      );
-    });
 
     setFilteredOrders(filteredData);
   };
@@ -126,7 +124,7 @@ const Orders = () => {
 
   return (
     <div className="orders">
-      <Header />
+      <Header /><br></br>
       <h1>Lista zamówień lakierów</h1>
 
       <div className="filters">
@@ -185,32 +183,29 @@ const Orders = () => {
             <th>Akcje</th>
           </tr>
         </thead>
-        <tbody>
-          {filteredOrders.map((order) => (
-            <tr key={order.id}>
-              <td>{order.id}</td>
-              <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-              <td>{order.user.firstName} {order.user.lastName}</td>
-              <td>{order.seller.firstName} {order.seller.lastName}</td>
-              <td>{order.status}</td>
-              <td>{order.totalPrice} PLN</td>
-              <td>
-                <button
-                  className="btn-update"
-                  onClick={() => handleUpdateStatus(order.id, "Zrealizowane")}
-                >
-                  Zrealizuj
-                </button>
-                <button
-                  className="btn-update"
-                  onClick={() => handleUpdateStatus(order.id, "Anulowane")}
-                >
-                  Anuluj
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+<tbody>
+  {filteredOrders.map((order) => (
+    <tr key={order.id}>
+      <td data-label="ID">{order.id}</td>
+      <td data-label="Data">{new Date(order.orderDate).toLocaleDateString()}</td>
+      <td data-label="Klient">{order.userName || "—"}</td>
+      <td data-label="Sprzedawca">{order.sellerName || "—"}</td>
+      <td data-label="Status">{order.status}</td>
+      <td data-label="Cena">{order.totalPrice} PLN</td>
+      <td data-label="Akcje">
+        <button className="btn-update" onClick={() => handleUpdateStatus(order.id, "Zrealizowane")}>
+          Zrealizuj
+        </button>
+        <button className="btn-update" onClick={() => handleUpdateStatus(order.id, "Anulowane")}>
+          Anuluj
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
+
+
       </table>
     </div>
   );

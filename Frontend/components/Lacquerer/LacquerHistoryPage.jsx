@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LacquerHeader from "./LacquererHeader";
-import BASE_URL from '../config.js';  // Zmienna BASE_URL
+import BASE_URL from '../config.js';
 
 const MyHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -22,12 +22,11 @@ const MyHistory = () => {
       return;
     }
 
-    // Zmieniamy metodę fetch, aby używać nagłówka zamiast query parameter
     fetch(`https://${BASE_URL}/api/orders/user-orders`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "userId": userId, // Wysyłamy userId w nagłówku
+        "userId": userId,
       },
     })
       .then((res) => {
@@ -37,7 +36,6 @@ const MyHistory = () => {
         return res.json();
       })
       .then((data) => {
-        console.log("Dane zamówień:", data);
         if (Array.isArray(data)) {
           setOrders(data);
         } else {
@@ -45,7 +43,6 @@ const MyHistory = () => {
         }
       })
       .catch((error) => {
-        console.error("Błąd pobierania zamówień:", error);
         setErrorMessage(error.message || "Błąd pobierania zamówień.");
       });
   }, [navigate]);
@@ -55,13 +52,12 @@ const MyHistory = () => {
   };
 
   const handleWriteMessage = (orderId) => {
-    // Po kliknięciu przycisku, przekierowujemy na stronę wiadomości dla danego zamówienia
     navigate(`/orders/${orderId}/messages`);
   };
 
   return (
     <div className="order-list">
-                        <LacquerHeader />
+      <LacquerHeader />
       <div className="order-list-content">
         {errorMessage ? (
           <div className="error-message">❌ {errorMessage}</div>
@@ -86,11 +82,11 @@ const MyHistory = () => {
                   <div><strong>Łączna cena:</strong> {order.totalPrice ? order.totalPrice.toFixed(2) : "Brak ceny"}</div>
                   <div>
                     <strong>Produkty:</strong>
-                    {order.orderItems?.length > 0 ? (
+                    {order.items?.length > 0 ? (
                       <ul>
-                        {order.orderItems.map((item, index) => (
+                        {order.items.map((item, index) => (
                           <li key={index}>
-                            {item.product.name} - {item.quantity} szt. - {item.price.toFixed(2)} zł
+                            {item.productName} - {item.quantity} szt. - {item.price.toFixed(2)} zł
                           </li>
                         ))}
                       </ul>

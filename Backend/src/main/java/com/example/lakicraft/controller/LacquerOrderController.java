@@ -152,7 +152,7 @@ public class LacquerOrderController {
     public ResponseEntity<Map<String, String>> getLacquerOrderImages() {
         String baseUrl = System.getenv("APP_URL");
         if (baseUrl == null || baseUrl.isBlank()) {
-            baseUrl = "http://localhost:8080";
+            baseUrl = "https://localhost:8080";
         }
 
         Map<String, String> images = Map.of(

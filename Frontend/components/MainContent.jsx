@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BASE_URL from './config.js';  // Zmienna BASE_URL
 
-
 const MainContent = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");  // Dodane pole 'message'
+  const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -27,7 +26,52 @@ const MainContent = () => {
 
   const navigate = useNavigate();
 
-  // Funkcja obsługująca wysyłanie formularza kontaktowego
+  // ✅ Automatyczne logowanie po rejestracji
+  const handleLoginAfterRegister = async (email, password) => {
+    try {
+      const response = await fetch(`https://${BASE_URL}/api/user/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUserData(data.user);
+        localStorage.setItem("userData", JSON.stringify(data.user));
+        setIsLoggedIn(true);
+        setShowRegisterModal(false); // zamykamy modal rejestracji
+        setErrorMessage("");
+
+        // ✅ Przekierowanie według roli
+        switch (data.user.role) {
+          case "admin":
+            navigate("/admin-dashboard");
+            break;
+          case "stolarz":
+            navigate("/carpenter-dashboard");
+            break;
+          case "lakiernik":
+            navigate("/lacquerer-dashboard");
+            break;
+          case "sprzedawca":
+            navigate("/seller-dashboard");
+            break;
+          default:
+            navigate("/");
+            break;
+        }
+      } else {
+        setErrorMessage(data.message || "Błąd automatycznego logowania.");
+      }
+    } catch (error) {
+      setErrorMessage("Błąd połączenia przy automatycznym logowaniu!");
+      console.error(error);
+    }
+  };
+
+  // ✅ Formularz kontaktowy
   const handleContactSubmit = async (e) => {
     e.preventDefault();
   
@@ -44,11 +88,9 @@ const MainContent = () => {
         body: JSON.stringify(contactData),
       });
   
-      // Zaloguj surową odpowiedź
       const rawData = await response.text();
       console.log('Raw Response:', rawData);
   
-      // Spróbuj sparsować odpowiedź tylko, jeśli jest to JSON
       let data = {};
       try {
         data = JSON.parse(rawData);
@@ -74,8 +116,8 @@ const MainContent = () => {
       console.error(error);
     }
   };
-  
 
+  // ✅ Sprawdzenie zalogowania przy starcie
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("userData"));
     if (user) {
@@ -101,7 +143,7 @@ const MainContent = () => {
     }
   }, [navigate]);
 
-  // Funkcja logowania
+  // ✅ Funkcja logowania (manualnego)
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -147,7 +189,7 @@ const MainContent = () => {
     }
   };
 
-  // Funkcja rejestracji
+  // ✅ Funkcja rejestracji – teraz auto-loguje po sukcesie
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -170,23 +212,31 @@ const MainContent = () => {
         body: JSON.stringify(newUser),
       });
 
-      const data = await response.json();
+      const rawData = await response.text();
+
+      let data = {};
+      if (rawData) {
+        try {
+          data = JSON.parse(rawData);
+        } catch (error) {
+          console.warn("Nie udało się sparsować JSON:", error);
+        }
+      }
 
       if (response.ok) {
-        setSuccessMessage("Rejestracja zakończona sukcesem!");
-        setErrorMessage("");
-        setTimeout(() => {
-          setSuccessMessage("");
-        }, 5000);
+        // ✅ Po rejestracji automatyczny login
+        await handleLoginAfterRegister(registerData.email, registerData.password);
       } else {
-        if (response.status === 400 && data.message.includes("Użytkownik z tym adresem e-mail już istnieje")) {
+        if (response.status === 400 && data.message && data.message.includes("Użytkownik z tym adresem e-mail już istnieje")) {
           setErrorMessage("Adres e-mail już istnieje. Proszę użyć innego.");
+        } else if (rawData) {
+          setErrorMessage(rawData);
         } else {
-          setErrorMessage(data.message || "Błąd rejestracji.");
+          setErrorMessage("Błąd rejestracji.");
         }
       }
     } catch (error) {
-      setErrorMessage("Adres e-mail już istnieje. Proszę użyć innego");
+      setErrorMessage("Błąd połączenia z serwerem!");
       console.error(error);
     }
   };
@@ -202,12 +252,16 @@ const MainContent = () => {
             <button onClick={() => setShowRegisterModal(true)}>Zarejestruj się</button>
           </>
         ) : (
-          <button onClick={() => {
-            localStorage.removeItem("userData");
-            setUserData(null);
-            setIsLoggedIn(false);
-            navigate("/");
-          }}>Wyloguj się</button>
+          <button
+            onClick={() => {
+              localStorage.removeItem("userData");
+              setUserData(null);
+              setIsLoggedIn(false);
+              navigate("/");
+            }}
+          >
+            Wyloguj się
+          </button>
         )}
       </section>
 

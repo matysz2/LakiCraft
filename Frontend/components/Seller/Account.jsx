@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SellerHeader from "./SellerHeaders";
 import LakiernikHeader from "../Lacquerer/LacquererHeader";
 import CarpenterHeader from "../Carpenter/CarpenterHeader";
-import BASE_URL from '../config.js';  // Zmienna BASE_URL
+import BASE_URL from "../config.js"; // Zmienna BASE_URL
 
 const Account = () => {
   const [user, setUser] = useState(null);
@@ -43,7 +43,7 @@ const Account = () => {
     fetch(`https://${BASE_URL}/api/user?id=${userData.id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
-      }
+      },
     })
       .then((res) => {
         if (!res.ok) throw new Error(`Błąd pobierania danych: ${res.status}`);
@@ -63,6 +63,11 @@ const Account = () => {
 
   const handleEdit = () => {
     setIsEditing(true);
+    // Przy edycji zawsze resetujemy hasło, żeby input był pusty
+    setEditableUser((prev) => ({
+      ...prev,
+      password: "",
+    }));
   };
 
   const handleSave = () => {
@@ -70,7 +75,13 @@ const Account = () => {
     setSaveStatus("");
     setSaveError("");
 
-    console.log("Dane do wysłania: ", editableUser);
+    // Przygotowujemy dane do wysłania – nie wysyłamy pustego hasła
+    const dataToSend = { ...editableUser };
+    if (!editableUser.password || editableUser.password.trim() === "") {
+      delete dataToSend.password; // usuń hasło, jeśli nie zmieniono
+    }
+
+    console.log("Dane do wysłania: ", dataToSend);
 
     fetch(`https://${BASE_URL}/api/user?id=${user.id}`, {
       method: "PUT",
@@ -78,7 +89,7 @@ const Account = () => {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(editableUser),
+      body: JSON.stringify(dataToSend),
     })
       .then((res) => {
         if (!res.ok) throw new Error(`Błąd: ${res.status}`);
@@ -147,15 +158,17 @@ const Account = () => {
     <p>
       <strong>{label}:</strong>
       {name === "createdAt" || name === "accountStatus" || name === "name" ? (
-        // Zablokuj możliwość edytowania pola 'name'
         <span>{value || "Brak danych"}</span>
       ) : isEditing ? (
         name === "password" ? (
           <input
+            key={isEditing ? "edit-mode" : "view-mode"} // resetuje input przy każdej edycji
             type="password"
             name={name}
-            value={editableUser[name] || ""}
+            autoComplete="new-password" // wyłącza autouzupełnianie
+            defaultValue="" // zawsze puste
             onChange={handleChange}
+            placeholder="Wpisz nowe hasło"
           />
         ) : (
           <input
@@ -173,10 +186,18 @@ const Account = () => {
 
   return (
     <div className="account-container">
-{user.role === "sprzedawca" ? <SellerHeader /> 
-  : user.role === "lakiernik" ? <LakiernikHeader /> 
-  : user.role === "stolarz" ? <CarpenterHeader /> 
-  : <div style={{ color: 'red', fontSize: '16px' }}>Błąd: Nieznana rola użytkownika</div>}
+      {user.role === "sprzedawca" ? (
+        <SellerHeader />
+      ) : user.role === "lakiernik" ? (
+        <LakiernikHeader />
+      ) : user.role === "stolarz" ? (
+        <CarpenterHeader />
+      ) : (
+        <div style={{ color: "red", fontSize: "16px" }}>
+          Błąd: Nieznana rola użytkownika
+        </div>
+      )}
+
       <h2>Moje Konto</h2>
       <div className="account-details">
         {renderField("Nazwa Firmy", user.name, "name")}
@@ -184,11 +205,17 @@ const Account = () => {
         {renderField("Nazwisko", user.lastName, "lastName")}
         {renderField("Email", user.email, "email")}
         {renderField("Status konta", user.accountStatus, "accountStatus")}
-        {renderField("Data rejestracji", user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "", "createdAt")}
+        {renderField(
+          "Data rejestracji",
+          user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "",
+          "createdAt"
+        )}
         {renderField("Hasło", "", "password", "password")}
       </div>
+
       {saveStatus && <p style={{ color: "green" }}>{saveStatus}</p>}
       {saveError && <p style={{ color: "red" }}>{saveError}</p>}
+
       <div className="account-actions">
         {isEditing ? (
           <button className="save-btn" onClick={handleSave}>
@@ -208,4 +235,3 @@ const Account = () => {
 };
 
 export default Account;
-

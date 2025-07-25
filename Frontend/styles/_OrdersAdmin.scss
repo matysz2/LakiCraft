@@ -5,20 +5,50 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   max-width: 1200px;
   margin: 20px auto;
-  min-height: calc(100vh - 80px); // Dodajemy minimalną wysokość, żeby stopka była na dole
+  min-height: calc(100vh - 80px);
 
   h1 {
     color: #333;
     font-size: 28px;
     margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+
+    input {
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 200px;
+      max-width: 100%;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+      &:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      }
+
+      &::placeholder {
+        color: #aaa;
+      }
+    }
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 80px; // Odstęp na dole dla stopki
+    margin-bottom: 80px;
 
-    th, td {
+    th,
+    td {
       padding: 12px;
       text-align: left;
       border-bottom: 1px solid #ddd;
@@ -60,9 +90,10 @@
       }
     }
   }
+
   .btn-back {
     padding: 10px 20px;
-    background-color: #2196f3; /* Kolor przycisku */
+    background-color: #2196f3;
     color: white;
     border: none;
     border-radius: 5px;
@@ -74,11 +105,9 @@
     &:hover {
       background-color: #1976d2;
     }
-
-  
   }
-  
 
+  /* === MOBILE === */
   @media (max-width: 768px) {
     padding: 15px;
     max-width: 100%;
@@ -89,83 +118,64 @@
 
     table {
       font-size: 14px;
-      th, td {
-        padding: 8px;
-      }
-    }
+      border: 0;
 
-    .btn-update {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-  }
-
-  /* Stylowanie sekcji filtrów */
-  .filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-
-    input {
-      padding: 10px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      width: 200px;
-      max-width: 100%;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-
-      &:focus {
-        border-color: #007bff;
-        outline: none;
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      thead {
+        display: none;
       }
 
-      &::placeholder {
-        color: #aaa;
+      tbody {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
       }
 
-      @media (max-width: 768px) {
+      tr {
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+        padding: 12px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 14px;
+        border-bottom: 1px solid #eee;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &::before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: #555;
+        }
+      }
+
+      .btn-update {
         width: 100%;
+        margin-top: 5px;
       }
-    }
-  }
-
-  /* Stylowanie dla input typu date */
-  .filters input[type="date"] {
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 200px;
-    max-width: 100%;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-
-    &:focus {
-      border-color: #007bff;
-      outline: none;
-      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    }
-
-    &::placeholder {
-      color: #aaa;
-    }
-
-    @media (max-width: 768px) {
-      width: 100%;
     }
   }
 
   @media (max-width: 480px) {
-    h1 {
-      font-size: 20px;
+    table td {
+      flex-direction: column;
+      align-items: flex-start;
+
+      &::before {
+        margin-bottom: 4px;
+      }
     }
 
-    table {
-      font-size: 12px;
+    .filters input {
+      width: 100%;
     }
   }
-  
 }
-

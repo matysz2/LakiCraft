@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_admin.scss";
 import Header from "../Header";
-import BASE_URL from '../config.js';  // Zmienna BASE_URL
+import BASE_URL from "../config.js";
 
 const AdminUser = () => {
   const [users, setUsers] = useState([]);
@@ -34,9 +34,7 @@ const AdminUser = () => {
     if (role === "admin") {
       fetch(`https://${BASE_URL}/api/user/users`)
         .then((res) => {
-          if (!res.ok) {
-            throw new Error("Błąd podczas pobierania użytkowników");
-          }
+          if (!res.ok) throw new Error("Błąd podczas pobierania użytkowników");
           return res.json();
         })
         .then((data) => {
@@ -51,10 +49,8 @@ const AdminUser = () => {
   }, [role]);
 
   const handleDeleteUser = (userId, userName) => {
-    const isConfirmed = window.confirm(`Czy na pewno chcesz usunąć użytkownika ${userName}?`);
-    
-    if (!isConfirmed) return;
-  
+    if (!window.confirm(`Czy na pewno chcesz usunąć użytkownika ${userName}?`)) return;
+
     fetch(`https://${BASE_URL}/api/user/users/${userId}`, {
       method: "DELETE",
     })
@@ -67,7 +63,7 @@ const AdminUser = () => {
       })
       .catch((err) => setError(err.message));
   };
-  
+
   const handleEditUser = (user) => {
     setEditingUser(user);
   };
@@ -81,19 +77,14 @@ const AdminUser = () => {
       body: JSON.stringify(editingUser),
     })
       .then((res) => {
-        if (!res.ok) {
-          throw new Error("Błąd podczas zapisywania zmian");
-        }
+        if (!res.ok) throw new Error("Błąd podczas zapisywania zmian");
         return res.json();
       })
       .then((updatedUser) => {
         setUsers(users.map((user) => (user.id === updatedUser.id ? updatedUser : user)));
         setEditingUser(null);
         setSuccessMessage("Zmiany zapisane pomyślnie!");
-
-        setTimeout(() => {
-          setSuccessMessage("");
-        }, 2000);
+        setTimeout(() => setSuccessMessage(""), 2000);
       })
       .catch((err) => setError(err.message));
   };
@@ -102,7 +93,7 @@ const AdminUser = () => {
     const { name, value } = e.target;
     setEditingUser((prevUser) => ({
       ...prevUser,
-      [name]: value,
+      [name]: name === "paymentDueDays" ? Number(value) : value,
     }));
   };
 
@@ -111,26 +102,42 @@ const AdminUser = () => {
 
   return (
     <div className="admin-user-list">
-      <Header />
-      <h1>Lista użytkowników</h1>
+      <Header /><br></br><br></br><br></br>
+      
+<h1>Lista użytkowników</h1>
 
       {successMessage && <div className="success-message">{successMessage}</div>}
-
       {editingUser && (
         <div className="edit-form">
           <h2>Edytuj użytkownika</h2>
+          
           <form>
             <div className="form-group">
               <label>Imię</label>
-              <input type="text" name="firstName" value={editingUser.firstName} onChange={handleInputChange} />
+              <input
+                type="text"
+                name="firstName"
+                value={editingUser.firstName}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="form-group">
               <label>Nazwisko</label>
-              <input type="text" name="lastName" value={editingUser.lastName} onChange={handleInputChange} />
+              <input
+                type="text"
+                name="lastName"
+                value={editingUser.lastName}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="form-group">
               <label>Email</label>
-              <input type="email" name="email" value={editingUser.email} onChange={handleInputChange} />
+              <input
+                type="email"
+                name="email"
+                value={editingUser.email}
+                onChange={handleInputChange}
+              />
             </div>
             <div className="form-group">
               <label>Rola</label>
@@ -143,21 +150,43 @@ const AdminUser = () => {
             </div>
             <div className="form-group">
               <label>Status konta</label>
-              <select name="accountStatus" value={editingUser.accountStatus} onChange={handleInputChange}>
+              <select
+                name="accountStatus"
+                value={editingUser.accountStatus}
+                onChange={handleInputChange}
+              >
                 <option value="active">Aktywne</option>
                 <option value="suspended">Zawieszone</option>
               </select>
             </div>
-            <button type="button" onClick={handleSaveChanges}>Zapisz zmiany</button>
-            <button type="button" onClick={() => setEditingUser(null)}>Anuluj</button>
-            <button type="button" className="btn-back" onClick={() => navigate(-1)}>Cofnij</button>
+            <div className="form-group">
+              <label>Termin płatności (dni)</label>
+              <input
+                type="number"
+                name="paymentDueDays"
+                value={editingUser.paymentDueDays || ""}
+                onChange={handleInputChange}
+                min="0"
+              />
+            </div>
+            <button type="button" onClick={handleSaveChanges}>
+              Zapisz zmiany
+            </button>
+            <button type="button" onClick={() => setEditingUser(null)}>
+              Anuluj
+            </button>
+            <button type="button" className="btn-back" onClick={() => navigate(-1)}>
+              Cofnij
+            </button>
           </form>
         </div>
       )}
 
       {!editingUser && (
         <>
-          <button className="btn-back" onClick={() => navigate(-1)}>Cofnij</button>
+          <button className="btn-back" onClick={() => navigate(-1)}>
+            Cofnij
+          </button>
           <table>
             <thead>
               <tr>
@@ -166,20 +195,31 @@ const AdminUser = () => {
                 <th>Email</th>
                 <th>Rola</th>
                 <th>Status</th>
+                <th>Termin płatności</th>
                 <th>Akcje</th>
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
                 <tr key={user.id}>
-                  <td>{user.id}</td>
-                  <td>{user.firstName} {user.lastName}</td>
-                  <td>{user.email}</td>
-                  <td>{user.role}</td>
-                  <td>{user.accountStatus}</td>
-                  <td>
-                    <button className="btn-edit" onClick={() => handleEditUser(user)}>Edytuj</button>
-                    <button className="btn-delete" onClick={() => handleDeleteUser(user.id, user.firstName)}>Usuń</button>
+                  <td data-label="ID">{user.id}</td>
+                  <td data-label="Imię">
+                    {user.firstName} {user.lastName}
+                  </td>
+                  <td data-label="Email">{user.email}</td>
+                  <td data-label="Rola">{user.role}</td>
+                  <td data-label="Status">{user.accountStatus}</td>
+                  <td data-label="Termin płatności">{user.paymentDueDays} dni</td>
+                  <td data-label="Akcje">
+                    <button className="btn-edit" onClick={() => handleEditUser(user)}>
+                      Edytuj
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => handleDeleteUser(user.id, user.firstName)}
+                    >
+                      Usuń
+                    </button>
                   </td>
                 </tr>
               ))}

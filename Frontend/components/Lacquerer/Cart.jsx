@@ -113,7 +113,7 @@ const Cart = () => {
   };
 
   const redirectToPayPal = () => {
-    const payPalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=TWÓJ_PAYPAL_EMAIL&amount=${totalPrice.toFixed(2)}&currency_code=PLN&item_name=Zamówienie&return=http://localhost:3000/orders&cancel_return=http://localhost:3000/cart`;
+    const payPalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=TWÓJ_PAYPAL_EMAIL&amount=${totalPrice.toFixed(2)}&currency_code=PLN&item_name=Zamówienie&return=https://localhost:3000/orders&cancel_return=https://localhost:3000/cart`;
     window.location.href = payPalUrl;
   };
 

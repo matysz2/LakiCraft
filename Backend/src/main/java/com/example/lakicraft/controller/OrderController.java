@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.example.lakicraft.dto.OrderDTO;
+import com.example.lakicraft.dto.OrderItemDTO;
 import com.example.lakicraft.model.OrderItem;
 import com.example.lakicraft.model.Orders;
 import com.example.lakicraft.model.Product;
@@ -24,7 +26,8 @@ import com.example.lakicraft.repository.ProductRepository;
 import com.example.lakicraft.repository.SaleRepository;
 import com.example.lakicraft.repository.UserRepository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+
 
 
  // Upewnij się, że CORS jest poprawnie ustawione dla aplikacji React
@@ -63,6 +66,25 @@ public class OrderController {
         this.productRepository = productRepository;
         this.orderItemRepository = orderItemRepository;
     }
+
+
+    private OrderDTO mapToDTO(Orders order) {
+    return new OrderDTO(
+        order.getId(),
+        order.getOrderDate(),
+        order.getTotalPrice(),
+        order.getStatus(),
+        order.getShippingAddress(),
+        order.getSeller() != null ? order.getSeller().getName() : null,
+
+        order.getOrderItems().stream().map(oi -> new OrderItemDTO(
+            oi.getProduct().getId(),
+            oi.getProduct().getName(),
+            oi.getQuantity(),
+            oi.getPrice()
+        )).toList()
+    );
+}
 
 
 
@@ -125,23 +147,40 @@ public class OrderController {
     }
     
    
- @GetMapping("/customer")
-public ResponseEntity<List<Orders>> getOrdersByCustomer(@RequestHeader("userId") Long userId) {
+@GetMapping("/customer")
+@Transactional(readOnly = true)  // utrzymuje sesję do końca mapowania
+public ResponseEntity<List<OrderDTO>> getOrdersByCustomer(@RequestHeader("userId") Long userId) {
+    // Dociągamy zamówienia z fetch join, żeby mieć wszystkie potrzebne dane
     List<Orders> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);
-    return ResponseEntity.ok(orders); // ZAWSZE zwraca 200 OK + lista (pusta lub nie)
+
+    // Mapujemy na DTO
+    List<OrderDTO> orderDTOs = orders.stream()
+            .map(this::mapToDTO)
+            .toList();
+
+    return ResponseEntity.ok(orderDTOs);
 }
 
 
-    @Transactional
-    @GetMapping("/user-orders")
-    public ResponseEntity<List<Orders>> getUserOrders(@RequestHeader("userId") Long userId) {
-        if (userId == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        List<Orders> orders = orderRepository.findTop5ByUserIdOrderByOrderDateDesc(userId);
-        return ResponseEntity.ok(orders);
+
+ 
+@Transactional(readOnly = true)
+@GetMapping("/user-orders")
+public ResponseEntity<List<OrderDTO>> getUserOrders(@RequestHeader("userId") Long userId) {
+    if (userId == null) {
+        return ResponseEntity.badRequest().build();
     }
 
+    // Dociągamy zamówienia z repozytorium
+    List<Orders> orders = orderRepository.findTop5ByUserIdOrderByOrderDateDesc(userId);
+
+    // Mapujemy na DTO
+    List<OrderDTO> orderDTOs = orders.stream()
+            .map(this::mapToDTO)
+            .toList();
+
+    return ResponseEntity.ok(orderDTOs);
+}
     
    // Endpoint do sprawdzania, czy produkt może być usunięty
 @GetMapping("/order-items/check/{productId}")
@@ -206,10 +245,21 @@ public ResponseEntity<Orders> createOrder(@RequestBody Orders orderRequest) {
 
 
    // Endpoint do pobierania wszystkich zamówień
-   @GetMapping("/admin")
-   public List<Orders> getAllOrders() {
-       return orderRepository.findAll();
-   }
+@Transactional(readOnly = true)
+@GetMapping("/admin")
+public ResponseEntity<List<OrderDTO>> getAllOrdersForAdmin() {
+
+    // Pobierz wszystkie zamówienia
+    List<Orders> orders = orderRepository.findAll();
+
+    // Zmapuj na DTO (unikamy LazyInitializationException)
+    List<OrderDTO> orderDTOs = orders.stream()
+            .map(this::mapToDTO)
+            .toList();
+
+    return ResponseEntity.ok(orderDTOs);
+}
+
 
    // Endpoint do aktualizacji statusu zamówienia
    @PutMapping("/admin/{orderId}/status")

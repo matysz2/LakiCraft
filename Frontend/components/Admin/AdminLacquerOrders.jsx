@@ -56,7 +56,7 @@ const LacquerOrders = () => {
   }, [searchTerm, statusFilter, dateFilter, orders]);
 
   const handleUpdateStatus = (orderId, newStatus) => {
-    fetch(`http://https://${BASE_URL}/api/admin/stats/${orderId}/status`, {
+    fetch(`https://https://${BASE_URL}/api/admin/stats/${orderId}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: newStatus }),
@@ -116,29 +116,32 @@ const LacquerOrders = () => {
             <th>Akcje</th>
           </tr>
         </thead>
-        <tbody>
-          {filteredOrders.map((order) => (
-            <tr key={order.id}>
-              <td>{order.id}</td>
-              <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-              <td>{order.carpenter.firstName} {order.carpenter.lastName}</td>
-              <td>{order.lacquer}</td>
-              <td>{order.status}</td>
-              <td>{order.paintingMeters} m²</td>
-              <td>{order.totalPrice} PLN</td>
-              <td>
-                {order.status === "Zrealizowane" ? (
-                  <button className="btn-revert" onClick={() => handleUpdateStatus(order.id, "W realizacji")}>Przywróć</button>
-                ) : (
-                  <>
-                    <button className="btn-update" onClick={() => handleUpdateStatus(order.id, "Zrealizowane")}>Zrealizuj</button>
-                    <button className="btn-cancel" onClick={() => handleUpdateStatus(order.id, "Anulowane")}>Anuluj</button>
-                  </>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
+      <tbody>
+  {filteredOrders.map((order) => (
+    <tr key={order.id}>
+      <td data-label="ID">{order.id}</td>
+      <td data-label="Data">{new Date(order.orderDate).toLocaleDateString()}</td>
+      <td data-label="Stolarz">
+        {order.carpenter.firstName} {order.carpenter.lastName}
+      </td>
+      <td data-label="Lakier">{order.lacquer}</td>
+      <td data-label="Status">{order.status}</td>
+      <td data-label="Metry">{order.paintingMeters} m²</td>
+      <td data-label="Łączna cena">{order.totalPrice} PLN</td>
+      <td data-label="Akcje">
+        {order.status === "Zrealizowane" ? (
+          <button className="btn-revert" onClick={() => handleUpdateStatus(order.id, "W realizacji")}>Przywróć</button>
+        ) : (
+          <>
+            <button className="btn-update" onClick={() => handleUpdateStatus(order.id, "Zrealizowane")}>Zrealizuj</button>
+            <button className="btn-cancel" onClick={() => handleUpdateStatus(order.id, "Anulowane")}>Anuluj</button>
+          </>
+        )}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
       </table>
     </div>
   );

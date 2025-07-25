@@ -1,5 +1,6 @@
 package com.example.lakicraft.controller;
 
+import com.example.lakicraft.dto.MessageDTO;
 import com.example.lakicraft.model.Message;
 import com.example.lakicraft.model.Orders;
 import com.example.lakicraft.repository.MessageRepository;
@@ -25,16 +26,21 @@ public class MessageController {
     private OrderRepository orderRepository;
 
     // Pobieranie wiadomości dla konkretnego zamówienia
-    @GetMapping("/{orderId}/messages")
-    public ResponseEntity<?> getMessagesByOrderId(@PathVariable Long orderId) {
-        Optional<Orders> order = orderRepository.findById(orderId);
-        if (order.isEmpty()) {
-            return ResponseEntity.status(404).body("Zamówienie o podanym ID nie istnieje.");
-        }
-
-        List<Message> messages = messageRepository.findByOrder(order.get());
-        return ResponseEntity.ok(messages);
+  @GetMapping("/{orderId}/messages")
+public ResponseEntity<?> getMessagesByOrderId(@PathVariable Long orderId) {
+    Optional<Orders> order = orderRepository.findById(orderId);
+    if (order.isEmpty()) {
+        return ResponseEntity.status(404).body("Zamówienie o podanym ID nie istnieje.");
     }
+
+    List<Message> messages = messageRepository.findByOrder(order.get());
+
+    List<MessageDTO> messageDTOs = messages.stream()
+            .map(MessageDTO::new)
+            .toList();
+
+    return ResponseEntity.ok(messageDTOs);
+}
 
     // Wysyłanie nowej wiadomości dla konkretnego zamówienia
     @GetMapping("/messages")
@@ -74,13 +80,12 @@ public ResponseEntity<?> sendMessageToOrder(@PathVariable Long orderId, @Request
         return ResponseEntity.status(404).body("Zamówienie o podanym ID nie istnieje.");
     }
 
-    // Ustawienie zamówienia dla nowej wiadomości
     newMessage.setOrder(order.get());
 
-    // Zapisanie wiadomości w repozytorium
     try {
         Message savedMessage = messageRepository.save(newMessage);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedMessage);
+        MessageDTO dto = new MessageDTO(savedMessage);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     } catch (Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Błąd podczas wysyłania wiadomości.");
     }

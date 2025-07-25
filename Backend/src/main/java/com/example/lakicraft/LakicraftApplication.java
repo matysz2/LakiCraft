@@ -25,7 +25,7 @@ public class LakicraftApplication {
                 registry.addMapping("/api/**")
                         .allowedOrigins(
                                 "https://lakicraft.netlify.app", // produkcyjny frontend
-                                "http://localhost:3000" ,
+                                "https://localhost:3000" ,
                                 "https://09bab9525ba9.ngrok-free.app"
 
                         )

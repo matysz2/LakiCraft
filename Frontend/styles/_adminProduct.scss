@@ -1,22 +1,59 @@
 .admin-product-list {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-  
-    h1 {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #301616;
+    border-radius: 5px;
+  }
+
+  .btn-back {
+    background: #333;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .success-message {
+    background-color: #28a745;
+    color: white;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
       text-align: center;
-      margin-bottom: 20px;
     }
-    .search-input {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 15px;
-      border: 1px solid #301616;
-      border-radius: 5px;
+
+    th {
+      background: #f4f4f4;
     }
+
     .btn-status {
       padding: 8px 16px;
       font-size: 14px;
@@ -24,102 +61,143 @@
       border-radius: 4px;
       cursor: pointer;
       transition: background-color 0.3s;
-    
+
       &.btn-list {
-        background-color: #28a745;  // Zielony kolor dla "Wystaw"
+        background-color: #28a745;
         color: white;
       }
-    
+
       &.btn-block {
-        background-color: #5935dc;  // Czerwony kolor dla "Zablokuj"
+        background-color: #5935dc;
         color: white;
       }
-    
+
       &:hover {
         opacity: 0.9;
       }
     }
-    
-    .success-message {
-      background-color: #28a745;
-      color: white;
-      padding: 10px;
-      margin-bottom: 20px;
-      border-radius: 5px;
-      font-weight: bold;
-      text-align: center;
-    }
-    
-    .btn-back {
-      background: #333;
-      color: #fff;
-      padding: 10px 15px;
+
+    .btn-delete {
+      padding: 8px 16px;
+      font-size: 14px;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
-      margin-bottom: 20px;
-      display: block;
-    }
-  
-    table {
-      width: 100%;
-      border-collapse: collapse;
-  
-      th, td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: center;
+      transition: background-color 0.3s, transform 0.1s;
+      background: #dc3545;
+      color: white;
+
+      &:hover {
+        background: darkred;
+        opacity: 0.9;
       }
-  
-      th {
-        background: #f4f4f4;
-      }
-    
-      .btn-block {
-        background: rgb(76, 0, 255);
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 4px;
-        &:hover {
-          background: darkred;
-        
-        }
-      }
-      .btn-delete {
-        padding: 8px 16px;
-        font-size: 14px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.1s;
-        background: #dc3545; // Czerwony kolor jak w Bootstrap
-        color: white;
-      
-        &:hover {
-          background: darkred;
-          opacity: 0.9;
-        }
-      
-        &:active {
-          background: #a71d2a;
-          transform: scale(0.95);
-        }
-      }
-      
-  
-  @media (max-width: 768px) {
-    .admin-product-list {
-      padding: 10px;
-  
-      table {
-        font-size: 14px;
-  
-        th, td {
-          padding: 8px;
-        }
+
+      &:active {
+        background: #a71d2a;
+        transform: scale(0.95);
       }
     }
   }
+
+  // Responsive styles
+  @media (max-width: 992px) {
+    table {
+      font-size: 14px;
+
+      th, td {
+        padding: 8px;
+      }
+
+      .btn-status,
+      .btn-delete {
+        padding: 6px 10px;
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+  table {
+    width: 100%;
+    border: 0;
+
+    thead {
+      display: none;
+    }
+
+    tbody {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    tr {
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    td {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 14px;
+      border-bottom: 1px solid #eee;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #555;
+        flex-basis: 45%;
+        text-align: left;
+      }
+    }
+
+    .btn-status,
+    .btn-delete {
+      width: 100%;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+  }
+
+  .btn-back,
+  .search-input {
+    width: 100%;
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
 }
+
+
+  @media (max-width: 480px) {
+    table {
+      tbody td {
+        font-size: 12px;
+        padding: 8px;
+      }
+
+      .btn-status,
+      .btn-delete {
+        font-size: 12px;
+        padding: 5px 8px;
+      }
+    }
+
+    .search-input {
+      font-size: 14px;
+    }
+
+    .btn-back {
+      font-size: 14px;
+    }
+  }
 }

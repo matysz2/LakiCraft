@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_findLacquers.scss";
-import BASE_URL from '../config.js';  // Zmienna BASE_URL
+import BASE_URL from '../config.js';
 
 const FindLacquers = () => {
   const navigate = useNavigate();
@@ -11,23 +11,33 @@ const FindLacquers = () => {
   const [errors, setErrors] = useState("");
   const [expandedLacquerer, setExpandedLacquerer] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [cardModalVisible, setCardModalVisible] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
+
   const [formData, setFormData] = useState({
     lacquer: "",
     orderDate: new Date().toISOString(),
     shippingAddress: "",
     status: "Nowe",
     totalPrice: 0,
-    carpenter: "", // Ensure carpenter is properly set from userData
+    carpenter: "",
     paintingMeters: "",
     appointment: null,
-    client_id: null, // This needs to be set in handleReserve
+    client_id: null,
     userData: null,
     clientData: null,
   });
 
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+  const handleShowBusinessCard = async (userId) => {
+    try {
+      const response = await fetch(`https://${BASE_URL}/api/business-card?userId=${userId}`);
+      if (!response.ok) throw new Error("Brak wizytówki");
+      const data = await response.json();
+      setSelectedCard(data);
+      setCardModalVisible(true);
+    } catch (err) {
+      alert("Nie udało się pobrać wizytówki.");
+    }
   };
 
   useEffect(() => {
@@ -46,7 +56,7 @@ const FindLacquers = () => {
     setFormData((prev) => ({
       ...prev,
       shippingAddress: parsedUserData.shippingAddress,
-      carpenter: parsedUserData.id, // Set carpenter from userData
+      carpenter: parsedUserData.id,
       userData: parsedUserData,
     }));
   }, [navigate]);
@@ -79,100 +89,87 @@ const FindLacquers = () => {
     const lacquerer = appointments
       .flatMap((appointment) => appointment.user)
       .find((user) => user.id === lacquererId);
-  
+
     setFormData((prev) => ({
       ...prev,
-      lacquer: "", 
-      client_id: lacquererId, // Ensure client_id is set
-      appointment, 
-      clientData: lacquerer, 
+      lacquer: "",
+      client_id: lacquererId,
+      appointment,
+      clientData: lacquerer,
     }));
     setShowModal(true);
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!formData.client_id || !formData.carpenter) {
-      alert("Brak wymaganych danych: klient i stolarz muszą być określeni.");
+      alert("Brak wymaganych danych.");
       return;
     }
-  
+
     try {
-      const totalPrice = formData.paintingMeters * 50; // Adjust pricing logic if necessary
-  
-      // Construct the orderData with full objects, not just ids
+      const totalPrice = formData.paintingMeters * 50;
       const orderData = {
         lacquer: formData.lacquer,
-        orderDate: new Date().toISOString(), // Current date in ISO format
+        orderDate: new Date().toISOString(),
         shippingAddress: formData.shippingAddress,
         status: formData.status,
-        totalPrice: totalPrice,
+        totalPrice,
         carpenter: {
-          id: formData.carpenter, // Carpenter ID wrapped in object
+          id: formData.carpenter,
           name: userData.firstName + " " + userData.lastName,
           email: userData.email,
           shippingAddress: userData.shippingAddress,
         },
         paintingMeters: formData.paintingMeters,
         appointment: {
-          id: formData.appointment.id, // Appointment ID
-          date: formData.appointment.date, // Appointment date
+          id: formData.appointment.id,
+          date: formData.appointment.date,
           status: formData.appointment.status,
-          description: formData.appointment.description || "", // Default empty description
+          description: formData.appointment.description || "",
           user: {
-            id: formData.appointment.user.id, // Lacquerer ID wrapped in object
-            name: formData.appointment.user.name, // Lacquerer name
-            email: formData.appointment.user.email, // Lacquerer email
+            id: formData.appointment.user.id,
+            name: formData.appointment.user.name,
+            email: formData.appointment.user.email,
           },
         },
         client: {
-          id: formData.client_id, // Client ID wrapped in object
-          name: userData.firstName + " " + userData.lastName, // Assuming client data is in userData
+          id: formData.client_id,
+          name: userData.firstName + " " + userData.lastName,
           email: userData.email,
           shippingAddress: userData.shippingAddress,
         },
       };
-  
-      console.log("Wysyłane zamówienie:", JSON.stringify(orderData, null, 2));
-  
+
       const response = await fetch(`https://${BASE_URL}/api/lacquer-orders`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",  // Bez "charset=UTF-8"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
       });
-      
-  
+
       if (!response.ok) throw new Error("Błąd podczas składania zamówienia.");
+
       alert("Zamówienie złożone pomyślnie!");
       setShowModal(false);
     } catch (error) {
       alert("Nie udało się złożyć zamówienia.");
     }
   };
-  
 
-
-  if (loading) {
-    return <div>Ładowanie...</div>;
-  }
+  if (loading) return <div>Ładowanie...</div>;
 
   return (
     <div className="find-lacquers">
       <h2>Wybierz lakiernika i termin</h2>
       {errors && <p className="error">{errors}</p>}
+
       <section className="lacquerers-section">
         {appointments.length === 0 ? (
           <p>Brak dostępnych lakierników</p>
         ) : (
           Object.entries(
             appointments.reduce((acc, appointment) => {
-              if (!appointment.user || typeof appointment.user === "number") {
-                return acc;
-              }
-
+              if (!appointment.user || typeof appointment.user === "number") return acc;
               const lacquererId = appointment.user.id;
               if (!acc[lacquererId]) {
                 acc[lacquererId] = {
@@ -187,7 +184,14 @@ const FindLacquers = () => {
             .filter(([_, { lacquerer }]) => lacquerer.firstName && lacquerer.lastName)
             .map(([lacquererId, { lacquerer, availableDates }]) => (
               <div key={`lacquerer-${lacquererId}`} className="lacquerer-item">
-                <h3>{lacquerer.firstName} {lacquerer.lastName}</h3>
+                <h3>
+                  <a href="#" onClick={(e) => {
+                    e.preventDefault();
+                    handleShowBusinessCard(lacquerer.id);
+                  }}>
+                    {lacquerer.firstName} {lacquerer.lastName}
+                  </a>
+                </h3>
                 <p>{lacquerer.shippingAddress}</p>
                 <button className="toggle-btn" onClick={() => toggleLacquererDetails(lacquererId)}>
                   {expandedLacquerer === lacquererId ? "Ukryj terminy" : "Pokaż terminy"}
@@ -195,22 +199,16 @@ const FindLacquers = () => {
 
                 {expandedLacquerer === lacquererId && (
                   <div className="available-dates">
-                    <h2>Wolne terminy:</h2>
+                    <h4>Wolne terminy:</h4>
                     <ul>
-                      {availableDates.length > 0 ? (
-                        availableDates
-                          .filter((appointment) => appointment.status.toLowerCase() === "wolny")
-                          .map((appointment) => (
-                            <li key={`appointment-${appointment.id}`}>
-                              {new Date(appointment.date).toLocaleString("pl-PL")}
-                              <button className="reserve-btn" onClick={() => handleReserve(lacquererId, appointment)}>
-                                Zarezerwuj
-                              </button>
-                            </li>
-                          ))
-                      ) : (
-                        <p>Brak dostępnych terminów</p>
-                      )}
+                      {availableDates.filter((a) => a.status.toLowerCase() === "wolny").map((appointment) => (
+                        <li key={`appointment-${appointment.id}`}>
+                          {new Date(appointment.date).toLocaleString("pl-PL")}
+                          <button className="reserve-btn" onClick={() => handleReserve(lacquererId, appointment)}>
+                            Zarezerwuj
+                          </button>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 )}
@@ -219,7 +217,6 @@ const FindLacquers = () => {
         )}
       </section>
 
-      {/* Modal do rezerwacji */}
       {showModal && (
         <div className="modal">
           <div className="modal-content">
@@ -236,6 +233,27 @@ const FindLacquers = () => {
               <button type="submit" className="submit">Zamów</button>
               <button type="button" className="cancel" onClick={() => setShowModal(false)}>Anuluj</button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {cardModalVisible && selectedCard && (
+        <div className="modal card-modal">
+          <div className="modal-content">
+            <button className="close-btn" onClick={() => setCardModalVisible(false)}>✖️</button>
+            <h2>{selectedCard.name}</h2>
+            <p><strong>Specjalizacja:</strong> {selectedCard.jobTitle}</p>
+            <p><strong>O mnie:</strong> {selectedCard.bio}</p>
+            <p><strong>Kontakt:</strong> {selectedCard.contactEmail}</p>
+            {selectedCard.profileImageUrl && (
+              <img
+                src={`https://${BASE_URL}/${selectedCard.profileImageUrl}`}
+                alt="Profil lakiernika"
+                width="150"
+                height="150"
+                style={{ borderRadius: "50%", objectFit: "cover" }}
+              />
+            )}
           </div>
         </div>
       )}
