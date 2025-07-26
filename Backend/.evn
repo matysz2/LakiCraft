@@ -1,14 +1,13 @@
-# Baza danych
-SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/lakicraft
-SPRING_DATASOURCE_USERNAME=lakicraft_user
-SPRING_DATASOURCE_PASSWORD=9OFcI03ISuR6Ala4h4U4774P4vDEvNA2
-SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+# PORT Rendera
+PORT=8080
 
-# Konfiguracja PostgreSQL
-POSTGRES_USER=lakicraft_user
-POSTGRES_PASSWORD=9OFcI03ISuR6Ala4h4U4774P4vDEvNA2
-POSTGRES_DB=lakicraft
+# ✅ Z danych z MYSQL_PUBLIC_URL:
+# mysql://root:qzmLsevRkjVJKXzgAYlalCosmmrkxUWm@turntable.proxy.rlwy.net:38871/railway
+MYSQLHOST=turntable.proxy.rlwy.net
+MYSQLPORT=38871
+MYSQLUSER=root
+MYSQLPASSWORD=qzmLsevRkjVJKXzgAYlalCosmmrkxUWm
+MYSQLDATABASE=railway
 
-# E-mail
-MAIL_USERNAME=twoj_email@wp.pl
-MAIL_PASSWORD=twoje_silne_haslo
+# Opcjonalnie jako komentarz:
+# MYSQL_PUBLIC_URL=mysql://root:qzmLsevRkjVJKXzgAYlalCosmmrkxUWm@turntable.proxy.rlwy.net:38871/railway
