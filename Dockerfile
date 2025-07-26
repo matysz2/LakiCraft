@@ -3,17 +3,16 @@ FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
-# Kopiujemy tylko pom.xml i src.
-# Ważne: ścieżki są względne do katalogu głównego projektu na Render (czyli "Backend")
+# Kopiujemy pliki pom.xml i src z bieżącego kontekstu (czyli Backend/)
 COPY pom.xml /app/pom.xml
 COPY src /app/src
 
-# Debug wersji (można usunąć po udanym wdrożeniu)
+# Debug wersji (pomocne przy diagnostyce)
 RUN java -version
 RUN javac -version
 RUN mvn -version
 
-# Budujemy aplikację bez mvnw
+# Budujemy aplikację
 RUN mvn clean package -DskipTests
 
 
@@ -22,9 +21,10 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-# Kopiujemy jar z etapu budowania (zakładając, że jar powstaje w target)
+# Kopiujemy wygenerowany plik JAR z poprzedniego etapu
 COPY --from=builder /app/target/lakicraft-0.0.1-SNAPSHOT.jar /app/lakicraft.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app/lakicraft.jar"] # Uruchomienie pliku JAR
+# Uruchamiamy aplikację
+ENTRYPOINT ["java", "-jar", "/app/lakicraft.jar"]
