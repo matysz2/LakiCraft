@@ -1,0 +1,19 @@
+# PORT, na którym aplikacja Spring Boot będzie nasłuchiwać na Renderze
+# Render automatycznie udostępnia zmienną PORT, więc zazwyczaj nie musisz jej ręcznie ustawiać,
+# ale jeśli chcesz mieć pewność, że jest 8080, możesz ją dodać.
+PORT=8080
+
+# Zmienne środowiskowe dla połączenia z bazą danych MySQL na Railway
+# WAŻNE: Nazwy zmiennych MUSZĄ mieć podkreślniki (_), aby pasowały do Twojego application.properties
+# i do tego, co Railway generuje.
+
+MYSQL_HOST=turntable.proxy.rlwy.net
+MYSQL_PORT=38871
+MYSQL_USER=root
+MYSQL_PASSWORD=qzmLsevRkjVJKXzgAYlalCosmmrkxUWm
+MYSQL_DATABASE=railway
+
+# Ta zmienna (MYSQL_PUBLIC_URL) nie jest potrzebna w Twojej obecnej konfiguracji application.properties,
+# ponieważ Spring Boot buduje URL z poszczególnych komponentów.
+# Możesz ją pominąć w Renderze.
+# MYSQL_PUBLIC_URL=mysql://root:qzmLsevRkjVJKXzgAYlalCosmmrkxUWm@turntable.proxy.rlwy.net:38871/railway
