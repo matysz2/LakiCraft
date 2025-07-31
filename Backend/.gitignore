@@ -1,0 +1,37 @@
+# Ignorowanie plików konfiguracyjnych zawierających dane dostępowe
+.env
+*.env
+config.yml
+config.json
+secrets.yml
+secrets.json
+
+# Ignorowanie logów i plików tymczasowych
+*.log
+logs/
+*.tmp
+tmp/
+
+# Ignorowanie plików specyficznych dla edytorów
+.vscode/
+.idea/
+*.swp
+
+# Ignorowanie plików binarnych
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Ignorowanie plików systemowych
+.DS_Store
+Thumbs.db
+
+# Ignorowanie zależności (jeśli używasz Node.js, Python, itp.)
+node_modules/
+venv/
+__pycache__/
+
+# Ignorowanie plików kompilacji (np. dla aplikacji webowych)
+dist/
+build/
