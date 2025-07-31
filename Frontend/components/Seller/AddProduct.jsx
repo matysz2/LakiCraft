@@ -75,7 +75,7 @@ const AddProduct = () => {
     }
 
     // Wysłanie danych na backend
-    fetch(`https://${BASE_URL}/api/products`, {
+    fetch(`${BASE_URL}/api/products`, {
       method: "POST",
       body: formDataToSend,
       headers: {

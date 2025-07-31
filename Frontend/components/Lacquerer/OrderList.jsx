@@ -25,7 +25,7 @@ const LacquerOrderList = () => {
     }
 
     // Pobranie zamówień lakierowania dla użytkownika
-    fetch(`https://${BASE_URL}/api/lacquerOrders/user/${userId}`)
+    fetch(`${BASE_URL}/api/lacquerOrders/user/${userId}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`Błąd serwera: ${res.status} ${res.statusText}`);
@@ -47,7 +47,7 @@ const LacquerOrderList = () => {
   };
 
   const updateOrderStatus = (orderId, status) => {
-    fetch(`https://${BASE_URL}/${orderId}/status`, { // Zaktualizowany URL
+    fetch(`${BASE_URL}/${orderId}/status`, { // Zaktualizowany URL
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

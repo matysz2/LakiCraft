@@ -22,7 +22,7 @@ const MyHistory = () => {
       return;
     }
 
-    fetch(`https://${BASE_URL}/api/orders/user-orders`, {
+    fetch(`${BASE_URL}/api/orders/user-orders`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

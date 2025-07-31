@@ -34,7 +34,7 @@ const OrderMessages = () => {
       try {
         // ✅ 1. Pobierz dane zamówienia (kluczowe dla lacquerera)
         const orderResponse = await fetch(
-          `https://${BASE_URL}/api/lacquerOrders/${orderId}`
+          `${BASE_URL}/api/lacquerOrders/${orderId}`
         );
         if (!orderResponse.ok) throw new Error("Nie udało się pobrać zamówienia");
         const orderJson = await orderResponse.json();
@@ -47,7 +47,7 @@ const OrderMessages = () => {
 
         // ✅ 2. Pobierz wiadomości
         const messagesResponse = await fetch(
-          `https://${BASE_URL}/api/lacquerOrders/${orderId}/messages`
+          `${BASE_URL}/api/lacquerOrders/${orderId}/messages`
         );
         if (!messagesResponse.ok)
           throw new Error("Błąd sieci przy pobieraniu wiadomości");
@@ -100,7 +100,7 @@ const OrderMessages = () => {
 
     try {
       const response = await fetch(
-        `https://${BASE_URL}/api/lacquerOrders/${orderId}/message`,
+        `${BASE_URL}/api/lacquerOrders/${orderId}/message`,
         {
           method: "POST",
           headers: {

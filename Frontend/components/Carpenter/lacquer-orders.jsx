@@ -44,7 +44,7 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`https://${BASE_URL}/api/orders/customer`, {
+        const response = await fetch(`${BASE_URL}/api/orders/customer`, {
           headers: {
             "Content-Type": "application/json",
             "userId": userData.id,
@@ -94,21 +94,22 @@ const Orders = () => {
                     {expandedOrder === order.id ? "Ukryj szczegóły" : "Pokaż szczegóły"}
                   </button>
                 </div>
-                {expandedOrder === order.id && (
-                  <div className="order-item-details">
-                    <p><strong>Adres dostawy: </strong>{order.shippingAddress}</p>
-                    <p><strong>Cena całkowita: </strong>{order.totalPrice} zł</p>
-                    <div className="order-items">
-                      <h4>Pozycje w zamówieniu:</h4>
-                      {order.orderItems.map((item, index) => (
-                        <div key={index}>
-                          <p><strong>Produkt: </strong>{item.product.name}</p>
-                          <p><strong>Ilość: </strong>{item.quantity}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+   {expandedOrder === order.id && (
+  <div className="order-item-details">
+    <p><strong>Adres dostawy: </strong>{order.shippingAddress}</p>
+    <p><strong>Cena całkowita: </strong>{order.totalPrice} zł</p>
+    <div className="order-items">
+      <h4>Pozycje w zamówieniu:</h4>
+      {order.items.map((item, index) => (
+        <div key={index}>
+          <p><strong>Produkt: </strong>{item.productName}</p>
+          <p><strong>Ilość: </strong>{item.quantity}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
               </div>
             ))}
           </div>

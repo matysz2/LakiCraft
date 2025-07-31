@@ -69,7 +69,7 @@ const CarpenterDashboard = () => {
   }, [userData]);
 
   const fetchPaintingOrders = async (userId) => {
-    const response = await fetch(`https://${BASE_URL}/api/lacquerOrders/new`, {      
+    const response = await fetch(`${BASE_URL}/api/lacquerOrders/new`, {      
       headers: { "Content-Type": "application/json" },
     });
     
@@ -79,7 +79,7 @@ const CarpenterDashboard = () => {
   };
 
   const fetchLacquerPurchases = async (userId) => {
-    const response = await fetch(`https://${BASE_URL}/api/orders/user-orders`, {
+    const response = await fetch(`${BASE_URL}/api/orders/user-orders`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

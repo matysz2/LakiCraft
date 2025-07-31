@@ -7,7 +7,7 @@ const AdminStats = () => {
 
   // Funkcja do pobierania statystyk
   const fetchStats = () => {
-    fetch(`https://${BASE_URL}/api/admin/stats`)
+    fetch(`${BASE_URL}/api/admin/stats`)
       .then((res) => res.json())
       .then((data) => setStats(data))
       .catch(() => setStats(null));  // Możesz tu wyświetlić komunikat o błędzie, jeśli chcesz
@@ -23,7 +23,7 @@ const AdminStats = () => {
     if (!window.confirm(`Czy na pewno chcesz usunąć produkt ${productName}?`)) return;
 
     try {
-      const res = await fetch(`https://${BASE_URL}/api/products/${productId}`, {
+      const res = await fetch(`${BASE_URL}/api/products/${productId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });

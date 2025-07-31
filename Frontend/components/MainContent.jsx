@@ -29,7 +29,7 @@ const MainContent = () => {
   // ✅ Automatyczne logowanie po rejestracji
   const handleLoginAfterRegister = async (email, password) => {
     try {
-      const response = await fetch(`https://${BASE_URL}/api/user/login`, {
+      const response = await fetch(`${BASE_URL}/api/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -82,7 +82,7 @@ const MainContent = () => {
   
     try {
       const contactData = { name, email, message };
-      const response = await fetch(`https://${BASE_URL}/api/contact`, {
+      const response = await fetch(`${BASE_URL}/api/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(contactData),
@@ -148,7 +148,7 @@ const MainContent = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`https://${BASE_URL}/api/user/login`, {
+      const response = await fetch(`${BASE_URL}/api/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -206,7 +206,7 @@ const MainContent = () => {
         paymentDueDays: 0,
       };
 
-      const response = await fetch(`https://${BASE_URL}/api/user/register`, {
+      const response = await fetch(`${BASE_URL}/api/user/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),

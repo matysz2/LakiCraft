@@ -22,7 +22,7 @@ const OrderList = () => {
       return;
     }
 
-    fetch(`https://${BASE_URL}/api/orders`, {
+    fetch(`${BASE_URL}/api/orders`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -61,7 +61,7 @@ const OrderList = () => {
       return;
     }
   
-    fetch(`https://${BASE_URL}/api/orders/${orderId}/status`, {
+    fetch(`${BASE_URL}/api/orders/${orderId}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +94,7 @@ const OrderList = () => {
     const message = prompt("Wpisz wiadomość do klienta:");
     if (message) {
       try {
-        const response = await fetch(`https://${BASE_URL}/api/orders/${orderId}/message`, {
+        const response = await fetch(`${BASE_URL}/api/orders/${orderId}/message`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -22,7 +22,7 @@ const LacquerOrders = () => {
       return;
     }
 
-    fetch(`https://${BASE_URL}/api/lacquer-orders`)
+    fetch(`${BASE_URL}/api/lacquer-orders`)
       .then((res) => res.json())
       .then((data) => {
         setOrders(data);
@@ -56,7 +56,7 @@ const LacquerOrders = () => {
   }, [searchTerm, statusFilter, dateFilter, orders]);
 
   const handleUpdateStatus = (orderId, newStatus) => {
-    fetch(`https://https://${BASE_URL}/api/admin/stats/${orderId}/status`, {
+    fetch(`https://${BASE_URL}/api/admin/stats/${orderId}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: newStatus }),

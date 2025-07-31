@@ -38,7 +38,7 @@ const MyServices = () => {
       return;
     }
 
-    fetch(`https://${BASE_URL}/api/business-card?userId=${userId}`)
+    fetch(`${BASE_URL}/api/business-card?userId=${userId}`)
       .then((response) => {
         if (response.status === 404) {
           setCardData(null);
@@ -95,8 +95,8 @@ const handleSave = async () => {
 
     // ✅ nowe URL-e
     const url = isNewCard
-      ? `https://${BASE_URL}/api/business-card/create`
-      : `https://${BASE_URL}/api/business-card/update`; // <-- używamy POST update
+      ? `${BASE_URL}/api/business-card/create`
+      : `${BASE_URL}/api/business-card/update`; // <-- używamy POST update
 
     const response = await fetch(url, {
       method: "POST", // <-- zawsze POST (CORS-friendly)
@@ -141,7 +141,7 @@ const handleSave = async () => {
             {/* ✅ Dynamiczne zdjęcie jak w products */}
             {editableCardData.profileImageUrl && showImage && (
               <img
-                src={`https://${BASE_URL}/${editableCardData.profileImageUrl}`}
+                src={`${BASE_URL}/${editableCardData.profileImageUrl}`}
                 alt="Zdjęcie profilowe"
                 width={150}
                 height={150}

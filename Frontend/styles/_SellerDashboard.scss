@@ -72,11 +72,12 @@ p {
 
 @media (max-width: 768px) {
   .products {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr; // Zmienione z 1fr 1fr na 1fr
   }
 
   .product-item {
     padding: 10px;
+    width: 100%; // Upewnienie się, że produkt zajmuje całą szerokość
   }
 
   .summary-item,

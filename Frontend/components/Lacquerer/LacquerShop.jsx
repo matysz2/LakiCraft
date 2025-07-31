@@ -21,7 +21,7 @@ const LacquerShop = () => {
       }
 
       try {
-        const response = await fetch(`https://${BASE_URL}/api/lacquers`, {
+        const response = await fetch(`${BASE_URL}/api/lacquers`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LacquerHeader from "./LacquererHeader";
 import "../../styles/_lacquererDashboard.scss";
-import BASE_URL from '../config.js';  // Zmienna BASE_URL
+import BASE_URL from "../config.js";
 
 const LacquererDashboard = () => {
   const navigate = useNavigate();
@@ -11,13 +11,17 @@ const LacquererDashboard = () => {
   const [customerOrders, setCustomerOrders] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errors, setErrors] = useState({ pendingOrders: "", customerOrders: "", appointments: "" });
+  const [errors, setErrors] = useState({
+    pendingOrders: "",
+    customerOrders: "",
+    appointments: "",
+  });
 
-  // Nowe stany dla formularza dodawania terminu
+  const [expandedOrder, setExpandedOrder] = useState(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
-  const [description, setDescription] = useState('');
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     const storedUserData = localStorage.getItem("userData");
@@ -41,28 +45,38 @@ const LacquererDashboard = () => {
         setLoading(true);
         setErrors({ pendingOrders: "", customerOrders: "", appointments: "" });
 
-        const [pendingOrdersRes, customerOrdersRes, appointmentsRes] = await Promise.allSettled([
-          fetchLacquerOrders(userData.id),
-          fetchCustomerOrders(userData.id),
-          fetchAppointments(userData.id),
-        ]);
+        const [pendingOrdersRes, customerOrdersRes, appointmentsRes] =
+          await Promise.allSettled([
+            fetchLacquerOrders(userData.id),
+            fetchCustomerOrders(userData.id),
+            fetchAppointments(userData.id),
+          ]);
 
         if (pendingOrdersRes.status === "fulfilled") {
           setPendingOrders(pendingOrdersRes.value);
         } else {
-          setErrors(prev => ({ ...prev, pendingOrders: "Nie udało się pobrać zamówień lakierowania." }));
+          setErrors((prev) => ({
+            ...prev,
+            pendingOrders: "Nie udało się pobrać zamówień lakierowania.",
+          }));
         }
 
         if (customerOrdersRes.status === "fulfilled") {
           setCustomerOrders(customerOrdersRes.value);
         } else {
-          setErrors(prev => ({ ...prev, customerOrders: "Nie udało się pobrać Twoich zamówień." }));
+          setErrors((prev) => ({
+            ...prev,
+            customerOrders: "Nie udało się pobrać Twoich zamówień.",
+          }));
         }
 
         if (appointmentsRes.status === "fulfilled") {
           setAppointments(appointmentsRes.value);
         } else {
-          setErrors(prev => ({ ...prev, appointments: "Nie udało się pobrać terminów." }));
+          setErrors((prev) => ({
+            ...prev,
+            appointments: "Nie udało się pobrać terminów.",
+          }));
         }
       } catch (error) {
         console.error("Błąd ogólny:", error);
@@ -74,45 +88,35 @@ const LacquererDashboard = () => {
     fetchData();
   }, [userData]);
 
-const fetchLacquerOrders = async (userId) => {
-  const response = await fetch(`https://${BASE_URL}/${userId}/pending`, {
-    headers: { "Content-Type": "application/json" },
-  });
-
-  if (!response.ok) throw new Error("Nie udało się pobrać zamówień lakierowania.");
-
-  const text = await response.text();
-  return text ? JSON.parse(text) : []; // <-- Pusta odpowiedź zostanie zamieniona na []
-};
+  const fetchLacquerOrders = async (userId) => {
+    const response = await fetch(`${BASE_URL}/${userId}/pending`, {
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!response.ok)
+      throw new Error("Nie udało się pobrać zamówień lakierowania.");
+    const text = await response.text();
+    return text ? JSON.parse(text) : [];
+  };
 
   const fetchCustomerOrders = async (userId) => {
-    const response = await fetch(`https://${BASE_URL}/api/orders/customer`, {
-      headers: { "userId": userId },
+const response = await fetch(`${BASE_URL}/api/orders/user-orders`, {
+      headers: { userId },
     });
-    if (!response.ok) throw new Error("Błąd serwera przy pobieraniu zamówień klienta.");
+    if (!response.ok)
+      throw new Error("Błąd serwera przy pobieraniu zamówień klienta.");
     return await response.json();
   };
 
   const fetchAppointments = async (userId) => {
-    const response = await fetch(`https://${BASE_URL}/api/appointments?userId=${userData.id}`);
+    const response = await fetch(
+      `${BASE_URL}/api/appointments?userId=${userId}`
+    );
     if (!response.ok) throw new Error("Błąd serwera");
     return await response.json();
   };
 
   const handleAddAppointment = () => {
     setIsFormVisible(!isFormVisible);
-  };
-
-  const handleDateChange = (e) => {
-    setSelectedDate(e.target.value);
-  };
-
-  const handleTimeChange = (e) => {
-    setSelectedTime(e.target.value);
-  };
-
-  const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
   };
 
   const handleSubmitAppointment = async (e) => {
@@ -124,18 +128,15 @@ const fetchLacquerOrders = async (userId) => {
 
     const newAppointment = {
       date: `${selectedDate} ${selectedTime}`,
-      status: 'Wolny',
-      description: description,
-      user: { id: userData.id }, // Dodaj ID użytkownika
+      status: "Wolny",
+      description,
+      user: { id: userData.id },
     };
-    
 
     try {
-      const response = await fetch(`https://${BASE_URL}/api/appointments`, {
+      const response = await fetch(`${BASE_URL}/api/appointments`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newAppointment),
       });
 
@@ -143,63 +144,59 @@ const fetchLacquerOrders = async (userId) => {
         const savedAppointment = await response.json();
         setAppointments([...appointments, savedAppointment]);
         setIsFormVisible(false);
-        setSelectedDate('');
-        setSelectedTime('');
-        setDescription('');
-      } else {
-        throw new Error("Błąd podczas dodawania terminu.");
-      }
+        setSelectedDate("");
+        setSelectedTime("");
+        setDescription("");
+      } else throw new Error();
     } catch (error) {
       console.error("Błąd dodawania terminu:", error);
       alert("Nie udało się dodać terminu.");
     }
   };
 
-  const handleDeleteAppointment = async (appointmentId) => {
+  const handleDeleteAppointment = async (id) => {
     try {
-      const response = await fetch(`https://${BASE_URL}/api/appointments/${appointmentId}`, {
+      const res = await fetch(`${BASE_URL}/api/appointments/${id}`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
-      if (response.ok) {
-        setAppointments(appointments.filter(appt => appt.id !== appointmentId));
-        alert("Termin został pomyślnie usunięty.");
-      } else {
-        throw new Error("Błąd podczas usuwania terminu.");
-      }
-    } catch (error) {
-      console.error("Błąd usuwania terminu:", error);
+      if (res.ok) {
+        setAppointments(appointments.filter((appt) => appt.id !== id));
+        alert("Termin został usunięty.");
+      } else throw new Error();
+    } catch (err) {
+      console.error("Błąd usuwania terminu:", err);
       alert("Nie udało się usunąć terminu.");
     }
   };
 
-  if (loading) {
-    return <div>Ładowanie...</div>;
-  }
+  const toggleOrderDetails = (id) => {
+    setExpandedOrder(expandedOrder === id ? null : id);
+  };
+
+  if (loading) return <div>Ładowanie...</div>;
 
   return (
     <div className="lacquerer-dashboard">
       <LacquerHeader />
       <h1>Witaj, {userData?.name || "Nieznany użytkownik"} w panelu lakiernika</h1>
 
-      {/* Sekcja terminów */}
       <section className="appointments">
         <h2>Moje terminy:</h2>
         {errors.appointments && <p className="error">{errors.appointments}</p>}
         {appointments.length > 0 ? (
           appointments.map((appt) => {
-            const formattedDate = new Date(appt.date).toLocaleString('pl-PL', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
+            const formattedDate = new Date(appt.date).toLocaleString("pl-PL", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
             });
             return (
               <div key={appt.id} className="appointment-item">
-                <p>{formattedDate} - Status: {appt.status} - {appt.description}</p>
+                <p>
+                  {formattedDate} - Status: {appt.status} - {appt.description}
+                </p>
                 <button
                   className="delete-button"
                   onClick={() => handleDeleteAppointment(appt.id)}
@@ -212,9 +209,7 @@ const fetchLacquerOrders = async (userId) => {
         ) : (
           <p>Brak dostępnych terminów.</p>
         )}
-
         <button onClick={handleAddAppointment}>Dodaj termin</button>
-
         {isFormVisible && (
           <div className="appointment-form">
             <form onSubmit={handleSubmitAppointment}>
@@ -223,7 +218,7 @@ const fetchLacquerOrders = async (userId) => {
                 <input
                   type="date"
                   value={selectedDate}
-                  onChange={handleDateChange}
+                  onChange={(e) => setSelectedDate(e.target.value)}
                 />
               </label>
               <label>
@@ -231,14 +226,14 @@ const fetchLacquerOrders = async (userId) => {
                 <input
                   type="time"
                   value={selectedTime}
-                  onChange={handleTimeChange}
+                  onChange={(e) => setSelectedTime(e.target.value)}
                 />
               </label>
               <label>
                 Opis:
                 <textarea
                   value={description}
-                  onChange={handleDescriptionChange}
+                  onChange={(e) => setDescription(e.target.value)}
                   placeholder="Wpisz opis terminu"
                 />
               </label>
@@ -248,7 +243,6 @@ const fetchLacquerOrders = async (userId) => {
         )}
       </section>
 
-      {/* Sekcja oczekujących zamówień lakierowania */}
       <section className="orders">
         <h2>Oczekujące zamówienia lakierowania:</h2>
         {errors.pendingOrders && <p className="error">{errors.pendingOrders}</p>}
@@ -256,12 +250,24 @@ const fetchLacquerOrders = async (userId) => {
           pendingOrders.map((order) => (
             <div key={order.id} className="order">
               <p><strong>Zamówienie #{order.id}</strong></p>
-              <p>Klient: {order.carpenter.name || "Nieznany"}</p>
+              <p>Klient: {order.carpenter?.name || "Nieznany"}</p>
               <p>Lakier: {order.lacquer}</p>
               <p>Status: {order.status}</p>
               <p>Data zamówienia: {new Date(order.orderDate).toLocaleString("pl-PL")}</p>
               <p>Cena: {order.totalPrice} zł</p>
               <p>Ilość metrów do malowania: {order.paintingMeters} m</p>
+              {order.items?.length > 0 && (
+                <div className="order-items">
+                  <h4>Pozycje:</h4>
+                  {order.items.map((item, idx) => (
+                    <div key={idx}>
+                      <p>Produkt: {item.productName}</p>
+                      <p>Ilość: {item.quantity}</p>
+                      <p>Cena: {item.price} zł</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))
         ) : (
@@ -269,7 +275,6 @@ const fetchLacquerOrders = async (userId) => {
         )}
       </section>
 
-      {/* Sekcja zamówień klienta */}
       <section className="customer-orders">
         <h2>Twoje zamówienia lakierów:</h2>
         {errors.customerOrders && <p className="error">{errors.customerOrders}</p>}
@@ -280,7 +285,22 @@ const fetchLacquerOrders = async (userId) => {
               <p>Data zamówienia: {new Date(order.orderDate).toLocaleString("pl-PL")}</p>
               <p>Status: {order.status}</p>
               <p>Kwota: {order.totalPrice} zł</p>
-              <p>Sprzedawca: {order.seller?.name || "Nieznany"}</p>
+              <p>Sprzedawca: {order.sellerName || "Nieznany"}</p>
+              <button onClick={() => toggleOrderDetails(order.id)}>
+                {expandedOrder === order.id ? "Ukryj szczegóły" : "Pokaż szczegóły"}
+              </button>
+              {expandedOrder === order.id && order.items?.length > 0 && (
+                <div className="order-items">
+                  <h4>Pozycje:</h4>
+                  {order.items.map((item, idx) => (
+                    <div key={idx}>
+                      <p>Produkt: {item.productName}</p>
+                      <p>Ilość: {item.quantity}</p>
+                      <p>Cena: {item.price} zł</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))
         ) : (

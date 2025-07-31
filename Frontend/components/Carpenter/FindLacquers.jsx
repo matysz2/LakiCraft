@@ -30,7 +30,7 @@ const FindLacquers = () => {
 
   const handleShowBusinessCard = async (userId) => {
     try {
-      const response = await fetch(`https://${BASE_URL}/api/business-card?userId=${userId}`);
+      const response = await fetch(`${BASE_URL}/api/business-card?userId=${userId}`);
       if (!response.ok) throw new Error("Brak wizytówki");
       const data = await response.json();
       setSelectedCard(data);
@@ -67,7 +67,7 @@ const FindLacquers = () => {
     const fetchAppointments = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`https://${BASE_URL}/api/appointments/available`);
+        const response = await fetch(`${BASE_URL}/api/appointments/available`);
         if (!response.ok) throw new Error("Błąd podczas pobierania dostępnych terminów.");
         const data = await response.json();
         setAppointments(data);
@@ -141,7 +141,7 @@ const FindLacquers = () => {
         },
       };
 
-      const response = await fetch(`https://${BASE_URL}/api/lacquer-orders`, {
+      const response = await fetch(`${BASE_URL}/api/lacquer-orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
@@ -247,7 +247,7 @@ const FindLacquers = () => {
             <p><strong>Kontakt:</strong> {selectedCard.contactEmail}</p>
             {selectedCard.profileImageUrl && (
               <img
-                src={`https://${BASE_URL}/${selectedCard.profileImageUrl}`}
+                src={`${BASE_URL}/${selectedCard.profileImageUrl}`}
                 alt="Profil lakiernika"
                 width="150"
                 height="150"

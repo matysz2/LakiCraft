@@ -83,7 +83,7 @@ const Cart = () => {
     };
 
     try {
-      const response = await fetch(`https://${BASE_URL}/api/orders/create`, {
+      const response = await fetch(`${BASE_URL}/api/orders/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
@@ -127,7 +127,7 @@ const Cart = () => {
           cart.map((item) => (
             <div key={item.id} className="cart-item">
               <p><strong>Kod: {item.kod}</strong></p>
-              {item.imagePath && <img src={`https://${BASE_URL}/${item.imagePath}`} alt={item.name} />}
+              {item.imagePath && <img src={`${BASE_URL}/${item.imagePath}`} alt={item.name} />}
               <div className="cart-item-details">
                 <p><strong>{item.name}</strong></p>
                 <p>Sprzedawca: <strong>{item?.user?.name || "Nieznany sprzedawca"}</strong></p>

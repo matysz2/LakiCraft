@@ -16,7 +16,7 @@ const AdminProduct = () => {
   // Funkcja do pobierania produktów z serwera
   const fetchProducts = () => {
     setLoading(true);
-    fetch(`https://${BASE_URL}/api/products/allproduct`, {
+    fetch(`${BASE_URL}/api/products/allproduct`, {
       method: "GET",
       headers: { "Cache-Control": "no-cache" }, // Unikaj cache
     })
@@ -62,7 +62,7 @@ const AdminProduct = () => {
     if (!window.confirm(`Czy na pewno chcesz ${actionText} produkt ${productName}?`)) return;
   
     try {
-      const res = await fetch(`https://${BASE_URL}/api/products/${productId}/status`, {
+      const res = await fetch(`${BASE_URL}/api/products/${productId}/status`, {
         credentials: "include",
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -86,7 +86,7 @@ const AdminProduct = () => {
     if (!window.confirm(`Czy na pewno chcesz usunąć produkt ${productName}?`)) return;
   
     try {
-      const res = await fetch(`https://${BASE_URL}/api/user/admin/${productId}`, {
+      const res = await fetch(`${BASE_URL}/api/user/admin/${productId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
