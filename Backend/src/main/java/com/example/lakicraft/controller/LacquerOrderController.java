@@ -45,7 +45,7 @@ public class LacquerOrderController {
     // Pobranie oczekujących zamówień lakierowania (status "nowe")
    @GetMapping("/{userId}/pending")
 public List<LacquerOrder> getNewLacquerOrdersByUser(@PathVariable Long userId) {
-    return lacquerOrderRepository.findByCarpenterIdAndStatus(userId, "nowe");
+    return lacquerOrderRepository.findByCarpenterIdAndStatusIgnoreCase(userId, "nowe");
 }
 
 
