@@ -38,8 +38,8 @@ List<PaintMessage> findByLacquerOrderId(@Param("lacquerOrderId") Long lacquerOrd
 @Query("SELECT COUNT(l) FROM LacquerOrder l WHERE l.status = :status")
 long countByStatus(@Param("status") String status);
 
-@Query("SELECT o FROM LacquerOrder o WHERE o.carpenter.id = :id AND LOWER(o.status) = LOWER(:status)")
-List<LacquerOrder> findPendingOrders(@Param("id") Long userId, @Param("status") String status);
+List<LacquerOrder> findByCarpenterIdAndStatusIgnoreCase(Long userId, String status);
+
 
 
 
