@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/_carpenterDashboard.scss";
-import BASE_URL from '../config.js';  // Zmienna BASE_URL
-
+import BASE_URL from "../config.js"; // Zmienna BASE_URL
 
 const CarpenterDashboard = () => {
   const navigate = useNavigate();
@@ -12,7 +11,6 @@ const CarpenterDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [userLoading, setUserLoading] = useState(true);
   const [errors, setErrors] = useState({ paintingOrders: "", lacquerPurchases: "" });
-  const [expandedPurchase, setExpandedPurchase] = useState(null);
 
   useEffect(() => {
     const storedUserData = localStorage.getItem("userData");
@@ -41,25 +39,36 @@ const CarpenterDashboard = () => {
         setErrors({ paintingOrders: "", lacquerPurchases: "" });
 
         const [paintingOrdersRes, lacquerPurchasesRes] = await Promise.allSettled([
-          fetchPaintingOrders(userData.id),
+          fetchPaintingOrders(),
           fetchLacquerPurchases(userData.id),
         ]);
 
         if (paintingOrdersRes.status === "fulfilled") {
           setPaintingOrders(paintingOrdersRes.value);
         } else {
-          setErrors(prev => ({ ...prev, paintingOrders: "Nie udało się pobrać zleceń lakierowania." }));
+          setErrors(prev => ({
+            ...prev,
+            paintingOrders: "Nie udało się pobrać zleceń lakierowania.",
+          }));
         }
 
         if (lacquerPurchasesRes.status === "fulfilled") {
-          setLacquerPurchases(lacquerPurchasesRes.value);
+          const sortedPurchases = lacquerPurchasesRes.value
+            .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))
+            .slice(0, 5); // tylko ostatnie 5
+          setLacquerPurchases(sortedPurchases);
         } else {
-          setErrors(prev => ({ ...prev, lacquerPurchases: "Nie udało się pobrać historii zakupów lakierów." }));
+          setErrors(prev => ({
+            ...prev,
+            lacquerPurchases: "Nie udało się pobrać historii zakupów lakierów.",
+          }));
         }
       } catch (error) {
         console.error("Błąd ogólny:", error);
-        setErrors(prev => ({ ...prev, paintingOrders: "Błąd podczas pobierania danych zleceń." }));
-        setErrors(prev => ({ ...prev, lacquerPurchases: "Błąd podczas pobierania historii zakupów." }));
+        setErrors({
+          paintingOrders: "Błąd podczas pobierania danych zleceń.",
+          lacquerPurchases: "Błąd podczas pobierania historii zakupów.",
+        });
       } finally {
         setLoading(false);
       }
@@ -68,13 +77,13 @@ const CarpenterDashboard = () => {
     fetchData();
   }, [userData]);
 
-  const fetchPaintingOrders = async (userId) => {
-    const response = await fetch(`${BASE_URL}/api/lacquerOrders/new`, {      
+  const fetchPaintingOrders = async () => {
+    const response = await fetch(`${BASE_URL}/api/lacquerOrders/new`, {
+      method: "GET",
       headers: { "Content-Type": "application/json" },
     });
-    
+
     if (!response.ok) throw new Error("Nie udało się pobrać zleceń lakierowania.");
-    
     return await response.json();
   };
 
@@ -83,16 +92,13 @@ const CarpenterDashboard = () => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "userId": userId 
+        userId: userId,
       },
     });
-  
-    if (!response.ok) throw new Error("Błąd serwera przy pobieraniu historii zakupów lakierów.");
-    return await response.json();
-  };
 
-  const toggleDetails = (purchaseId) => {
-    setExpandedPurchase(expandedPurchase === purchaseId ? null : purchaseId);
+    if (!response.ok)
+      throw new Error("Błąd serwera przy pobieraniu historii zakupów lakierów.");
+    return await response.json();
   };
 
   if (userLoading) {
@@ -115,7 +121,7 @@ const CarpenterDashboard = () => {
               <div key={order.id} className="order">
                 <p><strong>Zlecenie #{order.id}</strong></p>
                 <p>Lakier: {order.lacquer}</p>
-                <p>Lakiernik: {order.client.name || "Nieznany"}</p>
+                <p>Lakiernik: {order.client?.name || "Nieznany"}</p>
                 <p>Status: {order.status}</p>
                 <p>Data zamówienia: {new Date(order.orderDate).toLocaleString("pl-PL")}</p>
                 <p>Ilość do malowania: {order.paintingMeters} m²</p>
@@ -137,17 +143,6 @@ const CarpenterDashboard = () => {
                 <p><strong>Zakup #{purchase.id}</strong></p>
                 <p>Data zakupu: {new Date(purchase.orderDate).toLocaleString("pl-PL")}</p>
                 <p>Status: {purchase.status}</p>
-                <button onClick={() => toggleDetails(purchase.id)}>
-                  {expandedPurchase === purchase.id ? "Ukryj szczegóły" : "Pokaż szczegóły"}
-                </button>
-                {expandedPurchase === purchase.id && (
-                  <div className="purchase-details">
-                    <p>Lakier: {purchase.orderItems[0]?.product.name}</p>
-                    <p>Sprzedawca: {purchase.seller.name || "Nieznany"}</p>
-                    <p>Cena: {purchase.totalPrice} zł</p>
-                    <p>Adres dostawy: {purchase.shippingAddress}</p>
-                  </div>
-                )}
               </div>
             ))
           ) : (
