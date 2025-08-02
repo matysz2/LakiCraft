@@ -33,59 +33,62 @@ const CarpenterDashboard = () => {
   useEffect(() => {
     if (!userData) return;
 
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setErrors({ paintingOrders: "", lacquerPurchases: "" });
+const fetchData = async () => {
+  try {
+    setLoading(true);
+    setErrors({ paintingOrders: "", lacquerPurchases: "" });
 
-        const [paintingOrdersRes, lacquerPurchasesRes] = await Promise.allSettled([
-          fetchPaintingOrders(),
-          fetchLacquerPurchases(userData.id),
-        ]);
+    const [paintingOrdersRes, lacquerPurchasesRes] = await Promise.allSettled([
+      fetchPaintingOrders(userData.id), // ✅ PRZEKAZUJEMY carpenterId
+      fetchLacquerPurchases(userData.id),
+    ]);
 
-        if (paintingOrdersRes.status === "fulfilled") {
-          setPaintingOrders(paintingOrdersRes.value);
-        } else {
-          setErrors(prev => ({
-            ...prev,
-            paintingOrders: "Nie udało się pobrać zleceń lakierowania.",
-          }));
-        }
+    if (paintingOrdersRes.status === "fulfilled") {
+      setPaintingOrders(paintingOrdersRes.value);
+    } else {
+      setErrors(prev => ({
+        ...prev,
+        paintingOrders: "Nie udało się pobrać zleceń lakierowania.",
+      }));
+    }
 
-        if (lacquerPurchasesRes.status === "fulfilled") {
-          const sortedPurchases = lacquerPurchasesRes.value
-            .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))
-            .slice(0, 5); // tylko ostatnie 5
-          setLacquerPurchases(sortedPurchases);
-        } else {
-          setErrors(prev => ({
-            ...prev,
-            lacquerPurchases: "Nie udało się pobrać historii zakupów lakierów.",
-          }));
-        }
-      } catch (error) {
-        console.error("Błąd ogólny:", error);
-        setErrors({
-          paintingOrders: "Błąd podczas pobierania danych zleceń.",
-          lacquerPurchases: "Błąd podczas pobierania historii zakupów.",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (lacquerPurchasesRes.status === "fulfilled") {
+      const sortedPurchases = lacquerPurchasesRes.value
+        .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))
+        .slice(0, 5);
+      setLacquerPurchases(sortedPurchases);
+    } else {
+      setErrors(prev => ({
+        ...prev,
+        lacquerPurchases: "Nie udało się pobrać historii zakupów lakierów.",
+      }));
+    }
+  } catch (error) {
+    console.error("Błąd ogólny:", error);
+    setErrors({
+      paintingOrders: "Błąd podczas pobierania danych zleceń.",
+      lacquerPurchases: "Błąd podczas pobierania historii zakupów.",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
     fetchData();
   }, [userData]);
 
-  const fetchPaintingOrders = async () => {
-    const response = await fetch(`${BASE_URL}/api/lacquerOrders/new`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
+const fetchPaintingOrders = async (carpenterId) => {
+  const response = await fetch(`${BASE_URL}/api/lacquerOrders/new?carpenterId=${carpenterId}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
 
-    if (!response.ok) throw new Error("Nie udało się pobrać zleceń lakierowania.");
-    return await response.json();
-  };
+  if (!response.ok) throw new Error("Nie udało się pobrać zleceń lakierowania.");
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : [];
+};
+
 
   const fetchLacquerPurchases = async (userId) => {
     const response = await fetch(`${BASE_URL}/api/orders/user-orders`, {
