@@ -41,6 +41,7 @@ long countByStatus(@Param("status") String status);
 List<LacquerOrder> findByClientIdAndStatusIgnoreCase(Long userId, String status);
 
 
+List<LacquerOrder> findByCarpenterIdAndStatusIgnoreCase(Long userId, String status);
 
 
 
