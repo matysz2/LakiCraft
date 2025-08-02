@@ -38,7 +38,7 @@ List<PaintMessage> findByLacquerOrderId(@Param("lacquerOrderId") Long lacquerOrd
 @Query("SELECT COUNT(l) FROM LacquerOrder l WHERE l.status = :status")
 long countByStatus(@Param("status") String status);
 
-List<LacquerOrder> findByCarpenterIdAndStatusIgnoreCase(Long userId, String status);
+List<LacquerOrder> findByClientIdAndStatusIgnoreCase(Long userId, String status);
 
 
 
