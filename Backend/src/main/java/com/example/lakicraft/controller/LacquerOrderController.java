@@ -82,10 +82,10 @@ public class LacquerOrderController {
     }
 
     // Pobranie wszystkich nowych zamówień
-    @GetMapping("/api/lacquerOrders/new")
-    public List<LacquerOrder> getNewLacquerOrders() {
-        return lacquerOrderRepository.findByStatus("nowe");
-    }
+ @GetMapping("/api/lacquerOrders/new")
+public List<LacquerOrder> getNewLacquerOrders(@RequestParam Long carpenterId) {
+    return lacquerOrderRepository.findByCarpenterIdAndStatusIgnoreCase(carpenterId, "nowe");
+}
 
     // Pobranie zamówień według stolarza, posortowanych malejąco po ID
     @GetMapping("/carpenter/{carpenterId}")
