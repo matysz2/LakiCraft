@@ -39,6 +39,7 @@ List<PaintMessage> findByLacquerOrderId(@Param("lacquerOrderId") Long lacquerOrd
 long countByStatus(@Param("status") String status);
 
  
+    List<LacquerOrder> findByCarpenterIdAndStatusIgnoreCase(Long carpenterId, String status);
 
 
      

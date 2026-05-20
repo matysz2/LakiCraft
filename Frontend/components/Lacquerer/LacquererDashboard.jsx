@@ -169,9 +169,7 @@ const response = await fetch(`${BASE_URL}/api/orders/user-orders`, {
     }
   };
 
-  const toggleOrderDetails = (id) => {
-    setExpandedOrder(expandedOrder === id ? null : id);
-  };
+
 
   if (loading) return <div>Ładowanie...</div>;
 
@@ -286,21 +284,7 @@ const response = await fetch(`${BASE_URL}/api/orders/user-orders`, {
               <p>Status: {order.status}</p>
               <p>Kwota: {order.totalPrice} zł</p>
               <p>Sprzedawca: {order.sellerName || "Nieznany"}</p>
-              <button onClick={() => toggleOrderDetails(order.id)}>
-                {expandedOrder === order.id ? "Ukryj szczegóły" : "Pokaż szczegóły"}
-              </button>
-              {expandedOrder === order.id && order.items?.length > 0 && (
-                <div className="order-items">
-                  <h4>Pozycje:</h4>
-                  {order.items.map((item, idx) => (
-                    <div key={idx}>
-                      <p>Produkt: {item.productName}</p>
-                      <p>Ilość: {item.quantity}</p>
-                      <p>Cena: {item.price} zł</p>
-                    </div>
-                  ))}
-                </div>
-              )}
+           
             </div>
           ))
         ) : (

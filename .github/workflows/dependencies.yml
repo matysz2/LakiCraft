@@ -1,0 +1,73 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    # Check for updates daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-backend-deps:
+    name: Update Backend Dependencies
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      
+      - name: Check for Maven Updates
+        working-directory: ./Backend
+        run: mvn versions:display-dependency-updates
+        continue-on-error: true
+      
+      - name: Create Pull Request for Maven Updates
+        run: |
+          echo "Manual maven dependency updates recommended"
+          echo "Run: mvn versions:use-latest-releases -DgenerateBackupPoms=false"
+        continue-on-error: true
+
+  update-frontend-deps:
+    name: Update Frontend Dependencies
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: Frontend/package-lock.json
+      
+      - name: Update npm packages
+        working-directory: ./Frontend
+        run: npm update --save
+        continue-on-error: true
+      
+      - name: Audit npm packages
+        working-directory: ./Frontend
+        run: npm audit
+        continue-on-error: true
+      
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update npm dependencies'
+          title: 'Chore: Update npm dependencies'
+          body: 'Automated npm dependency updates'
+          branch: 'chore/npm-updates'
+          delete-branch: true
+        continue-on-error: true

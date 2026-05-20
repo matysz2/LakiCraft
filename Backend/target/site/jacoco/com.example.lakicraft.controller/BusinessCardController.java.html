@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BusinessCardController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">lakicraft</a> &gt; <a href="index.source.html" class="el_package">com.example.lakicraft.controller</a> &gt; <span class="el_source">BusinessCardController.java</span></div><h1>BusinessCardController.java</h1><pre class="source lang-java linenums">package com.example.lakicraft.controller;
+
+import com.example.lakicraft.model.BusinessCard;
+import com.example.lakicraft.repository.BusinessCardRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.*;
+import java.util.Optional;
+
+@RestController
+@RequestMapping(&quot;/api/business-card&quot;)
+<span class="fc" id="L16">@RequiredArgsConstructor</span>
+@CrossOrigin(origins = &quot;https://localhost:3000&quot;)  // ✅ pozwalamy Reactowi
+public class BusinessCardController {
+
+    private final BusinessCardRepository businessCardRepository;
+
+    // katalog do uploadów
+    private static final String UPLOAD_DIR = &quot;uploads&quot;;
+
+    /**
+     * ✅ Pobierz wizytówkę użytkownika
+     */
+    @GetMapping
+    public ResponseEntity&lt;?&gt; getBusinessCard(@RequestParam Long userId) {
+<span class="nc" id="L30">        return businessCardRepository.findByUserId(userId)</span>
+<span class="nc" id="L31">                .map(ResponseEntity::ok)</span>
+<span class="nc" id="L32">                .orElse(ResponseEntity.notFound().build());</span>
+    }
+
+    /**
+     * ✅ Utwórz nową wizytówkę
+     */
+    @PostMapping(&quot;/create&quot;)
+    public ResponseEntity&lt;?&gt; createBusinessCard(
+            @RequestParam Long userId,
+            @RequestParam String name,
+            @RequestParam String jobTitle,
+            @RequestParam String bio,
+            @RequestParam String contactEmail,
+            @RequestParam(required = false) MultipartFile profileImage
+    ) throws IOException {
+
+<span class="nc" id="L48">        BusinessCard card = new BusinessCard();</span>
+<span class="nc" id="L49">        card.setUserId(userId);</span>
+<span class="nc" id="L50">        card.setName(name);</span>
+<span class="nc" id="L51">        card.setJobTitle(jobTitle);</span>
+<span class="nc" id="L52">        card.setBio(bio);</span>
+<span class="nc" id="L53">        card.setContactEmail(contactEmail);</span>
+
+<span class="nc bnc" id="L55" title="All 4 branches missed.">        if (profileImage != null &amp;&amp; !profileImage.isEmpty()) {</span>
+<span class="nc" id="L56">            String relativePath = saveFile(userId, profileImage);</span>
+<span class="nc" id="L57">            card.setProfileImageUrl(relativePath);</span>
+        }
+
+<span class="nc" id="L60">        return ResponseEntity.ok(businessCardRepository.save(card));</span>
+    }
+
+    /**
+     * ✅ Edytuj istniejącą wizytówkę
+     */
+    @PatchMapping
+    public ResponseEntity&lt;?&gt; updateBusinessCard(
+            @RequestParam Long userId,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String jobTitle,
+            @RequestParam(required = false) String bio,
+            @RequestParam(required = false) String contactEmail,
+            @RequestParam(required = false) MultipartFile profileImage
+    ) throws IOException {
+
+<span class="nc" id="L76">        BusinessCard card = businessCardRepository.findByUserId(userId)</span>
+<span class="nc" id="L77">                .orElseThrow(() -&gt; new RuntimeException(&quot;Brak wizytówki do edycji&quot;));</span>
+
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (name != null) card.setName(name);</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        if (jobTitle != null) card.setJobTitle(jobTitle);</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (bio != null) card.setBio(bio);</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (contactEmail != null) card.setContactEmail(contactEmail);</span>
+
+<span class="nc bnc" id="L84" title="All 4 branches missed.">        if (profileImage != null &amp;&amp; !profileImage.isEmpty()) {</span>
+            // usuń stare zdjęcie jeśli było
+<span class="nc" id="L86">            deleteOldFile(card.getProfileImageUrl());</span>
+            // zapisz nowe
+<span class="nc" id="L88">            String relativePath = saveFile(userId, profileImage);</span>
+<span class="nc" id="L89">            card.setProfileImageUrl(relativePath);</span>
+        }
+
+<span class="nc" id="L92">        return ResponseEntity.ok(businessCardRepository.save(card));</span>
+    }
+
+    /**
+     * ✅ Pomocnicza metoda do zapisu pliku
+     */
+    private String saveFile(Long userId, MultipartFile file) throws IOException {
+<span class="nc" id="L99">        String fileName = userId + &quot;_&quot; + System.currentTimeMillis() + &quot;_&quot; + file.getOriginalFilename();</span>
+<span class="nc" id="L100">        Path uploadPath = Paths.get(UPLOAD_DIR);</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);</span>
+
+<span class="nc" id="L103">        Path target = uploadPath.resolve(fileName);</span>
+<span class="nc" id="L104">        Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);</span>
+
+<span class="nc" id="L106">        return &quot;uploads/&quot; + fileName; // Zwracamy ścieżkę względną do frontendu</span>
+    }
+
+    /**
+     * ✅ Pomocnicza metoda do usuwania starego pliku
+     */
+    private void deleteOldFile(String oldPath) {
+<span class="nc bnc" id="L113" title="All 4 branches missed.">        if (oldPath != null &amp;&amp; !oldPath.isEmpty()) {</span>
+            try {
+<span class="nc" id="L115">                Path path = Paths.get(oldPath);</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">                if (Files.exists(path)) {</span>
+<span class="nc" id="L117">                    Files.delete(path);</span>
+                }
+<span class="nc" id="L119">            } catch (Exception e) {</span>
+<span class="nc" id="L120">                System.err.println(&quot;⚠️ Nie udało się usunąć starego pliku: &quot; + e.getMessage());</span>
+<span class="nc" id="L121">            }</span>
+        }
+<span class="nc" id="L123">    }</span>
+
+    /**
+ * ✅ Edytuj istniejącą wizytówkę – używamy POST, nie PATCH (mniej problemów z CORS)
+ */
+@PostMapping(&quot;/update&quot;)
+public ResponseEntity&lt;?&gt; updateBusinessCardPost(
+        @RequestParam Long userId,
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String jobTitle,
+        @RequestParam(required = false) String bio,
+        @RequestParam(required = false) String contactEmail,
+        @RequestParam(required = false) MultipartFile profileImage
+) throws IOException {
+
+<span class="nc" id="L138">    BusinessCard card = businessCardRepository.findByUserId(userId)</span>
+<span class="nc" id="L139">            .orElseThrow(() -&gt; new RuntimeException(&quot;Brak wizytówki do edycji&quot;));</span>
+
+<span class="nc bnc" id="L141" title="All 2 branches missed.">    if (name != null) card.setName(name);</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">    if (jobTitle != null) card.setJobTitle(jobTitle);</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">    if (bio != null) card.setBio(bio);</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">    if (contactEmail != null) card.setContactEmail(contactEmail);</span>
+
+<span class="nc bnc" id="L146" title="All 4 branches missed.">    if (profileImage != null &amp;&amp; !profileImage.isEmpty()) {</span>
+<span class="nc" id="L147">        deleteOldFile(card.getProfileImageUrl());</span>
+<span class="nc" id="L148">        String relativePath = saveFile(userId, profileImage);</span>
+<span class="nc" id="L149">        card.setProfileImageUrl(relativePath);</span>
+    }
+
+<span class="nc" id="L152">    return ResponseEntity.ok(businessCardRepository.save(card));</span>
+}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

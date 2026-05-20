@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaintMessageController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">lakicraft</a> &gt; <a href="index.source.html" class="el_package">com.example.lakicraft.controller</a> &gt; <span class="el_source">PaintMessageController.java</span></div><h1>PaintMessageController.java</h1><pre class="source lang-java linenums">package com.example.lakicraft.controller;
+
+import com.example.lakicraft.model.LacquerOrder;
+import com.example.lakicraft.model.PaintMessage;
+import com.example.lakicraft.model.User;
+import com.example.lakicraft.repository.PaintMessageRepository;
+import com.example.lakicraft.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
+import com.example.lakicraft.repository.LacquerOrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+
+
+@RestController
+@RequestMapping(&quot;/api/lacquerOrders&quot;)
+public class PaintMessageController {
+
+    private final UserRepository userRepository;
+    private final PaintMessageRepository paintMessageRepository;
+    private final LacquerOrderRepository lacquerOrderRepository;
+
+ // Constructor injection for all repositories
+ public PaintMessageController(LacquerOrderRepository lacquerOrderRepository, 
+ PaintMessageRepository paintMessageRepository,
+<span class="fc" id="L34"> UserRepository userRepository) {</span>
+<span class="fc" id="L35">this.lacquerOrderRepository = lacquerOrderRepository;</span>
+<span class="fc" id="L36">this.paintMessageRepository = paintMessageRepository;</span>
+<span class="fc" id="L37">this.userRepository = userRepository;  // Ensuring that userRepository is initialized</span>
+<span class="fc" id="L38">}</span>
+
+
+    // Pobranie wszystkich wiadomości dla danego zamówienia
+    @GetMapping(&quot;/{orderId}/messages&quot;)
+    public List&lt;PaintMessage&gt; getMessagesByOrderId(@PathVariable Long orderId) {
+<span class="nc" id="L44">        return paintMessageRepository.findByLacquerOrderId(orderId);</span>
+    }
+
+    @Transactional
+    @PostMapping(&quot;/{orderId}/message&quot;)
+    public ResponseEntity&lt;PaintMessage&gt; createMessage(@PathVariable Long orderId, 
+                                                     @RequestBody PaintMessage paintMessage) {
+        // Sprawdzenie, czy zamówienie istnieje
+<span class="nc" id="L52">        LacquerOrder lacquerOrder = lacquerOrderRepository.findById(orderId)</span>
+<span class="nc" id="L53">                .orElseThrow(() -&gt; new RuntimeException(&quot;Zamówienie lakierowania o ID &quot; + orderId + &quot; nie istnieje.&quot;));</span>
+    
+        // Ustawienie zamówienia w wiadomości
+<span class="nc" id="L56">        paintMessage.setLacquerOrder(lacquerOrder);</span>
+    
+        // Walidacja: sprawdzenie, czy 'user' i 'lacquerer' są ustawione
+<span class="nc bnc" id="L59" title="All 4 branches missed.">        if (paintMessage.getUser() == null || paintMessage.getLacquerer() == null) {</span>
+<span class="nc" id="L60">            throw new RuntimeException(&quot;Użytkownik lub lakiernik nie może być nullem.&quot;);</span>
+        }
+    
+        // Ustawienie użytkownika i lakiernika (jeśli są dostępni)
+<span class="nc" id="L64">        User sender = userRepository.findById(paintMessage.getUser().getId())</span>
+<span class="nc" id="L65">                .orElseThrow(() -&gt; new RuntimeException(&quot;Użytkownik o ID &quot; + paintMessage.getUser().getId() + &quot; nie istnieje.&quot;));</span>
+<span class="nc" id="L66">        paintMessage.setUser(sender);</span>
+    
+<span class="nc" id="L68">        User lacquerer = userRepository.findById(paintMessage.getLacquerer().getId())</span>
+<span class="nc" id="L69">                .orElseThrow(() -&gt; new RuntimeException(&quot;Lakiernik o ID &quot; + paintMessage.getLacquerer().getId() + &quot; nie istnieje.&quot;));</span>
+<span class="nc" id="L70">        paintMessage.setLacquerer(lacquerer);</span>
+    
+        // Ustawienie daty wysłania wiadomości
+<span class="nc" id="L73">        paintMessage.setSentAt(LocalDateTime.now());</span>
+    
+        // Zapisanie wiadomości
+<span class="nc" id="L76">        PaintMessage savedMessage = paintMessageRepository.save(paintMessage);</span>
+    
+        // Zwrócenie odpowiedzi HTTP z kodem 201 (Created) i zapisanym obiektem wiadomości
+<span class="nc" id="L79">        return new ResponseEntity&lt;&gt;(savedMessage, HttpStatus.CREATED);</span>
+    }
+    
+    @GetMapping(&quot;/{orderId}&quot;)
+    public ResponseEntity&lt;LacquerOrder&gt; getOrderById(@PathVariable Long orderId) {
+<span class="nc" id="L84">    return lacquerOrderRepository.findById(orderId)</span>
+<span class="nc" id="L85">            .map(ResponseEntity::ok)</span>
+<span class="nc" id="L86">            .orElse(ResponseEntity.notFound().build());</span>
+}
+
+    }
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

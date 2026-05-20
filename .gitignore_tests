@@ -1,0 +1,25 @@
+# Test Files & Coverage
+/Backend/target/
+/Backend/coverage/
+/Backend/.jacoco/
+coverage.xml
+.coverage
+
+/Frontend/coverage/
+/Frontend/.vitest/
+/Frontend/dist/
+
+# Test Artifacts
+*.test.jar
+test-results/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local

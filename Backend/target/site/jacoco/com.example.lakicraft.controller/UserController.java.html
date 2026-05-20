@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">lakicraft</a> &gt; <a href="index.source.html" class="el_package">com.example.lakicraft.controller</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.example.lakicraft.controller;
+
+import com.example.lakicraft.model.User;
+import com.example.lakicraft.repository.UserRepository;
+import com.example.lakicraft.service.PasswordService;
+import com.example.lakicraft.service.UserService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
+@RequestMapping(&quot;/api/user&quot;)
+@CrossOrigin(origins = &quot;https://localhost:3000&quot;)
+public class UserController {
+
+    private final UserService userService;
+    private final PasswordService passwordService;
+    private final UserRepository userRepository;
+
+<span class="fc" id="L26">    public UserController(UserService userService, PasswordService passwordService, UserRepository userRepository) {</span>
+<span class="fc" id="L27">        this.userService = userService;</span>
+<span class="fc" id="L28">        this.passwordService = passwordService;</span>
+<span class="fc" id="L29">        this.userRepository = userRepository;</span>
+<span class="fc" id="L30">    }</span>
+
+    @GetMapping(&quot;/test-cors&quot;)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; testCors() {
+<span class="nc" id="L34">        return ResponseEntity.ok(Map.of(</span>
+            &quot;message&quot;, &quot;CORS działa poprawnie!&quot;,
+<span class="nc" id="L36">            &quot;timestamp&quot;, LocalDateTime.now()</span>
+        ));
+    }
+
+    @GetMapping(&quot;/test&quot;)
+    public String hello() {
+<span class="nc" id="L42">        return &quot;Działa!&quot;;</span>
+    }
+
+@PostMapping(&quot;/login&quot;)
+public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; login(@RequestBody Map&lt;String, String&gt; loginRequest) {
+<span class="nc" id="L47">    String email = loginRequest.get(&quot;email&quot;);</span>
+<span class="nc" id="L48">    String password = loginRequest.get(&quot;password&quot;);</span>
+
+<span class="nc" id="L50">    Optional&lt;User&gt; optionalUser = userRepository.findByEmail(email);</span>
+
+<span class="nc bnc" id="L52" title="All 2 branches missed.">    if (optionalUser.isPresent()) {</span>
+<span class="nc" id="L53">        User user = optionalUser.get();</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (passwordService.checkPassword(password, user.getPassword())) {</span>
+<span class="nc" id="L55">            return ResponseEntity.ok(Map.of(&quot;message&quot;, &quot;Zalogowano pomyślnie&quot;, &quot;user&quot;, user));</span>
+        } else {
+<span class="nc" id="L57">            return ResponseEntity.status(401).body(Map.of(&quot;message&quot;, &quot;Nieprawidłowe hasło&quot;));</span>
+        }
+    } else {
+<span class="nc" id="L60">        return ResponseEntity.status(404).body(Map.of(&quot;message&quot;, &quot;Użytkownik o podanym e-mailu nie istnieje&quot;));</span>
+    }
+}
+
+    @PostMapping(&quot;/register&quot;)
+    public ResponseEntity&lt;?&gt; registerUser(@RequestBody User user) {
+        try {
+<span class="nc bnc" id="L67" title="All 2 branches missed.">            if (userRepository.existsByEmail(user.getEmail())) {</span>
+<span class="nc" id="L68">                return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
+<span class="nc" id="L69">                                     .body(&quot;Użytkownik z tym adresem e-mail już istnieje.&quot;);</span>
+            }
+
+<span class="nc" id="L72">            user.setCreatedAt(LocalDateTime.now());</span>
+<span class="nc" id="L73">            user.setUpdatedAt(LocalDateTime.now());</span>
+<span class="nc" id="L74">            user.setAccountStatus(&quot;active&quot;);</span>
+<span class="nc" id="L75">            user.setPaymentDueDays(0);</span>
+
+            // Hashujemy hasło przed zapisem
+<span class="nc" id="L78">            String hashedPassword = passwordService.hashPassword(user.getPassword());</span>
+<span class="nc" id="L79">            user.setPassword(hashedPassword);</span>
+
+<span class="nc" id="L81">            User registeredUser = userRepository.save(user);</span>
+
+<span class="nc" id="L83">            return ResponseEntity.ok(registeredUser);</span>
+<span class="nc" id="L84">        } catch (Exception e) {</span>
+<span class="nc" id="L85">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(&quot;Błąd rejestracji użytkownika.&quot;);</span>
+        }
+    }
+
+    // Endpoint do zmiany hasła
+    @PutMapping(&quot;/change-password/{userId}&quot;)
+    public ResponseEntity&lt;?&gt; changePassword(@PathVariable Long userId, @RequestBody Map&lt;String, String&gt; passwords) {
+<span class="nc" id="L92">        String currentPassword = passwords.get(&quot;currentPassword&quot;);</span>
+<span class="nc" id="L93">        String newPassword = passwords.get(&quot;newPassword&quot;);</span>
+
+<span class="nc" id="L95">        Optional&lt;User&gt; userOptional = userRepository.findById(userId);</span>
+
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        if (userOptional.isPresent()) {</span>
+<span class="nc" id="L98">            User user = userOptional.get();</span>
+
+<span class="nc bnc" id="L100" title="All 2 branches missed.">            if (!passwordService.checkPassword(currentPassword, user.getPassword())) {</span>
+<span class="nc" id="L101">                return ResponseEntity.status(401).body(Map.of(&quot;message&quot;, &quot;Nieprawidłowe aktualne hasło.&quot;));</span>
+            }
+
+<span class="nc" id="L104">            String hashedNewPassword = passwordService.hashPassword(newPassword);</span>
+<span class="nc" id="L105">            user.setPassword(hashedNewPassword);</span>
+<span class="nc" id="L106">            userRepository.save(user);</span>
+
+<span class="nc" id="L108">            return ResponseEntity.ok(Map.of(&quot;message&quot;, &quot;Hasło zostało zmienione.&quot;));</span>
+        } else {
+<span class="nc" id="L110">            return ResponseEntity.status(404).body(Map.of(&quot;message&quot;, &quot;Użytkownik nie znaleziony&quot;));</span>
+        }
+    }
+
+    // Reszta Twoich metod (pozostawiam bez zmian)
+
+    @GetMapping(&quot;&quot;)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; getUserWithoutPassword(@RequestParam(&quot;id&quot;) int id) {
+        try {
+<span class="nc" id="L119">            User user = userService.getUserWithoutPassword(id);</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">            if (user != null) {</span>
+<span class="nc" id="L121">                return ResponseEntity.ok(Map.of(</span>
+                    &quot;message&quot;, &quot;Użytkownik znaleziony&quot;,
+                    &quot;user&quot;, user
+                ));
+            }
+<span class="nc" id="L126">            return ResponseEntity.status(404).body(Map.of(&quot;message&quot;, &quot;Użytkownik nie znaleziony&quot;));</span>
+<span class="nc" id="L127">        } catch (Exception e) {</span>
+<span class="nc" id="L128">            return ResponseEntity.status(500).body(Map.of(&quot;message&quot;, &quot;Wystąpił błąd na serwerze&quot;, &quot;error&quot;, e.getMessage()));</span>
+        }
+    }
+
+    @PutMapping(&quot;&quot;)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; updateUser(@RequestParam(&quot;id&quot;) int id, @RequestBody User updatedUser) {
+        try {
+<span class="nc" id="L135">            User user = userService.updateUser(id, updatedUser);</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">            if (user != null) {</span>
+<span class="nc" id="L137">                user.setPassword(null);</span>
+<span class="nc" id="L138">                return ResponseEntity.ok(Map.of(</span>
+                    &quot;message&quot;, &quot;Dane użytkownika zostały zaktualizowane.&quot;,
+                    &quot;user&quot;, user
+                ));
+            }
+<span class="nc" id="L143">            return ResponseEntity.status(404).body(Map.of(&quot;message&quot;, &quot;Użytkownik nie znaleziony&quot;));</span>
+<span class="nc" id="L144">        } catch (Exception e) {</span>
+<span class="nc" id="L145">            return ResponseEntity.status(500).body(Map.of(&quot;message&quot;, &quot;Wystąpił błąd podczas aktualizacji&quot;, &quot;error&quot;, e.getMessage()));</span>
+        }
+    }
+
+    @DeleteMapping(&quot;&quot;)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; deleteUser(@RequestParam(&quot;id&quot;) int id) {
+        try {
+<span class="nc" id="L152">            boolean deleted = userService.deleteUser(id);</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">            if (deleted) {</span>
+<span class="nc" id="L154">                return ResponseEntity.ok(Map.of(&quot;message&quot;, &quot;Użytkownik został usunięty.&quot;));</span>
+            }
+<span class="nc" id="L156">            return ResponseEntity.status(404).body(Map.of(&quot;message&quot;, &quot;Użytkownik nie znaleziony&quot;));</span>
+<span class="nc" id="L157">        } catch (Exception e) {</span>
+<span class="nc" id="L158">            return ResponseEntity.status(500).body(Map.of(&quot;message&quot;, &quot;Wystąpił błąd podczas usuwania&quot;, &quot;error&quot;, e.getMessage()));</span>
+        }
+    }
+
+    @PostMapping(&quot;/logout&quot;)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; logout(@RequestHeader(value = &quot;Session-Id&quot;, required = false) String sessionId, HttpSession session) {
+        try {
+<span class="nc" id="L165">            session.invalidate();</span>
+<span class="nc" id="L166">            return ResponseEntity.ok(Map.of(&quot;message&quot;, &quot;Wylogowano pomyślnie&quot;));</span>
+<span class="nc" id="L167">        } catch (Exception e) {</span>
+<span class="nc" id="L168">            return ResponseEntity.status(500).body(Map.of(&quot;message&quot;, &quot;Wystąpił błąd podczas wylogowania&quot;, &quot;error&quot;, e.getMessage()));</span>
+        }
+    }
+
+    @GetMapping(&quot;/users&quot;)
+    public List&lt;User&gt; getAllUsers() {
+<span class="nc" id="L174">        return userRepository.findAll();</span>
+    }
+
+    @PostMapping(&quot;/blockUser/{userId}&quot;)
+    public ResponseEntity&lt;Void&gt; blockUser(@PathVariable Long userId) {
+<span class="nc" id="L179">        Optional&lt;User&gt; userOptional = userRepository.findById(userId);</span>
+
+<span class="nc bnc" id="L181" title="All 2 branches missed.">        if (userOptional.isPresent()) {</span>
+<span class="nc" id="L182">            User user = userOptional.get();</span>
+<span class="nc" id="L183">            user.setBlocked(true);</span>
+<span class="nc" id="L184">            userRepository.save(user);</span>
+<span class="nc" id="L185">            return ResponseEntity.ok().build();</span>
+        } else {
+<span class="nc" id="L187">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+    @DeleteMapping(&quot;/users/{userId}&quot;)
+    public ResponseEntity&lt;Void&gt; deleteUser(@PathVariable Long userId) {
+<span class="nc" id="L193">        Optional&lt;User&gt; userOptional = userRepository.findById(userId);</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">        if (userOptional.isPresent()) {</span>
+<span class="nc" id="L195">            userRepository.delete(userOptional.get());</span>
+<span class="nc" id="L196">            return ResponseEntity.ok().build();</span>
+        } else {
+<span class="nc" id="L198">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+@PutMapping(&quot;/admin/users/{userId}&quot;)
+public ResponseEntity&lt;User&gt; updateUser(@PathVariable Long userId, @RequestBody User updatedUser) {
+<span class="nc" id="L204">    Optional&lt;User&gt; userOptional = userRepository.findById(userId);</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">    if (userOptional.isPresent()) {</span>
+<span class="nc" id="L206">        User user = userOptional.get();</span>
+<span class="nc" id="L207">        user.setFirstName(updatedUser.getFirstName());</span>
+<span class="nc" id="L208">        user.setLastName(updatedUser.getLastName());</span>
+<span class="nc" id="L209">        user.setEmail(updatedUser.getEmail());</span>
+<span class="nc" id="L210">        user.setRole(updatedUser.getRole());</span>
+<span class="nc" id="L211">        user.setAccountStatus(updatedUser.getAccountStatus());</span>
+<span class="nc" id="L212">        user.setPaymentDueDays(updatedUser.getPaymentDueDays());</span>
+<span class="nc" id="L213">        user.setUpdatedAt(LocalDateTime.now()); // ✅ Dobrze aktualizować timestamp</span>
+<span class="nc" id="L214">        userRepository.save(user);</span>
+<span class="nc" id="L215">        return ResponseEntity.ok(user);</span>
+    } else {
+<span class="nc" id="L217">        return ResponseEntity.notFound().build();</span>
+    }
+}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

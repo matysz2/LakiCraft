@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: lakicraft-postgres
+    environment:
+      POSTGRES_DB: railway
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: qzmLsevRkjVJKXzgAYlalCosmmrkxUWm
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lakicraft-network
+
+  # Backend Service
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: lakicraft-backend
+    environment:
+      PORT: 8080
+      PGHOST: postgres
+      PGPORT: 5432
+      PGDATABASE: railway
+      PGUSER: root
+      PGPASSWORD: qzmLsevRkjVJKXzgAYlalCosmmrkxUWm
+      MAIL_USERNAME: ${MAIL_USERNAME:-test@example.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-password}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - lakicraft-network
+    restart: unless-stopped
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: lakicraft-frontend
+    environment:
+      - VITE_API_URL=http://backend:8080
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - lakicraft-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  lakicraft-network:
+    driver: bridge

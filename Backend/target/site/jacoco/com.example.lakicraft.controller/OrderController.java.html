@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">lakicraft</a> &gt; <a href="index.source.html" class="el_package">com.example.lakicraft.controller</a> &gt; <span class="el_source">OrderController.java</span></div><h1>OrderController.java</h1><pre class="source lang-java linenums">package com.example.lakicraft.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import com.example.lakicraft.dto.OrderDTO;
+import com.example.lakicraft.dto.OrderItemDTO;
+import com.example.lakicraft.model.OrderItem;
+import com.example.lakicraft.model.Orders;
+import com.example.lakicraft.model.Product;
+import com.example.lakicraft.model.Sale;
+import com.example.lakicraft.model.User;
+import com.example.lakicraft.repository.OrderItemRepository;
+import com.example.lakicraft.repository.OrderRepository;
+import com.example.lakicraft.repository.OrderStatusRepository;
+import com.example.lakicraft.repository.ProductRepository;
+import com.example.lakicraft.repository.SaleRepository;
+import com.example.lakicraft.repository.UserRepository;
+
+import org.springframework.transaction.annotation.Transactional;
+
+
+
+ // Upewnij się, że CORS jest poprawnie ustawione dla aplikacji React
+@RestController
+@RequestMapping(&quot;/api/orders&quot;)
+public class OrderController {
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private SaleRepository saleRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private OrderStatusRepository orderStatusRepository;
+    // Pobranie zamówień dla zalogowanego użytkownika
+ 
+    @Autowired
+    private final ProductRepository productRepository;
+
+    @Autowired
+    private final OrderItemRepository orderItemRepository;
+
+
+
+    public OrderController(OrderRepository orderRepository, SaleRepository saleRepository,
+            UserRepository userRepository, OrderStatusRepository orderStatusRepository,
+<span class="fc" id="L61">            ProductRepository productRepository, OrderItemRepository orderItemRepository) {</span>
+<span class="fc" id="L62">        this.orderRepository = orderRepository;</span>
+<span class="fc" id="L63">        this.saleRepository = saleRepository;</span>
+<span class="fc" id="L64">        this.userRepository = userRepository;</span>
+<span class="fc" id="L65">        this.orderStatusRepository = orderStatusRepository;</span>
+<span class="fc" id="L66">        this.productRepository = productRepository;</span>
+<span class="fc" id="L67">        this.orderItemRepository = orderItemRepository;</span>
+<span class="fc" id="L68">    }</span>
+
+
+    private OrderDTO mapToDTO(Orders order) {
+<span class="nc" id="L72">    return new OrderDTO(</span>
+<span class="nc" id="L73">        order.getId(),</span>
+<span class="nc" id="L74">        order.getOrderDate(),</span>
+<span class="nc" id="L75">        order.getTotalPrice(),</span>
+<span class="nc" id="L76">        order.getStatus(),</span>
+<span class="nc" id="L77">        order.getShippingAddress(),</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        order.getSeller() != null ? order.getSeller().getName() : null,</span>
+
+<span class="nc" id="L80">        order.getOrderItems().stream().map(oi -&gt; new OrderItemDTO(</span>
+<span class="nc" id="L81">            oi.getProduct().getId(),</span>
+<span class="nc" id="L82">            oi.getProduct().getName(),</span>
+<span class="nc" id="L83">            oi.getQuantity(),</span>
+<span class="nc" id="L84">            oi.getPrice()</span>
+<span class="nc" id="L85">        )).toList()</span>
+    );
+}
+
+
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Orders&gt;&gt; getOrders(@RequestHeader(&quot;userId&quot;) Long userId) {
+<span class="nc" id="L93">        List&lt;Orders&gt; orders = orderRepository.findBySellerId(userId);</span>
+        
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        if (orders.isEmpty()) {</span>
+<span class="nc" id="L96">            return ResponseEntity.noContent().build();</span>
+        }
+<span class="nc" id="L98">        return ResponseEntity.ok(orders);</span>
+    }
+
+
+
+    @Transactional
+    @PutMapping(&quot;/{orderId}/status&quot;)
+    public ResponseEntity&lt;String&gt; updateOrderStatus(@PathVariable Long orderId, @RequestBody Map&lt;String, Object&gt; requestBody) {
+        // Pobranie statusu i userId z ciała żądania
+<span class="nc" id="L107">        String status = (String) requestBody.get(&quot;status&quot;);</span>
+        
+        // Rzutowanie userId na Long, jeśli jest typu Integer
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        Long userId = (requestBody.get(&quot;userId&quot;) instanceof Integer) </span>
+<span class="nc" id="L111">                        ? Long.valueOf((Integer) requestBody.get(&quot;userId&quot;))</span>
+<span class="nc" id="L112">                        : (Long) requestBody.get(&quot;userId&quot;);</span>
+    
+        // Definicja dozwolonych statusów
+<span class="nc" id="L115">        List&lt;String&gt; validStatuses = Arrays.asList(&quot;Nowe&quot;, &quot;W realizacji&quot;, &quot;Zrealizowane&quot;);</span>
+    
+        // Sprawdzamy, czy status jest jednym z dozwolonych
+<span class="nc bnc" id="L118" title="All 4 branches missed.">        if (status == null || !validStatuses.contains(status)) {</span>
+<span class="nc" id="L119">            return ResponseEntity.status(400).body(&quot;{\&quot;error\&quot;: \&quot;Nieznany lub brakujący status\&quot;}&quot;);</span>
+        }
+    
+        // Pobierz zamówienie
+<span class="nc" id="L123">        Orders order = orderRepository.findById(orderId).orElse(null);</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        if (order == null) {</span>
+<span class="nc" id="L125">            return ResponseEntity.status(404).body(&quot;{\&quot;error\&quot;: \&quot;Zamówienie nie znalezione\&quot;}&quot;);</span>
+        }
+    
+        // Aktualizacja statusu zamówienia
+<span class="nc" id="L129">        order.setStatus(status);</span>
+<span class="nc" id="L130">        orderRepository.save(order);</span>
+    
+        // Jeśli status to &quot;Zrealizowane&quot;, zapisz dane do tabeli Sale
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (&quot;Zrealizowane&quot;.equals(status)) {</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">            for (OrderItem orderItem : order.getOrderItems()) {</span>
+<span class="nc" id="L135">                Sale sale = new Sale();</span>
+<span class="nc" id="L136">                sale.setUserId(userId);  // Używamy userId z requestBody</span>
+<span class="nc" id="L137">                sale.setProduct(orderItem.getProduct());</span>
+<span class="nc" id="L138">                sale.setAmount(BigDecimal.valueOf(orderItem.getQuantity()));</span>
+<span class="nc" id="L139">                sale.setTotalPrice(orderItem.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())));</span>
+<span class="nc" id="L140">                sale.setSaleDate(LocalDateTime.now());</span>
+    
+<span class="nc" id="L142">                saleRepository.save(sale);</span>
+<span class="nc" id="L143">            }</span>
+        }
+    
+<span class="nc" id="L146">        return ResponseEntity.ok(&quot;{\&quot;message\&quot;: \&quot;Status zamówienia zaktualizowany na &quot; + status + &quot;\&quot;}&quot;);</span>
+    }
+    
+   
+@GetMapping(&quot;/customer&quot;)
+@Transactional(readOnly = true)  // utrzymuje sesję do końca mapowania
+public ResponseEntity&lt;List&lt;OrderDTO&gt;&gt; getOrdersByCustomer(@RequestHeader(&quot;userId&quot;) Long userId) {
+    // Dociągamy zamówienia z fetch join, żeby mieć wszystkie potrzebne dane
+<span class="nc" id="L154">    List&lt;Orders&gt; orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);</span>
+
+    // Mapujemy na DTO
+<span class="nc" id="L157">    List&lt;OrderDTO&gt; orderDTOs = orders.stream()</span>
+<span class="nc" id="L158">            .map(this::mapToDTO)</span>
+<span class="nc" id="L159">            .toList();</span>
+
+<span class="nc" id="L161">    return ResponseEntity.ok(orderDTOs);</span>
+}
+
+
+
+ 
+@Transactional(readOnly = true)
+@GetMapping(&quot;/user-orders&quot;)
+public ResponseEntity&lt;List&lt;OrderDTO&gt;&gt; getUserOrders(@RequestHeader(&quot;userId&quot;) Long userId) {
+<span class="nc bnc" id="L170" title="All 2 branches missed.">    if (userId == null) {</span>
+<span class="nc" id="L171">        return ResponseEntity.badRequest().build();</span>
+    }
+
+    // Dociągamy zamówienia z repozytorium
+<span class="nc" id="L175">    List&lt;Orders&gt; orders = orderRepository.findTop5ByUserIdOrderByOrderDateDesc(userId);</span>
+
+    // Mapujemy na DTO
+<span class="nc" id="L178">    List&lt;OrderDTO&gt; orderDTOs = orders.stream()</span>
+<span class="nc" id="L179">            .map(this::mapToDTO)</span>
+<span class="nc" id="L180">            .toList();</span>
+
+<span class="nc" id="L182">    return ResponseEntity.ok(orderDTOs);</span>
+}
+    
+   // Endpoint do sprawdzania, czy produkt może być usunięty
+@GetMapping(&quot;/order-items/check/{productId}&quot;)
+public ResponseEntity&lt;Map&lt;String, Boolean&gt;&gt; checkProductDeletion(@PathVariable Long productId) {
+    try {
+<span class="nc" id="L189">        long count = orderRepository.countByOrderItems_Product_Id(productId);</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">        boolean canDelete = count == 0; // Jeśli liczba zależności wynosi 0, produkt może zostać usunięty</span>
+
+<span class="nc" id="L192">        Map&lt;String, Boolean&gt; response = Map.of(&quot;canDelete&quot;, canDelete);</span>
+<span class="nc" id="L193">        return ResponseEntity.ok(response);  // Zwracamy odpowiedź z informacją, czy produkt może zostać usunięty</span>
+<span class="nc" id="L194">    } catch (Exception e) {</span>
+        // Obsługuje błąd w przypadku nieoczekiwanych problemów
+<span class="nc" id="L196">        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(&quot;error&quot;, true));</span>
+    }
+}
+
+
+@PostMapping(&quot;/create&quot;)
+public ResponseEntity&lt;Orders&gt; createOrder(@RequestBody Orders orderRequest) {
+    // Pobranie użytkownika składającego zamówienie
+<span class="nc" id="L204">    User buyer = userRepository.findById(orderRequest.getUser().getId())</span>
+<span class="nc" id="L205">            .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;Buyer not found&quot;));</span>
+
+    // Pobranie sprzedawcy
+<span class="nc" id="L208">    User seller = userRepository.findById(orderRequest.getSeller().getId())</span>
+<span class="nc" id="L209">            .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;Seller not found&quot;));</span>
+
+    // Tworzenie nowego zamówienia
+<span class="nc" id="L212">    Orders order = new Orders();</span>
+<span class="nc" id="L213">    order.setUser(buyer);</span>
+<span class="nc" id="L214">    order.setSeller(seller);</span>
+<span class="nc" id="L215">    order.setOrderDate(LocalDateTime.now());</span>
+<span class="nc" id="L216">    order.setTotalPrice(orderRequest.getTotalPrice());</span>
+    
+    // Ustawienie statusu na 'Nowe' jeśli nie jest przekazany
+<span class="nc bnc" id="L219" title="All 2 branches missed.">    order.setStatus(orderRequest.getStatus() != null ? orderRequest.getStatus() : &quot;Nowe&quot;);</span>
+<span class="nc" id="L220">    order.setShippingAddress(orderRequest.getShippingAddress());</span>
+
+    // Zapisanie zamówienia do bazy
+<span class="nc" id="L223">    order = orderRepository.save(order);</span>
+
+    // Tworzenie pozycji zamówienia
+<span class="nc bnc" id="L226" title="All 2 branches missed.">    for (OrderItem orderItemRequest : orderRequest.getOrderItems()) {</span>
+<span class="nc" id="L227">        Product product = productRepository.findById(orderItemRequest.getProduct().getId())</span>
+<span class="nc" id="L228">                .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;Product not found&quot;));</span>
+
+<span class="nc" id="L230">        OrderItem orderItem = new OrderItem();</span>
+<span class="nc" id="L231">        orderItem.setOrder(order);</span>
+<span class="nc" id="L232">        orderItem.setProduct(product);</span>
+<span class="nc" id="L233">        orderItem.setQuantity(orderItemRequest.getQuantity());</span>
+<span class="nc" id="L234">        orderItem.setPrice(orderItemRequest.getPrice());</span>
+
+        // Zapisanie pozycji zamówienia
+<span class="nc" id="L237">        orderItemRepository.save(orderItem);</span>
+<span class="nc" id="L238">    }</span>
+
+    // Zwrócenie utworzonego zamówienia
+<span class="nc" id="L241">    return ResponseEntity.status(HttpStatus.CREATED).body(order);</span>
+}
+
+
+
+
+   // Endpoint do pobierania wszystkich zamówień
+@Transactional(readOnly = true)
+@GetMapping(&quot;/admin&quot;)
+public ResponseEntity&lt;List&lt;OrderDTO&gt;&gt; getAllOrdersForAdmin() {
+
+    // Pobierz wszystkie zamówienia
+<span class="nc" id="L253">    List&lt;Orders&gt; orders = orderRepository.findAll();</span>
+
+    // Zmapuj na DTO (unikamy LazyInitializationException)
+<span class="nc" id="L256">    List&lt;OrderDTO&gt; orderDTOs = orders.stream()</span>
+<span class="nc" id="L257">            .map(this::mapToDTO)</span>
+<span class="nc" id="L258">            .toList();</span>
+
+<span class="nc" id="L260">    return ResponseEntity.ok(orderDTOs);</span>
+}
+
+
+   // Endpoint do aktualizacji statusu zamówienia
+   @PutMapping(&quot;/admin/{orderId}/status&quot;)
+   public Orders updateOrderStatus(@PathVariable Long orderId, @RequestBody Orders order) {
+<span class="nc" id="L267">       Orders existingOrder = orderRepository.findById(orderId)</span>
+<span class="nc" id="L268">               .orElseThrow(() -&gt; new RuntimeException(&quot;Zamówienie nie zostało znalezione&quot;));</span>
+
+<span class="nc" id="L270">       existingOrder.setStatus(order.getStatus());</span>
+<span class="nc" id="L271">       return orderRepository.save(existingOrder);</span>
+   }
+
+}
+
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

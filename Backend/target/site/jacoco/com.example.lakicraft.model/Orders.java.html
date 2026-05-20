@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Orders.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">lakicraft</a> &gt; <a href="index.source.html" class="el_package">com.example.lakicraft.model</a> &gt; <span class="el_source">Orders.java</span></div><h1>Orders.java</h1><pre class="source lang-java linenums">package com.example.lakicraft.model;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+<span class="nc" id="L24">@Setter</span>
+
+@Entity
+<span class="fc" id="L27">public class Orders {</span>
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="nc" id="L30">    private Long id;</span>
+    
+    @ManyToOne
+    @JoinColumn(name = &quot;product_id&quot;)
+<span class="nc" id="L34">    private Product product;</span>
+
+    @ManyToOne
+    @JoinColumn(name = &quot;user_id&quot;, nullable = false)
+<span class="nc" id="L38">    private User user; // Powiązanie z tabelą User, który złożył zamówienie</span>
+    
+    @Column(nullable = false)
+<span class="nc" id="L41">    private LocalDateTime orderDate;</span>
+
+    @Column(nullable = false)
+<span class="nc" id="L44">    private BigDecimal totalPrice;</span>
+
+    @Column(nullable = false)
+<span class="nc" id="L47">    private String status;</span>
+
+    @Column(nullable = false)
+<span class="nc" id="L50">    private String shippingAddress;</span>
+
+    @OneToMany(mappedBy = &quot;order&quot;, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+<span class="nc" id="L54">    private List&lt;OrderItem&gt; orderItems;</span>
+
+    
+
+    // Nowe pole powiązania z użytkownikiem pełniącym rolę sprzedawcy
+    @ManyToOne
+    @JoinColumn(name = &quot;seller_id&quot;, nullable = false)
+<span class="nc" id="L61">    private User seller; // Powiązanie z tabelą User, który pełni rolę sprzedawcy</span>
+
+
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

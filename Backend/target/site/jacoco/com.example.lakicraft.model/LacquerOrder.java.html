@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LacquerOrder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">lakicraft</a> &gt; <a href="index.source.html" class="el_package">com.example.lakicraft.model</a> &gt; <span class="el_source">LacquerOrder.java</span></div><h1>LacquerOrder.java</h1><pre class="source lang-java linenums">package com.example.lakicraft.model;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@Getter
+<span class="nc" id="L16">@Setter</span>
+@Entity
+<span class="fc" id="L18">public class LacquerOrder {</span>
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="nc" id="L23">    private Long id;</span>
+
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = &quot;id&quot;)
+    @ManyToOne
+    @JoinColumn(name = &quot;user_id&quot;, nullable = false)
+<span class="nc" id="L28">    private User client; // Użytkownik składający zamówienie</span>
+
+    @Column(nullable = false)
+<span class="nc" id="L31">    private String lacquer; // Wybrany lakier</span>
+
+    @Column(nullable = false)
+<span class="nc" id="L34">    private LocalDateTime orderDate; // Data zamówienia</span>
+
+    @Column(nullable = false)
+<span class="nc" id="L37">    private BigDecimal totalPrice; // Cena całkowita za lakierowanie</span>
+
+    @Column(nullable = false)
+<span class="nc" id="L40">    private String status; // Status zamówienia (np. &quot;w trakcie&quot;, &quot;zrealizowane&quot;)</span>
+
+    @Column(nullable = false)
+<span class="nc" id="L43">    private String shippingAddress; // Adres dostawy</span>
+
+    @JsonIdentityReference
+    @ManyToOne
+    @JoinColumn(name = &quot;carpenter_id&quot;, nullable = false) // Stolarz zamawiający lakierowanie
+<span class="nc" id="L48">    private User carpenter; </span>
+
+    @ManyToOne
+    @JoinColumn(name = &quot;appointment_id&quot;, nullable = true) // Relacja do Appointment
+<span class="nc" id="L52">    private Appointment appointment;</span>
+
+    @JsonDeserialize
+    @Column(nullable = false)
+<span class="nc" id="L56">    private Double paintingMeters; // Liczba metrów malowania</span>
+
+    // Opcjonalna metoda do obliczania ceny na podstawie metry
+    public void calculateTotalPrice(BigDecimal pricePerMeter) {
+<span class="nc bnc" id="L60" title="All 4 branches missed.">        if (this.paintingMeters != null &amp;&amp; pricePerMeter != null) {</span>
+<span class="nc" id="L61">            this.totalPrice = pricePerMeter.multiply(new BigDecimal(this.paintingMeters));</span>
+        }
+<span class="nc" id="L63">    }</span>
+    
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

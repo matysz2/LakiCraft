@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Sale.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">lakicraft</a> &gt; <a href="index.source.html" class="el_package">com.example.lakicraft.model</a> &gt; <span class="el_source">Sale.java</span></div><h1>Sale.java</h1><pre class="source lang-java linenums">package com.example.lakicraft.model;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Entity
+public class Sale {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    private Long userId;  // Zmieniamy na Long dla lepszego dopasowania z bazą danych
+
+    @ManyToOne
+    @JoinColumn(name = &quot;product_id&quot;, referencedColumnName = &quot;id&quot;, nullable = false)  // Relacja z Product
+    private Product product;
+
+    private BigDecimal amount;  // Zmieniamy na BigDecimal dla dokładniejszych obliczeń
+    private BigDecimal totalPrice;  // Zmieniamy na BigDecimal
+
+    private LocalDateTime saleDate;
+
+    // Konstruktor domyślny
+<span class="fc" id="L31">    public Sale() {</span>
+<span class="fc" id="L32">    }</span>
+
+    // Konstruktor z parametrami
+<span class="nc" id="L35">    public Sale(Long userId, Product product, BigDecimal amount, BigDecimal totalPrice, LocalDateTime saleDate) {</span>
+<span class="nc" id="L36">        this.userId = userId;</span>
+<span class="nc" id="L37">        this.product = product;</span>
+<span class="nc" id="L38">        this.amount = amount;</span>
+<span class="nc" id="L39">        this.totalPrice = totalPrice;</span>
+<span class="nc" id="L40">        this.saleDate = saleDate;</span>
+<span class="nc" id="L41">    }</span>
+
+    // Gettery i settery
+    public int getId() {
+<span class="nc" id="L45">        return id;</span>
+    }
+
+    public void setId(int id) {
+<span class="nc" id="L49">        this.id = id;</span>
+<span class="nc" id="L50">    }</span>
+
+    public Long getUserId() {
+<span class="nc" id="L53">        return userId;</span>
+    }
+
+    public void setUserId(Long userId) {
+<span class="nc" id="L57">        this.userId = userId;</span>
+<span class="nc" id="L58">    }</span>
+
+    public Product getProduct() {
+<span class="nc" id="L61">        return product;</span>
+    }
+
+    public void setProduct(Product product) {
+<span class="nc" id="L65">        this.product = product;</span>
+<span class="nc" id="L66">    }</span>
+
+    public BigDecimal getAmount() {
+<span class="nc" id="L69">        return amount;</span>
+    }
+
+    public void setAmount(BigDecimal amount) {
+<span class="nc" id="L73">        this.amount = amount;</span>
+<span class="nc" id="L74">    }</span>
+
+    public BigDecimal getTotalPrice() {
+<span class="nc" id="L77">        return totalPrice;</span>
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+<span class="nc" id="L81">        this.totalPrice = totalPrice;</span>
+<span class="nc" id="L82">    }</span>
+
+    public LocalDateTime getSaleDate() {
+<span class="nc" id="L85">        return saleDate;</span>
+    }
+
+    public void setSaleDate(LocalDateTime saleDate) {
+<span class="nc" id="L89">        this.saleDate = saleDate;</span>
+<span class="nc" id="L90">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

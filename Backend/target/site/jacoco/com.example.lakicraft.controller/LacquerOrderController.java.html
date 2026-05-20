@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pl"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LacquerOrderController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">lakicraft</a> &gt; <a href="index.source.html" class="el_package">com.example.lakicraft.controller</a> &gt; <span class="el_source">LacquerOrderController.java</span></div><h1>LacquerOrderController.java</h1><pre class="source lang-java linenums">package com.example.lakicraft.controller;
+
+import com.example.lakicraft.model.Appointment;
+import com.example.lakicraft.model.LacquerOrder;
+import com.example.lakicraft.model.User;
+import com.example.lakicraft.repository.AppointmentRepository;
+import com.example.lakicraft.repository.LacquerOrderRepository;
+import com.example.lakicraft.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@RestController
+@RequestMapping(&quot;&quot;)
+public class LacquerOrderController {
+
+    private final LacquerOrderRepository lacquerOrderRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+    @Autowired
+<span class="fc" id="L35">    public LacquerOrderController(LacquerOrderRepository lacquerOrderRepository) {</span>
+<span class="fc" id="L36">        this.lacquerOrderRepository = lacquerOrderRepository;</span>
+<span class="fc" id="L37">    }</span>
+
+    // Pobranie wszystkich zamówień lakierowania
+    @GetMapping(&quot;/api/lacquer-orders&quot;)
+    public List&lt;LacquerOrder&gt; getAllLacquerOrders() {
+<span class="nc" id="L42">        return lacquerOrderRepository.findAll();</span>
+    }
+
+    // Pobranie oczekujących zamówień lakierowania (status &quot;nowe&quot;)
+    @GetMapping(&quot;/{userId}/pending&quot;)
+    public List&lt;LacquerOrder&gt; getNewLacquerOrdersByUser(@PathVariable Long userId) {
+<span class="nc" id="L48">        return lacquerOrderRepository.findByClientIdAndStatus(userId, &quot;nowe&quot;);</span>
+    }
+
+    // Pobranie zamówień lakierowania danego użytkownika (klienta)
+    @GetMapping(&quot;/api/lacquerOrders/user/{userId}&quot;)
+    public List&lt;LacquerOrder&gt; getLacquerOrdersByUser(@PathVariable Long userId) {
+<span class="nc" id="L54">        return lacquerOrderRepository.findByClientIdOrderByIdDesc(userId);</span>
+    }
+
+    // Aktualizacja statusu zamówienia lakierowania
+    @PutMapping(&quot;/{orderId}/status&quot;)
+    public ResponseEntity&lt;?&gt; updateLacquerOrderStatus(@PathVariable Long orderId, @RequestBody Map&lt;String, String&gt; body) {
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (!body.containsKey(&quot;status&quot;)) {</span>
+<span class="nc" id="L61">            return ResponseEntity.badRequest().body(Map.of(&quot;error&quot;, &quot;Brak pola 'status' w żądaniu.&quot;));</span>
+        }
+
+<span class="nc" id="L64">        String status = body.get(&quot;status&quot;);</span>
+<span class="nc" id="L65">        Optional&lt;LacquerOrder&gt; optionalOrder = lacquerOrderRepository.findById(orderId);</span>
+
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        if (optionalOrder.isEmpty()) {</span>
+<span class="nc" id="L68">            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(&quot;error&quot;, &quot;Zamówienie lakierowania o ID &quot; + orderId + &quot; nie istnieje.&quot;));</span>
+        }
+
+<span class="nc" id="L71">        LacquerOrder order = optionalOrder.get();</span>
+<span class="nc" id="L72">        order.setStatus(status);</span>
+<span class="nc" id="L73">        lacquerOrderRepository.save(order);</span>
+
+<span class="nc" id="L75">        return ResponseEntity.ok().body(Map.of(&quot;message&quot;, &quot;Status zamówienia zaktualizowany na: &quot; + status));</span>
+    }
+
+    // Pobranie zleceń lakierowania przypisanych do stolarza
+    @GetMapping(&quot;/{userId}/painting-orders&quot;)
+    public List&lt;LacquerOrder&gt; getPaintingOrdersByUser(@PathVariable Long userId) {
+<span class="nc" id="L81">        return lacquerOrderRepository.findByCarpenterId(userId);</span>
+    }
+
+    // Pobranie wszystkich nowych zamówień
+    @GetMapping(&quot;/api/lacquerOrders/new&quot;)
+    public List&lt;LacquerOrder&gt; getNewLacquerOrders() {
+<span class="nc" id="L87">        return lacquerOrderRepository.findByStatus(&quot;nowe&quot;);</span>
+    }
+
+    // Pobranie zamówień według stolarza, posortowanych malejąco po ID
+    @GetMapping(&quot;/carpenter/{carpenterId}&quot;)
+    public ResponseEntity&lt;List&lt;LacquerOrder&gt;&gt; getOrdersByCarpenter(@PathVariable Long carpenterId) {
+<span class="nc" id="L93">        List&lt;LacquerOrder&gt; orders = lacquerOrderRepository.findByCarpenterIdOrderByIdDesc(carpenterId);</span>
+<span class="nc" id="L94">        return ResponseEntity.ok(orders);</span>
+    }
+
+    // Usuwanie zamówienia
+    @DeleteMapping(&quot;/api/lacquerOrders/{orderId}&quot;)
+    public ResponseEntity&lt;Void&gt; deleteOrder(@PathVariable Long orderId) {
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        if (lacquerOrderRepository.existsById(orderId)) {</span>
+<span class="nc" id="L101">            lacquerOrderRepository.deleteById(orderId);</span>
+<span class="nc" id="L102">            return ResponseEntity.noContent().build();</span>
+        } else {
+<span class="nc" id="L104">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+    // Tworzenie zamówienia lakierowania
+    @PostMapping(&quot;/api/lacquer-orders&quot;)
+    public ResponseEntity&lt;?&gt; createLacquerOrder(@RequestBody LacquerOrder lacquerOrderRequest) {
+        try {
+<span class="nc bnc" id="L112" title="All 4 branches missed.">            if (lacquerOrderRequest.getAppointment() == null || lacquerOrderRequest.getAppointment().getId() == null) {</span>
+<span class="nc" id="L113">                return ResponseEntity.badRequest().body(&quot;AppointmentId is required&quot;);</span>
+            }
+
+<span class="nc" id="L116">            Appointment appointment = appointmentRepository.findById(lacquerOrderRequest.getAppointment().getId())</span>
+<span class="nc" id="L117">                    .orElseThrow(() -&gt; new RuntimeException(&quot;Appointment not found&quot;));</span>
+
+<span class="nc" id="L119">            appointment.setStatus(&quot;Zajęty&quot;);</span>
+<span class="nc" id="L120">            appointmentRepository.save(appointment);</span>
+
+<span class="nc bnc" id="L122" title="All 2 branches missed.">            if (lacquerOrderRequest.getClient() == null) {</span>
+<span class="nc" id="L123">                return ResponseEntity.badRequest().body(&quot;Client is required&quot;);</span>
+            }
+<span class="nc bnc" id="L125" title="All 2 branches missed.">            if (lacquerOrderRequest.getCarpenter() == null) {</span>
+<span class="nc" id="L126">                return ResponseEntity.badRequest().body(&quot;Carpenter is required&quot;);</span>
+            }
+
+<span class="nc" id="L129">            User client = userRepository.findById(lacquerOrderRequest.getClient().getId())</span>
+<span class="nc" id="L130">                    .orElseThrow(() -&gt; new RuntimeException(&quot;Client not found&quot;));</span>
+<span class="nc" id="L131">            User carpenter = userRepository.findById(lacquerOrderRequest.getCarpenter().getId())</span>
+<span class="nc" id="L132">                    .orElseThrow(() -&gt; new RuntimeException(&quot;Carpenter not found&quot;));</span>
+
+<span class="nc" id="L134">            lacquerOrderRequest.setAppointment(appointment);</span>
+<span class="nc" id="L135">            lacquerOrderRequest.setClient(client);</span>
+<span class="nc" id="L136">            lacquerOrderRequest.setCarpenter(carpenter);</span>
+
+<span class="nc" id="L138">            BigDecimal totalPrice = new BigDecimal(lacquerOrderRequest.getPaintingMeters()).multiply(new BigDecimal(&quot;10&quot;));</span>
+<span class="nc" id="L139">            lacquerOrderRequest.setTotalPrice(totalPrice);</span>
+
+<span class="nc" id="L141">            LacquerOrder lacquerOrder = lacquerOrderRepository.save(lacquerOrderRequest);</span>
+<span class="nc" id="L142">            return ResponseEntity.ok(lacquerOrder);</span>
+<span class="nc" id="L143">        } catch (RuntimeException e) {</span>
+<span class="nc" id="L144">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(&quot;Error: &quot; + e.getMessage());</span>
+<span class="nc" id="L145">        } catch (Exception e) {</span>
+<span class="nc" id="L146">            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(&quot;Unexpected error: &quot; + e.getMessage());</span>
+        }
+    }
+
+    // NOWY ENDPOINT - zwraca URL-e obrazków potrzebnych na frontendzie
+    @GetMapping(&quot;/api/lacquer-order-images&quot;)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; getLacquerOrderImages() {
+<span class="nc" id="L153">        String baseUrl = System.getenv(&quot;APP_URL&quot;);</span>
+<span class="nc bnc" id="L154" title="All 4 branches missed.">        if (baseUrl == null || baseUrl.isBlank()) {</span>
+<span class="nc" id="L155">            baseUrl = &quot;https://localhost:8080&quot;;</span>
+        }
+
+<span class="nc" id="L158">        Map&lt;String, String&gt; images = Map.of(</span>
+                &quot;lacquerOrders&quot;, baseUrl + &quot;/uploads/paint.webp&quot;,
+                &quot;lacquerHistory&quot;, baseUrl + &quot;/uploads/empty.webp&quot;
+        );
+
+<span class="nc" id="L163">        return ResponseEntity.ok(images);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
