@@ -1,8 +1,8 @@
 com\example\lakicraft\service\UserServiceTest.class
+com\example\lakicraft\service\PasswordServiceTest.class
+com\example\lakicraft\model\ProductTest.class
 com\example\lakicraft\BaseIntegrationTest.class
 com\example\lakicraft\LakicraftApplicationTests.class
-com\example\lakicraft\service\PasswordServiceTest.class
 com\example\lakicraft\controller\UserControllerIT.class
-com\example\lakicraft\model\ProductTest.class
 com\example\lakicraft\BaseUnitTest.class
 com\example\lakicraft\controller\ProductControllerIT.class

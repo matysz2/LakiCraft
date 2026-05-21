@@ -39,25 +39,25 @@ public class UserController {
 
     @GetMapping(&quot;/test&quot;)
     public String hello() {
-<span class="nc" id="L42">        return &quot;Działa!&quot;;</span>
+<span class="fc" id="L42">        return &quot;Działa!&quot;;</span>
     }
 
 @PostMapping(&quot;/login&quot;)
 public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; login(@RequestBody Map&lt;String, String&gt; loginRequest) {
-<span class="nc" id="L47">    String email = loginRequest.get(&quot;email&quot;);</span>
-<span class="nc" id="L48">    String password = loginRequest.get(&quot;password&quot;);</span>
+<span class="fc" id="L47">    String email = loginRequest.get(&quot;email&quot;);</span>
+<span class="fc" id="L48">    String password = loginRequest.get(&quot;password&quot;);</span>
 
-<span class="nc" id="L50">    Optional&lt;User&gt; optionalUser = userRepository.findByEmail(email);</span>
+<span class="fc" id="L50">    Optional&lt;User&gt; optionalUser = userRepository.findByEmail(email);</span>
 
-<span class="nc bnc" id="L52" title="All 2 branches missed.">    if (optionalUser.isPresent()) {</span>
-<span class="nc" id="L53">        User user = optionalUser.get();</span>
-<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (passwordService.checkPassword(password, user.getPassword())) {</span>
-<span class="nc" id="L55">            return ResponseEntity.ok(Map.of(&quot;message&quot;, &quot;Zalogowano pomyślnie&quot;, &quot;user&quot;, user));</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">    if (optionalUser.isPresent()) {</span>
+<span class="fc" id="L53">        User user = optionalUser.get();</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (passwordService.checkPassword(password, user.getPassword())) {</span>
+<span class="fc" id="L55">            return ResponseEntity.ok(Map.of(&quot;message&quot;, &quot;Zalogowano pomyślnie&quot;, &quot;user&quot;, user));</span>
         } else {
-<span class="nc" id="L57">            return ResponseEntity.status(401).body(Map.of(&quot;message&quot;, &quot;Nieprawidłowe hasło&quot;));</span>
+<span class="fc" id="L57">            return ResponseEntity.status(401).body(Map.of(&quot;message&quot;, &quot;Nieprawidłowe hasło&quot;));</span>
         }
     } else {
-<span class="nc" id="L60">        return ResponseEntity.status(404).body(Map.of(&quot;message&quot;, &quot;Użytkownik o podanym e-mailu nie istnieje&quot;));</span>
+<span class="fc" id="L60">        return ResponseEntity.status(404).body(Map.of(&quot;message&quot;, &quot;Użytkownik o podanym e-mailu nie istnieje&quot;));</span>
     }
 }
 

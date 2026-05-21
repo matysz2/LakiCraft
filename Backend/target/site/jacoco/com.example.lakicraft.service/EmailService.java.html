@@ -2,7 +2,6 @@
 
 import jakarta.mail.MessagingException; // Import dla MessagingException
 import jakarta.mail.internet.MimeMessage;  // Import dla MimeMessage
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.MailException;
@@ -10,26 +9,29 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 @Service
-<span class="fc" id="L13">public class EmailService {</span>
+public class EmailService {
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
+
+<span class="fc" id="L16">    public EmailService(JavaMailSender javaMailSender) {</span>
+<span class="fc" id="L17">        this.javaMailSender = javaMailSender;</span>
+<span class="fc" id="L18">    }</span>
 
     public String sendEmail(String toEmail, String subject, String message, String fromEmail, String userName) {
         try {
             // Tworzenie obiektu wiadomości
-<span class="nc" id="L21">            SimpleMailMessage mailMessage = new SimpleMailMessage();</span>
-<span class="nc" id="L22">            mailMessage.setFrom(&quot;matysz21@wp.pl&quot;); // Twój adres jako nadawca</span>
-<span class="nc" id="L23">            mailMessage.setTo(toEmail); // Adres odbiorcy (np. Twój e-mail)</span>
-<span class="nc" id="L24">            mailMessage.setSubject(subject); // Temat wiadomości</span>
-<span class="nc" id="L25">            mailMessage.setText(&quot;Wiadomość od: &quot; + userName + &quot; (&quot; + fromEmail + &quot;)\n\n&quot; + message); // Treść wiadomości z imieniem i adresem</span>
+<span class="fc" id="L23">            SimpleMailMessage mailMessage = new SimpleMailMessage();</span>
+<span class="fc" id="L24">            mailMessage.setFrom(&quot;matysz21@wp.pl&quot;); // Twój adres jako nadawca</span>
+<span class="fc" id="L25">            mailMessage.setTo(toEmail); // Adres odbiorcy (np. Twój e-mail)</span>
+<span class="fc" id="L26">            mailMessage.setSubject(subject); // Temat wiadomości</span>
+<span class="fc" id="L27">            mailMessage.setText(&quot;Wiadomość od: &quot; + userName + &quot; (&quot; + fromEmail + &quot;)\n\n&quot; + message); // Treść wiadomości z imieniem i adresem</span>
     
             // Wysyłanie e-maila
-<span class="nc" id="L28">            javaMailSender.send(mailMessage);</span>
-<span class="nc" id="L29">            return &quot;Email wysłany pomyślnie&quot;;</span>
-<span class="nc" id="L30">        } catch (Exception e) {</span>
+<span class="fc" id="L30">            javaMailSender.send(mailMessage);</span>
+<span class="fc" id="L31">            return &quot;Email wysłany pomyślnie&quot;;</span>
+<span class="fc" id="L32">        } catch (Exception e) {</span>
             // W przypadku błędu
-<span class="nc" id="L32">            return &quot;Błąd wysyłania e-maila: &quot; + e.getMessage();</span>
+<span class="fc" id="L34">            return &quot;Błąd wysyłania e-maila: &quot; + e.getMessage();</span>
         }
     }
     

@@ -104,46 +104,46 @@ public class OrderController {
     @PutMapping(&quot;/{orderId}/status&quot;)
     public ResponseEntity&lt;String&gt; updateOrderStatus(@PathVariable Long orderId, @RequestBody Map&lt;String, Object&gt; requestBody) {
         // Pobranie statusu i userId z ciała żądania
-<span class="nc" id="L107">        String status = (String) requestBody.get(&quot;status&quot;);</span>
+<span class="fc" id="L107">        String status = (String) requestBody.get(&quot;status&quot;);</span>
         
         // Rzutowanie userId na Long, jeśli jest typu Integer
-<span class="nc bnc" id="L110" title="All 2 branches missed.">        Long userId = (requestBody.get(&quot;userId&quot;) instanceof Integer) </span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">        Long userId = (requestBody.get(&quot;userId&quot;) instanceof Integer) </span>
 <span class="nc" id="L111">                        ? Long.valueOf((Integer) requestBody.get(&quot;userId&quot;))</span>
-<span class="nc" id="L112">                        : (Long) requestBody.get(&quot;userId&quot;);</span>
+<span class="fc" id="L112">                        : (Long) requestBody.get(&quot;userId&quot;);</span>
     
         // Definicja dozwolonych statusów
-<span class="nc" id="L115">        List&lt;String&gt; validStatuses = Arrays.asList(&quot;Nowe&quot;, &quot;W realizacji&quot;, &quot;Zrealizowane&quot;);</span>
+<span class="fc" id="L115">        List&lt;String&gt; validStatuses = Arrays.asList(&quot;Nowe&quot;, &quot;W realizacji&quot;, &quot;Zrealizowane&quot;);</span>
     
         // Sprawdzamy, czy status jest jednym z dozwolonych
-<span class="nc bnc" id="L118" title="All 4 branches missed.">        if (status == null || !validStatuses.contains(status)) {</span>
+<span class="pc bpc" id="L118" title="2 of 4 branches missed.">        if (status == null || !validStatuses.contains(status)) {</span>
 <span class="nc" id="L119">            return ResponseEntity.status(400).body(&quot;{\&quot;error\&quot;: \&quot;Nieznany lub brakujący status\&quot;}&quot;);</span>
         }
     
         // Pobierz zamówienie
-<span class="nc" id="L123">        Orders order = orderRepository.findById(orderId).orElse(null);</span>
-<span class="nc bnc" id="L124" title="All 2 branches missed.">        if (order == null) {</span>
+<span class="fc" id="L123">        Orders order = orderRepository.findById(orderId).orElse(null);</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">        if (order == null) {</span>
 <span class="nc" id="L125">            return ResponseEntity.status(404).body(&quot;{\&quot;error\&quot;: \&quot;Zamówienie nie znalezione\&quot;}&quot;);</span>
         }
     
         // Aktualizacja statusu zamówienia
-<span class="nc" id="L129">        order.setStatus(status);</span>
-<span class="nc" id="L130">        orderRepository.save(order);</span>
+<span class="fc" id="L129">        order.setStatus(status);</span>
+<span class="fc" id="L130">        orderRepository.save(order);</span>
     
         // Jeśli status to &quot;Zrealizowane&quot;, zapisz dane do tabeli Sale
-<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (&quot;Zrealizowane&quot;.equals(status)) {</span>
-<span class="nc bnc" id="L134" title="All 2 branches missed.">            for (OrderItem orderItem : order.getOrderItems()) {</span>
-<span class="nc" id="L135">                Sale sale = new Sale();</span>
-<span class="nc" id="L136">                sale.setUserId(userId);  // Używamy userId z requestBody</span>
-<span class="nc" id="L137">                sale.setProduct(orderItem.getProduct());</span>
-<span class="nc" id="L138">                sale.setAmount(BigDecimal.valueOf(orderItem.getQuantity()));</span>
-<span class="nc" id="L139">                sale.setTotalPrice(orderItem.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())));</span>
-<span class="nc" id="L140">                sale.setSaleDate(LocalDateTime.now());</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">        if (&quot;Zrealizowane&quot;.equals(status)) {</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">            for (OrderItem orderItem : order.getOrderItems()) {</span>
+<span class="fc" id="L135">                Sale sale = new Sale();</span>
+<span class="fc" id="L136">                sale.setUserId(userId);  // Używamy userId z requestBody</span>
+<span class="fc" id="L137">                sale.setProduct(orderItem.getProduct());</span>
+<span class="fc" id="L138">                sale.setAmount(BigDecimal.valueOf(orderItem.getQuantity()));</span>
+<span class="fc" id="L139">                sale.setTotalPrice(orderItem.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())));</span>
+<span class="fc" id="L140">                sale.setSaleDate(LocalDateTime.now());</span>
     
-<span class="nc" id="L142">                saleRepository.save(sale);</span>
-<span class="nc" id="L143">            }</span>
+<span class="fc" id="L142">                saleRepository.save(sale);</span>
+<span class="fc" id="L143">            }</span>
         }
     
-<span class="nc" id="L146">        return ResponseEntity.ok(&quot;{\&quot;message\&quot;: \&quot;Status zamówienia zaktualizowany na &quot; + status + &quot;\&quot;}&quot;);</span>
+<span class="fc" id="L146">        return ResponseEntity.ok(&quot;{\&quot;message\&quot;: \&quot;Status zamówienia zaktualizowany na &quot; + status + &quot;\&quot;}&quot;);</span>
     }
     
    
@@ -186,11 +186,11 @@ public ResponseEntity&lt;List&lt;OrderDTO&gt;&gt; getUserOrders(@RequestHeader(&
 @GetMapping(&quot;/order-items/check/{productId}&quot;)
 public ResponseEntity&lt;Map&lt;String, Boolean&gt;&gt; checkProductDeletion(@PathVariable Long productId) {
     try {
-<span class="nc" id="L189">        long count = orderRepository.countByOrderItems_Product_Id(productId);</span>
-<span class="nc bnc" id="L190" title="All 2 branches missed.">        boolean canDelete = count == 0; // Jeśli liczba zależności wynosi 0, produkt może zostać usunięty</span>
+<span class="fc" id="L189">        long count = orderRepository.countByOrderItems_Product_Id(productId);</span>
+<span class="pc bpc" id="L190" title="1 of 2 branches missed.">        boolean canDelete = count == 0; // Jeśli liczba zależności wynosi 0, produkt może zostać usunięty</span>
 
-<span class="nc" id="L192">        Map&lt;String, Boolean&gt; response = Map.of(&quot;canDelete&quot;, canDelete);</span>
-<span class="nc" id="L193">        return ResponseEntity.ok(response);  // Zwracamy odpowiedź z informacją, czy produkt może zostać usunięty</span>
+<span class="fc" id="L192">        Map&lt;String, Boolean&gt; response = Map.of(&quot;canDelete&quot;, canDelete);</span>
+<span class="fc" id="L193">        return ResponseEntity.ok(response);  // Zwracamy odpowiedź z informacją, czy produkt może zostać usunięty</span>
 <span class="nc" id="L194">    } catch (Exception e) {</span>
         // Obsługuje błąd w przypadku nieoczekiwanych problemów
 <span class="nc" id="L196">        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(&quot;error&quot;, true));</span>

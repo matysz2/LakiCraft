@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-<span class="nc" id="L24">@Setter</span>
+<span class="pc" id="L24">@Setter</span>
 
 @Entity
 <span class="fc" id="L27">public class Orders {</span>
@@ -44,14 +44,14 @@ import lombok.Setter;
 <span class="nc" id="L44">    private BigDecimal totalPrice;</span>
 
     @Column(nullable = false)
-<span class="nc" id="L47">    private String status;</span>
+<span class="fc" id="L47">    private String status;</span>
 
     @Column(nullable = false)
 <span class="nc" id="L50">    private String shippingAddress;</span>
 
     @OneToMany(mappedBy = &quot;order&quot;, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
-<span class="nc" id="L54">    private List&lt;OrderItem&gt; orderItems;</span>
+<span class="fc" id="L54">    private List&lt;OrderItem&gt; orderItems;</span>
 
     
 

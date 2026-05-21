@@ -2,7 +2,6 @@ package com.example.lakicraft.service;
 
 import jakarta.mail.MessagingException; // Import dla MessagingException
 import jakarta.mail.internet.MimeMessage;  // Import dla MimeMessage
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.MailException;
@@ -12,8 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
+
+    public EmailService(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
+    }
 
     public String sendEmail(String toEmail, String subject, String message, String fromEmail, String userName) {
         try {
