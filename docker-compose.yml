@@ -1,69 +1,114 @@
-version: '3.8'
-
 services:
-  # PostgreSQL Database
+  # ===================================================================
+  # 1. SERWIS BAZY DANYCH (PostgreSQL)
+  # ===================================================================
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: lakicraft-postgres
     environment:
-      POSTGRES_DB: railway
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: qzmLsevRkjVJKXzgAYlalCosmmrkxUWm
+      POSTGRES_DB: lakicraft_prod
+      POSTGRES_USER: lakicraft_user
+      POSTGRES_PASSWORD: lakicraft_secure_password
     ports:
-      - "5432:5432"
+      - "5444:5432" # Wystawiamy port na Windowsie (np. dla n8n), ale w sieci Dockera to 5432
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - lakicraft_db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U lakicraft_user -d lakicraft_prod"]
+      interval: 5s
       timeout: 5s
       retries: 5
     networks:
       - lakicraft-network
 
-  # Backend Service
+  # ===================================================================
+  # 2. SERWIS BACKENDU (Spring Boot)
+  # ===================================================================
   backend:
+    image: lakicraft-backend:latest
     build:
       context: ./Backend
       dockerfile: Dockerfile
-    container_name: lakicraft-backend
-    environment:
-      PORT: 8080
-      PGHOST: postgres
-      PGPORT: 5432
-      PGDATABASE: railway
-      PGUSER: root
-      PGPASSWORD: qzmLsevRkjVJKXzgAYlalCosmmrkxUWm
-      MAIL_USERNAME: ${MAIL_USERNAME:-test@example.com}
-      MAIL_PASSWORD: ${MAIL_PASSWORD:-password}
+    container_name: lakicraft-app-backend
     ports:
-      - "8080:8080"
+      - "8081:8080" # Mapowanie portu 8081 na komputerze na 8080 w kontenerze
+    environment:
+      - PORT=8080
+      - PGHOST=postgres
+      - PGPORT=5432
+      - PGDATABASE=lakicraft_prod
+      - PGUSER=lakicraft_user
+      - PGPASSWORD=lakicraft_secure_password
+      - MAIL_USERNAME=twoj_mail@wp.pl
+      - MAIL_PASSWORD=twoje_haslo_smtp
     depends_on:
       postgres:
-        condition: service_healthy
+        condition: service_healthy # Startuje dopiero, gdy baza pomyślnie przejdzie healthcheck
     networks:
       - lakicraft-network
-    restart: unless-stopped
 
-  # Frontend Service
+  # ===================================================================
+  # 3. SERWIS FRONTENDU (React + Vite + Nginx)
+  # ===================================================================
   frontend:
+    image: lakicraft-frontend:latest
     build:
       context: ./Frontend
       dockerfile: Dockerfile
-    container_name: lakicraft-frontend
-    environment:
-      - VITE_API_URL=http://backend:8080
+    container_name: lakicraft-app-frontend
     ports:
-      - "80:80"
+      - "3000:80" # Twoja aplikacja pod adresem http://localhost:3000
     depends_on:
       - backend
     networks:
       - lakicraft-network
-    restart: unless-stopped
 
-volumes:
-  postgres_data:
+  # ===================================================================
+  # 4. KONTENER TESTOWY DLA BACKENDU (Uruchamiany na żądanie)
+  # ===================================================================
+  backend-tests:
+    image: maven:3.9.6-eclipse-temurin-21-alpine
+    container_name: lakicraft-backend-tests
+    volumes:
+      - ./Backend:/app # Montowanie kodu na żywo z dysku
+      # Współdzielenie lokalnego cache Mavena, żeby nie pobierać bibliotek za każdym razem:
+      - C:\Users\matys\.m2\repository:/root/.m2/repository
+    working_dir: /app
+    command: mvn test
+    environment:
+      - PORT=8080
+      - PGHOST=postgres
+      - PGPORT=5432
+      - PGDATABASE=lakicraft_prod
+      - PGUSER=lakicraft_user
+      - PGPASSWORD=lakicraft_secure_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - tools # Profil sprawia, że ten kontener NIE uruchamia się automatycznie przy 'docker compose up'
+    networks:
+      - lakicraft-network
 
+  # ===================================================================
+  # 5. KONTENER TESTOWY DLA FRONTENDU (Uruchamiany na żądanie)
+  # ===================================================================
+  frontend-tests:
+    image: node:20-alpine
+    container_name: lakicraft-frontend-tests
+    volumes:
+      - ./Frontend:/app
+    working_dir: /app
+    command: npm run test -- --run # Wykonaj testy raz (nie przechodź w tryb ciągłego nasłuchiwania 'watch')
+    profiles:
+      - tools
+    networks:
+      - lakicraft-network
+
+# Definicje sieci i wolumenów
 networks:
   lakicraft-network:
     driver: bridge
+
+volumes:
+  lakicraft_db_data:

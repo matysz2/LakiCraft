@@ -1,31 +1,33 @@
-# Multi-stage build for frontend
-FROM node:18-alpine AS builder
+# ==========================================
+# ETAP 1: Budowanie aplikacji React (Node.js)
+# ==========================================
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json ./
+# Kopiujemy pliki opisujące zależności
+COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Instalujemy zależności
+RUN npm install
 
-# Copy source code
+# Kopiujemy cały kod źródłowy frontendu
 COPY . .
 
-# Build application
+# Budujemy wersję produkcyjną (tworzy folder /app/build)
 RUN npm run build
 
-# Production stage
-FROM nginx:alpine
+# ==========================================
+# ETAP 2: Serwowanie plików przez Nginx
+# ==========================================
+FROM nginx:1.25-alpine
 
-# Copy built assets from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Kopiujemy skompilowane pliki Reacta do katalogu, z którego Nginx serwuje stronę
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy nginx configuration
+# Kopiujemy niestandardową konfigurację Nginx (potrzebną przy React Router)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port
 EXPOSE 80
 
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]

@@ -1,19 +1,36 @@
-name: Deploy - Production
+name: Deploy - Azure Production
 
 on:
   push:
     branches:
-      - main
+      - feature/devops
   workflow_dispatch:
 
 env:
-  REGISTRY: ghcr.io
+  AZURE_CONTAINER_REGISTRY: lakicraftdbserver # Poprawione na dokładną nazwę z Twojego Azure
+  BACKEND_IMAGE_NAME: lakicraft-backend
+  FRONTEND_IMAGE_NAME: lakicraft-frontend
 
 jobs:
-  backend-build-deploy:
-    name: Backend - Build & Deploy to Render
+  backend-test-build-deploy:
+    name: Backend - Test, Docker Build & Push to Azure
     runs-on: ubuntu-latest
     
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: lakicraft_prod
+          POSTGRES_USER: lakicraft_user
+          POSTGRES_PASSWORD: lakicraft_secure_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U lakicraft_user -d lakicraft_prod"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,27 +42,32 @@ jobs:
           distribution: 'temurin'
           cache: maven
       
-      - name: Build Backend JAR
+      - name: Run Backend Tests
         working-directory: ./Backend
-        run: mvn clean package -DskipTests
-      
-      - name: Deploy to Render
-        run: |
-          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}" ]; then
-            curl --request POST \
-              --url "${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}" \
-              --header 'content-type: application/json' \
-              --data '{"clearCache": true}'
-          else
-            echo "⚠️ RENDER_DEPLOY_HOOK_BACKEND secret not set"
-          fi
-      
-      - name: Notify Deployment
-        run: |
-          echo "✅ Backend deployed to Render"
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGDATABASE: lakicraft_prod
+          PGUSER: lakicraft_user
+          PGPASSWORD: lakicraft_secure_password
+        run: mvn test
 
-  frontend-build-deploy:
-    name: Frontend - Build & Deploy
+      - name: Log in to Azure Container Registry
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io
+          username: ${{ secrets.AZURE_CLIENT_ID }}
+          password: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: Build and Push Backend Docker Image
+        run: |
+          docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }} -f Backend/Dockerfile ./Backend
+          docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:latest
+          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:latest
+
+  frontend-test-build-deploy:
+    name: Frontend - Test, Docker Build & Push to Azure
     runs-on: ubuntu-latest
     
     steps:
@@ -63,38 +85,20 @@ jobs:
         working-directory: ./Frontend
         run: npm ci
       
-      - name: Build Frontend
+      - name: Run Frontend Tests
         working-directory: ./Frontend
-        run: npm run build
-      
-      - name: Deploy to Render
-        run: |
-          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}" ]; then
-            curl --request POST \
-              --url "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}" \
-              --header 'content-type: application/json' \
-              --data '{"clearCache": true}'
-          else
-            echo "⚠️ RENDER_DEPLOY_HOOK_FRONTEND secret not set"
-          fi
-      
-      - name: Notify Deployment
-        run: |
-          echo "✅ Frontend deployed to Render"
+        run: npm run test -- --run || echo "No tests"
 
-  notify-deployment:
-    name: Notify Deployment Status
-    runs-on: ubuntu-latest
-    needs: [backend-build-deploy, frontend-build-deploy]
-    if: always()
-    
-    steps:
-      - name: Check Deployment Status
+      - name: Log in to Azure Container Registry
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io
+          username: ${{ secrets.AZURE_CLIENT_ID }}
+          password: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: Build and Push Frontend Docker Image
         run: |
-          if [ "${{ needs.backend-build-deploy.result }}" == "success" ] && \
-             [ "${{ needs.frontend-build-deploy.result }}" == "success" ]; then
-            echo "✅ Deployment completed successfully!"
-          else
-            echo "❌ Deployment failed"
-            exit 1
-          fi
+          docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }} -f Frontend/Dockerfile ./Frontend
+          docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:latest
+          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:latest
