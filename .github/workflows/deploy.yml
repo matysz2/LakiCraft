@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_CONTAINER_REGISTRY: lakicraftdbserver # Poprawione na dokładną nazwę z Twojego Azure
+  AZURE_CONTAINER_REGISTRY: lakicraftreg2026
   BACKEND_IMAGE_NAME: lakicraft-backend
   FRONTEND_IMAGE_NAME: lakicraft-frontend
 
