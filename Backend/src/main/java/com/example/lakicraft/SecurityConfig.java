@@ -2,6 +2,7 @@ package com.example.lakicraft;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer; // <--- DODAJ TEN IMPORT
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,11 +14,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())                // Wyłącz CSRF, jeśli masz REST API
+            // Włączamy obsługę CORS w Spring Security i każemy mu pobrać 
+            // konfigurację z WebConfig (allowedOriginPatterns("*"))
+            .cors(Customizer.withDefaults())                 
+            .csrf(csrf -> csrf.disable())                // Wyłącz CSRF dla REST API
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()                  // Wszystkie żądania dostępne publicznie, bez auth
+                .anyRequest().permitAll()                  // Wszystkie żądania dostępne publicznie
             );
-            // Nie dodajemy .httpBasic(), bo nie chcemy wymuszać uwierzytelniania
 
         return http.build();
     }

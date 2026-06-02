@@ -11,10 +11,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(
-                    "https://lakicraft.netlify.app", // produkcja
-                    "https://localhost:3000"          // lokalne dev
-                )
+                // Zmieniamy .allowedOrigins na .allowedOriginPatterns("*")
+                // Dzięki temu Spring Boot zaakceptuje Twój frontend na Azure, Netlify oraz localhost
+                // bez konieczności wpisywania każdego adresu z osobna.
+                .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
