@@ -5,16 +5,9 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Kopiujemy pliki opisujące zależności (dla optymalizacji cache warstw)
 COPY package*.json ./
-
-# Instalujemy zależności produkcyjnie (dokładnie wg package-lock.json)
 RUN npm ci
-
-# Kopiujemy cały kod źródłowy frontendu
 COPY . .
-
-# Budujemy wersję produkcyjną (dla Vite tworzy folder /app/dist)
 RUN npm run build
 
 # ==========================================
@@ -22,14 +15,11 @@ RUN npm run build
 # ==========================================
 FROM nginx:1.25-alpine
 
-# Usuwamy domyślną konfigurację Nginxa, aby nasza miała priorytet
-RUN rm /etc/nginx/conf.d/default.conf
-
-# Kopiujemy skompilowane pliki statyczne Reacta (z folderu /app/dist z Etapu 1)
+# Kopiujemy skompilowane pliki statyczne Reacta
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Kopiujemy naszą niestandardową konfigurację Nginx (z Reverse Proxy do Backend-u)
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# POPRAWKA: Nadpisujemy GŁÓWNY plik konfiguracyjny Nginxa naszym plikiem
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 
