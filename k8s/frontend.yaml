@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: lakicraft-frontend:latest
+          image: matysz21/lakicraft-frontend:latest
           ports:
             - containerPort: 80
 ---

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: lakicraft-backend:latest
+          image: matysz21/lakicraft-backend:latest
           ports:
             - containerPort: 8080
           env:
@@ -43,29 +43,22 @@ spec:
                 secretKeyRef:
                   name: lakicraft-secrets
                   key: mail-password
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 15
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 20
-            periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: lakicraft-backend-service
+  name: lakicraft-app-backend
   namespace: default
 spec:
   selector:
     app: lakicraft-backend
   ports:
-    - protocol: TCP
+    - name: port-8080
+      protocol: TCP
       port: 8080
+      targetPort: 8080
+    - name: port-80
+      protocol: TCP
+      port: 80
       targetPort: 8080
   type: ClusterIP
