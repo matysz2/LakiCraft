@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lakicraft-backend-deployment
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lakicraft-backend
+  template:
+    metadata:
+      labels:
+        app: lakicraft-backend
+    spec:
+      containers:
+        - name: backend
+          image: lakicraft-backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: PGHOST
+              value: "postgres"
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              value: "lakicraft_prod"
+            - name: PGUSER
+              value: "lakicraft_user"
+            # Bezpieczne wstrzykiwanie hasła bazy danych
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lakicraft-secrets
+                  key: db-password
+            - name: MAIL_USERNAME
+              value: "twoj_mail@wp.pl"
+            # Bezpieczne wstrzykiwanie hasła do skrzynki e-mail (SMTP)
+            - name: MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lakicraft-secrets
+                  key: mail-password
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lakicraft-backend-service
+  namespace: default
+spec:
+  selector:
+    app: lakicraft-backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP
