@@ -10,7 +10,6 @@ env:
   AZURE_CONTAINER_REGISTRY: lakicraftreg2026
   BACKEND_IMAGE_NAME: lakicraft-backend
   FRONTEND_IMAGE_NAME: lakicraft-frontend
-  # === TUTAJ WPISAŁEM TWOJE NAZWY ===
   AKS_CLUSTER_NAME: lakicraft-cluster
   AKS_RESOURCE_GROUP: lakicraft-rg
 
@@ -69,17 +68,12 @@ jobs:
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:latest
 
-      # === NOWY KROK: LOGOWANIE I WDROŻENIE BACKENDU DO AKS ===
-      - name: Log in to Azure CLI
-        uses: azure/login@v2
+      # === POPRAWIONE: LOGOWANIE BEZPOŚREDNIO PRZEZ PASZPORT KUBECONFIG ===
+      - name: Set Kubernetes Context
+        uses: azure/k8s-set-context@v3
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set AKS Context
-        uses: azure/aks-set-context@v3
-        with:
-          resource-group: ${{ env.AKS_RESOURCE_GROUP }}
-          cluster-name: ${{ env.AKS_CLUSTER_NAME }}
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBERNETES_SECRET }}
 
       - name: Deploy Backend to AKS
         run: |
@@ -126,17 +120,12 @@ jobs:
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:latest
 
-      # === NOWY KROK: LOGOWANIE I WDROŻENIE FRONTENDU DO AKS ===
-      - name: Log in to Azure CLI
-        uses: azure/login@v2
+      # === POPRAWIONE: LOGOWANIE BEZPOŚREDNIO PRZEZ PASZPORT KUBECONFIG ===
+      - name: Set Kubernetes Context
+        uses: azure/k8s-set-context@v3
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set AKS Context
-        uses: azure/aks-set-context@v3
-        with:
-          resource-group: ${{ env.AKS_RESOURCE_GROUP }}
-          cluster-name: ${{ env.AKS_CLUSTER_NAME }}
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBERNETES_SECRET }}
 
       - name: Deploy Frontend to AKS
         run: |
