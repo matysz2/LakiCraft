@@ -68,7 +68,6 @@ jobs:
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:latest
 
-      # === POPRAWIONE: LOGOWANIE BEZPOŚREDNIO PRZEZ PASZPORT KUBECONFIG ===
       - name: Set Kubernetes Context
         uses: azure/k8s-set-context@v3
         with:
@@ -77,11 +76,8 @@ jobs:
 
       - name: Deploy Backend to AKS
         run: |
-          # Jeśli Twoje pliki k8s (deploymenty) są w repozytorium w folderze np. k8s, odkomentuj poniższą linię:
-          # kubectl apply -f k8s/
-          
-          # Zmusza Kubernetes do pobrania najnowszego obrazu ":latest" z ACR i restartu podów
-          kubectl rollout restart deployment lakicraft-app-backend
+          # TU BYŁ BŁĄD - WPISAŁEM POPRAWNĄ NAZWĘ Z TWOJEJ TABELKI:
+          kubectl rollout restart deployment lakicraft-backend-deployment
 
   frontend-test-build-deploy:
     name: Frontend - Test, Docker Build & Push to Azure
@@ -120,7 +116,6 @@ jobs:
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:latest
 
-      # === POPRAWIONE: LOGOWANIE BEZPOŚREDNIO PRZEZ PASZPORT KUBECONFIG ===
       - name: Set Kubernetes Context
         uses: azure/k8s-set-context@v3
         with:
@@ -129,8 +124,5 @@ jobs:
 
       - name: Deploy Frontend to AKS
         run: |
-          # Jeśli Twoje pliki k8s (deploymenty) są w repozytorium w folderze np. k8s, odkomentuj poniższą linię:
-          # kubectl apply -f k8s/
-          
-          # Zmusza Kubernetes do pobrania najnowszego obrazu ":latest" z ACR i restartu podów
+          # NAZWA ZWERYFIKOWANA - JEST POPRAWNA:
           kubectl rollout restart deployment lakicraft-frontend-deployment
