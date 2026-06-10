@@ -10,6 +10,9 @@ env:
   AZURE_CONTAINER_REGISTRY: lakicraftreg2026
   BACKEND_IMAGE_NAME: lakicraft-backend
   FRONTEND_IMAGE_NAME: lakicraft-frontend
+  # === NOWE: PODAJ NAZWĘ SWOJEGO KLASTRA AKS ===
+  AKS_CLUSTER_NAME: lakicraft-aks 
+  AKS_RESOURCE_GROUP: lakicraft-prod-rg
 
 jobs:
   backend-test-build-deploy:
@@ -66,18 +69,25 @@ jobs:
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:latest
 
-      # === KROK WDROŻENIA BACKENDU DO AZURE CONTAINER APPS ===
+      # === NOWY KROK: LOGOWANIE I WDROŻENIE BACKENDU DO AKS ===
       - name: Log in to Azure CLI
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy Backend to Azure Container Apps
-        uses: azure/container-apps-deploy-action@v1
+      - name: Set AKS Context
+        uses: azure/aks-set-context@v3
         with:
-          containerAppName: 'lakicraft-backend'
-          resourceGroup: 'lakicraft-prod-rg'
-          imageToDeploy: '${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}'
+          resource-group: ${{ env.AKS_RESOURCE_GROUP }}
+          cluster-name: ${{ env.AKS_CLUSTER_NAME }}
+
+      - name: Deploy Backend to AKS
+        run: |
+          # Jeśli Twoje pliki k8s (deploymenty) są w repozytorium w folderze np. k8s, odkomentuj poniższą linię:
+          # kubectl apply -f k8s/
+          
+          # Zmusza Kubernetes do pobrania najnowszego obrazu ":latest" z ACR i restartu podów
+          kubectl rollout restart deployment lakicraft-app-backend
 
   frontend-test-build-deploy:
     name: Frontend - Test, Docker Build & Push to Azure
@@ -116,15 +126,22 @@ jobs:
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:latest
 
-      # === KROK WDROŻENIA FRONTENDU DO AZURE CONTAINER APPS ===
+      # === NOWY KROK: LOGOWANIE I WDROŻENIE FRONTENDU DO AKS ===
       - name: Log in to Azure CLI
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy Frontend to Azure Container Apps
-        uses: azure/container-apps-deploy-action@v1
+      - name: Set AKS Context
+        uses: azure/aks-set-context@v3
         with:
-          containerAppName: 'lakicraft-frontend'
-          resourceGroup: 'lakicraft-prod-rg'
-          imageToDeploy: '${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}'
+          resource-group: ${{ env.AKS_RESOURCE_GROUP }}
+          cluster-name: ${{ env.AKS_CLUSTER_NAME }}
+
+      - name: Deploy Frontend to AKS
+        run: |
+          # Jeśli Twoje pliki k8s (deploymenty) są w repozytorium w folderze np. k8s, odkomentuj poniższą linię:
+          # kubectl apply -f k8s/
+          
+          # Zmusza Kubernetes do pobrania najnowszego obrazu ":latest" z ACR i restartu podów
+          kubectl rollout restart deployment lakicraft-frontend-deployment

@@ -5,21 +5,49 @@ metadata:
   namespace: default
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    # Usunęliśmy reguły regex, bo używamy czystego dopasowania prefiksów (Prefix match)
+    # Ta linijka nakazuje cert-managerowi automatyczne pobranie certyfikatu Let's Encrypt
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # Wymusza automatyczne przekierowanie z nieszyfrowanego http:// na bezpieczne https://
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
+  tls:
+    - hosts:
+        - lakicraft.pl
+        - www.lakicraft.pl
+      secretName: lakicraft-tls-secret # Tu cert-manager automatycznie zapisze klucze SSL
   rules:
-    - http:
+    # REGUŁY DLA GŁÓWNEJ DOMENY
+    - host: lakicraft.pl
+      http:
         paths:
-          # REGUŁA 1: Wszystko, co zaczyna się od /api, leci w nienaruszonej formie do Spring Boota
+          # Wszystko z prefiksem /api trafia do Spring Boota
           - path: /api
             pathType: Prefix
             backend:
               service:
-                name: lakicraft-backend-service
+                name: lakicraft-app-backend # Poprawiona nazwa działającego serwisu!
                 port:
                   number: 8080
+          # Cała reszta ruchu (strona główna, skrypty) trafia do Reacta
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: lakicraft-frontend-service
+                port:
+                  number: 80
 
-          # REGUŁA 2: Cała reszta ruchu (główna strona, pliki js, css) leci do Reacta
+    # REGUŁY DLA DOMENY Z WWW (żeby działały oba adresy)
+    - host: www.lakicraft.pl
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: lakicraft-app-backend
+                port:
+                  number: 8080
           - path: /
             pathType: Prefix
             backend:
