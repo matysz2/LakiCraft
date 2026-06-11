@@ -76,8 +76,8 @@ jobs:
 
       - name: Deploy Backend to AKS
         run: |
-          # TU BYŁ BŁĄD - WPISAŁEM POPRAWNĄ NAZWĘ Z TWOJEJ TABELKI:
-          kubectl rollout restart deployment lakicraft-backend-deployment
+          # JAWNA AKTUALIZACJA DO NOWEJ WERSJI OBRAZU (SHA COMMITA)
+          kubectl set image deployment/lakicraft-backend-deployment *=${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
 
   frontend-test-build-deploy:
     name: Frontend - Test, Docker Build & Push to Azure
@@ -111,7 +111,8 @@ jobs:
 
       - name: Build and Push Frontend Docker Image
         run: |
-          docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }} -f Frontend/Dockerfile ./Frontend
+          # POPRAWKA 3: DODANO --no-cache ŻEBY WYDRZEĆ STARY ADRES Z RENDERA
+          docker build --no-cache -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }} -f Frontend/Dockerfile ./Frontend
           docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:latest
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:latest
@@ -124,5 +125,5 @@ jobs:
 
       - name: Deploy Frontend to AKS
         run: |
-          # NAZWA ZWERYFIKOWANA - JEST POPRAWNA:
-          kubectl rollout restart deployment lakicraft-frontend-deployment
+          # POPRAWKA WERSJI: WYMUSZENIE AKTUALIZACJI DO DOKŁADNEGO TAGU SHA ZAMIAST :latest
+          kubectl set image deployment/lakicraft-frontend-deployment *=${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
