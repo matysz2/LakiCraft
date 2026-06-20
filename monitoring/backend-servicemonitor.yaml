@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: lakicraft-backend-monitor
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames:
+      - default
+  selector:
+    matchLabels:
+      app: lakicraft-backend
+  endpoints:
+  - targetPort: 8080
+    path: /actuator/prometheus
+    interval: 15s
+    scrapeTimeout: 10s
+    # Tutaj wklejasz poprawną konfigurację:
+    relabelings:
+    - sourceLabels: [job]
+      targetLabel: application
+      action: replace

@@ -1,0 +1,43 @@
+prometheusOperator:
+  enabled: true
+
+prometheus:
+  prometheusSpec:
+    # Włączenie automatycznego wykrywania obiektów ServiceMonitor w całym klastrze
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    
+    # Konfiguracja trwałego dysku (Persistence) dla bazy Prometheus
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+grafana:
+  enabled: true
+  # Definiujemy dane logowania administratora do panelu Grafana
+  adminPassword: "MojeSilneHasloDevOps2026!"
+  
+  persistence:
+    enabled: true
+    accessModes: ["ReadWriteOnce"]
+    size: 5Gi
+    
+  # Automatyczne ładowanie Dashboardów z obiektów ConfigMap
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      searchInNamespaces: ["monitoring", "default"]
+
+alertmanager:
+  enabled: false # Wyłączamy na tym etapie, aby zaoszczędzić RAM/CPU w klastrze
+
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true
