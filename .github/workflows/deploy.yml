@@ -17,7 +17,6 @@ jobs:
   backend-test-build-deploy:
     name: Backend - Test, Docker Build & Push to Azure
     runs-on: ubuntu-latest
-    
     services:
       postgres:
         image: postgres:16-alpine
@@ -74,15 +73,18 @@ jobs:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBERNETES_SECRET }}
 
-      - name: Deploy Backend to AKS
+      - name: Deploy Backend & Configs to AKS
         run: |
-          # JAWNA AKTUALIZACJA DO NOWEJ WERSJI OBRAZU (SHA COMMITA)
+          # Wdrożenie plików konfiguracyjnych (jeśli uległy zmianie)
+          kubectl apply -f postgres.yaml
+          kubectl apply -f ingress.yaml
+          kubectl apply -f cluster-issuer.yaml
+          # Wdrożenie nowej wersji backendu
           kubectl set image deployment/lakicraft-backend-deployment *=${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
 
   frontend-test-build-deploy:
     name: Frontend - Test, Docker Build & Push to Azure
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -111,7 +113,6 @@ jobs:
 
       - name: Build and Push Frontend Docker Image
         run: |
-          # POPRAWKA 3: DODANO --no-cache ŻEBY WYDRZEĆ STARY ADRES Z RENDERA
           docker build --no-cache -t ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }} -f Frontend/Dockerfile ./Frontend
           docker tag ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }} ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:latest
           docker push ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
@@ -125,5 +126,6 @@ jobs:
 
       - name: Deploy Frontend to AKS
         run: |
-          # POPRAWKA WERSJI: WYMUSZENIE AKTUALIZACJI DO DOKŁADNEGO TAGU SHA ZAMIAST :latest
+          # Wdrożenie frontendu
+          kubectl apply -f frontend.yaml
           kubectl set image deployment/lakicraft-frontend-deployment *=${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
