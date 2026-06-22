@@ -75,10 +75,10 @@ jobs:
 
       - name: Deploy Backend & Configs to AKS
         run: |
-          # Wdrożenie plików konfiguracyjnych (jeśli uległy zmianie)
-          kubectl apply -f postgres.yaml
-          kubectl apply -f ingress.yaml
-          kubectl apply -f cluster-issuer.yaml
+          # Wdrożenie plików konfiguracyjnych z folderu k8s/
+          kubectl apply -f k8s/postgres.yaml
+          kubectl apply -f k8s/ingress.yaml
+          kubectl apply -f k8s/cluster-issuer.yaml
           # Wdrożenie nowej wersji backendu
           kubectl set image deployment/lakicraft-backend-deployment *=${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
 
@@ -126,6 +126,6 @@ jobs:
 
       - name: Deploy Frontend to AKS
         run: |
-          # Wdrożenie frontendu
-          kubectl apply -f frontend.yaml
+          # Wdrożenie frontendu z folderu k8s/
+          kubectl apply -f k8s/frontend.yaml
           kubectl set image deployment/lakicraft-frontend-deployment *=${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
