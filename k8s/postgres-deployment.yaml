@@ -23,23 +23,8 @@ spec:
               value: lakicraft_prod
             - name: POSTGRES_USER
               value: lakicraft_user
-            # Pobieranie hasła startowego bazy z bezpiecznego Secretu
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: lakicraft-secrets
                   key: db-password
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres
-  namespace: default
-spec:
-  selector:
-    app: lakicraft-postgres
-  ports:
-    - protocol: TCP
-      port: 5432
-      targetPort: 5432
-  type: ClusterIP
