@@ -23,42 +23,17 @@ spec:
               value: "8080"
             - name: PGHOST
               value: "postgres"
-            - name: PGPORT
-              value: "5432"
             - name: PGDATABASE
               value: "lakicraft_prod"
             - name: PGUSER
               value: "lakicraft_user"
-            # Bezpieczne wstrzykiwanie hasła bazy danych
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
                   name: lakicraft-secrets
                   key: db-password
-            - name: MAIL_USERNAME
-              value: "twoj_mail@wp.pl"
-            # Bezpieczne wstrzykiwanie hasła do skrzynki e-mail (SMTP)
             - name: MAIL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: lakicraft-secrets
                   key: mail-password
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: lakicraft-app-backend
-  namespace: default
-spec:
-  selector:
-    app: lakicraft-backend
-  ports:
-    - name: port-8080
-      protocol: TCP
-      port: 8080
-      targetPort: 8080
-    - name: port-80
-      protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: ClusterIP

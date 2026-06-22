@@ -1,18 +1,30 @@
-# 1. Konfiguracja providera - to łączy Terraform z Twoim klastrem AKS
 provider "kubernetes" {
-  # Terraform odczyta Twoją aktualną sesję kubectl (z Cloud Shella)
-  config_path    = "~/.kube/config" 
+  config_path = "~/.kube/config"
 }
 
-# 2. Twoje istniejące zasoby
-resource "kubernetes_manifest" "backend" {
-  manifest = yamldecode(file("${path.module}/../backend.yaml"))
+# --- Backend ---
+resource "kubernetes_manifest" "backend_deployment" {
+  manifest = yamldecode(file("${path.module}/../k8s/backend-deployment.yaml"))
 }
 
-resource "kubernetes_manifest" "frontend" {
-  manifest = yamldecode(file("${path.module}/../frontend.yaml"))
+resource "kubernetes_manifest" "backend_service" {
+  manifest = yamldecode(file("${path.module}/../k8s/backend-service.yaml"))
 }
 
-resource "kubernetes_manifest" "postgres" {
-  manifest = yamldecode(file("${path.module}/../postgres.yaml"))
+# --- Frontend ---
+resource "kubernetes_manifest" "frontend_deployment" {
+  manifest = yamldecode(file("${path.module}/../k8s/frontend-deployment.yaml"))
+}
+
+resource "kubernetes_manifest" "frontend_service" {
+  manifest = yamldecode(file("${path.module}/../k8s/frontend-service.yaml"))
+}
+
+# --- Postgres ---
+resource "kubernetes_manifest" "postgres_deployment" {
+  manifest = yamldecode(file("${path.module}/../k8s/postgres-deployment.yaml"))
+}
+
+resource "kubernetes_manifest" "postgres_service" {
+  manifest = yamldecode(file("${path.module}/../k8s/postgres-service.yaml"))
 }
