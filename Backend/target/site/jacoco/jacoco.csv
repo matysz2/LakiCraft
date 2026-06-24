@@ -2,11 +2,10 @@ GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_
 lakicraft,com.example.lakicraft.dto,MessageDTO,393,0,70,0,19,0,56,0,21,0
 lakicraft,com.example.lakicraft.dto,OrderItemDTO,194,0,32,0,7,0,30,0,14,0
 lakicraft,com.example.lakicraft.dto,OrderDTO,393,0,64,0,26,0,54,0,22,0
-lakicraft,com.example.lakicraft,WebConfig,0,68,0,0,0,10,0,3,0,3
-lakicraft,com.example.lakicraft,LakicraftApplication,5,8,0,0,2,2,1,2,1,2
-lakicraft,com.example.lakicraft,SecurityConfig,0,27,0,0,0,7,0,5,0,5
+lakicraft,com.example.lakicraft,WebConfig,0,64,0,0,0,10,0,3,0,3
+lakicraft,com.example.lakicraft,LakicraftApplication,5,3,0,0,2,1,1,1,1,1
+lakicraft,com.example.lakicraft,SecurityConfig,0,38,0,0,0,9,0,5,0,5
 lakicraft,com.example.lakicraft,ServletInitializer,12,0,0,0,2,0,2,0,2,0
-lakicraft,com.example.lakicraft,LakicraftApplication.new WebMvcConfigurer() {...},0,55,0,0,0,7,0,2,0,2
 lakicraft,com.example.lakicraft.model,PaintMessage,42,6,0,0,7,3,12,1,12,1
 lakicraft,com.example.lakicraft.model,Message,42,6,0,0,6,3,12,1,12,1
 lakicraft,com.example.lakicraft.model,stock,3,0,0,0,1,0,1,0,1,0

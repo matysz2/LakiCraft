@@ -28,7 +28,7 @@ resource "kubernetes_deployment_v1" "backend" {
         container {
           image = "matysz21/lakicraft-backend:latest"
           name  = "backend"
-          
+          image_pull_policy = "Always"
           port { container_port = 8080 }
 
           env {
