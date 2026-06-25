@@ -1,13 +1,9 @@
-prometheusOperator:
-  enabled: true
-
+# 1. Konfiguracja Prometheus
 prometheus:
+  enabled: true
   prometheusSpec:
-    # Włączenie automatycznego wykrywania obiektów ServiceMonitor w całym klastrze
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
-    
-    # Konfiguracja trwałego dysku (Persistence) dla bazy Prometheus
     storageSpec:
       volumeClaimTemplate:
         spec:
@@ -16,26 +12,43 @@ prometheus:
             requests:
               storage: 10Gi
 
+# 2. Wyłączamy Alertmanager - Grafana będzie wysyłać maile samodzielnie
+alertmanager:
+  enabled: false
+
+# 3. Konfiguracja Grafany
 grafana:
   enabled: true
-  # Definiujemy dane logowania administratora do panelu Grafana
+  assertNoLeakedSecrets: false
   adminPassword: "MojeSilneHasloDevOps2026!"
-  
+  service:
+    type: LoadBalancer
   persistence:
     enabled: true
     accessModes: ["ReadWriteOnce"]
     size: 5Gi
-    
-  # Automatyczne ładowanie Dashboardów z obiektów ConfigMap
+  
   sidecar:
     dashboards:
       enabled: true
       label: grafana_dashboard
       searchInNamespaces: ["monitoring", "default"]
+  
+  grafana.ini:
+    smtp:
+      enabled: true
+      host: smtp.gmail.com:587
+      user: mateusz.czarnik.1989@gmail.com
+      password: "xfrimraqzcwcujzu"
+      skip_verify: true
+      from_address: mateusz.czarnik.1989@gmail.com
+      from_name: Grafana
+    unified_alerting:
+      enabled: true
+    alerting:
+      enabled: false
 
-alertmanager:
-  enabled: false # Wyłączamy na tym etapie, aby zaoszczędzić RAM/CPU w klastrze
-
+# 4. Pozostałe komponenty
 nodeExporter:
   enabled: true
 
